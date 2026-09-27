@@ -13,7 +13,7 @@
 
 ## 📌 Overview
 
-Based on Pi Coding Agent concept, **WebPi** is a single-file, self-contained, minimal, autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local recommended). 
+Based on Pi Coding Agent concept, **WebPi** is a single-file, self-contained, minimal, autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local Qwen3.8-27B recommended). 
 
 * No direct access outside of its sandbox.
    * Access only to in-browser virtual file system
