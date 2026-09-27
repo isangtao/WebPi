@@ -17,8 +17,8 @@ Based on the Pi Coding Agent concept by Mario Zechner, **WebPi** is a single-fil
 
 * No direct access outside of its sandbox.
    * Access only to in-browser virtual file system
-   * Manually copy and paste text files to import them
    * Tools are limited to : List, Read, Write, Edit, Move, Delete (There no web-search functionality, etc)
+   * Manually copy and paste text files to import them
    * Webpi functionality can only be extended by modifying the html code directly
 * Save and restore sessions (see samples in the Sessions directory of this repo)
 * Text editor pane
