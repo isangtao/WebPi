@@ -19,9 +19,9 @@ Based on the Pi Coding Agent concept by Mario Zechner and written by Gemini3.8Fl
 Features and limitations:
 
 * Save and restore complete sessions (see samples in the Sessions directory of this repo)
-* In addition to the Chat pane, there is a File pane, a Text editor pane, and a Preview pane for html files
-* User has the ability to roll-back and restore changes to any point in the conversation
-* Tools are: read file, write to file, edit file, move file, delete file, list files, and create/remove folder
+* Chat pane, File pane, Text editor pane, and Preview pane (for html files)
+* Roll-back and restore changes to any point in the conversation
+* Tools: read file, write to file, edit file, move file, delete file, list files, and create/remove folder
 * All API and tool calls are printed to console for inspection
 * WebPi has no direct access outside of its sandbox.
    * Except for saving and restoring session files, WebPi can only access the in-browser virtual file system
