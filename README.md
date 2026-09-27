@@ -21,11 +21,11 @@ Features and limitations:
 * Save and restore complete sessions (see samples in the Sessions directory of this repo)
 * In addition to the Chat pane, there is a File pane, a Text editor pane, and a Preview pane for html files
 * Ability to roll-back changes to any point in the conversation
+* Tools are: read file, write to file, edit file, move file, delete file, list files, and create/remove folder
 * All API and tool calls are printed to console for inspection
 * WebPi has no direct access outside of its sandbox.
-   * Except for saving and restoring session files, WebPi can only access in-browser virtual file system
-   * Tools are limited to : List, Read, Write, Edit, Move, Delete, Create&Remove Folder
-   * Text files must be manually copied and pasted to import them
+   * Except for saving and restoring session files, WebPi can only access the in-browser virtual file system
+   * Text files must be manually copied and pasted to "import" them
    * Webpi functionality can only be extended by modifying the html code directly (There no web-search functionality, etc)
 
 ---
