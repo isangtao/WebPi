@@ -44,7 +44,7 @@ Based on the Pi Coding Agent concept by Mario Zechner and written by Gemini3.8Fl
 
 ### 1. 🖥️ Core Application
 * **[WebPi Portal](https://isangtao.github.io/WebPi/WebPi.html)**  
-  The primary dashboard and web-based workspace.
+  The primary dashboard and web-based workspace. Use it directly in the portal or download a local copy (recommended).
 
 ---
 
