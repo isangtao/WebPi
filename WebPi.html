@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WebPi - Autonomous Coding Agent</title>
+  <style>
+    /* ==========================================================================
+       AIR-GAPPED EMBEDDED CSS (ZERO EXTERNAL DEPENDENCIES)
+       THEME VARIABLES & PRESETS
+       ========================================================================== */
+    :root, [data-theme="dark"] {
+      --bg-darkest: #070b14;
+      --bg-dark: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-surface-hover: #334155;
+      --border-color: #243049;
+      --border-focus: #7c3aed;
+      --brand-primary: #7c3aed;
+      --brand-hover: #6d28d9;
+      --brand-light: #ede9fe;
+      --brand-muted: #4c1d95;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      
+      --header-bg: rgba(15, 23, 42, 0.95);
+      --handle-bg: #1e1b4b;
+      --tool-bg: #090c18;
+      --tool-top-bg: rgba(26, 16, 56, 0.6);
+      --tool-body-bg: rgba(7, 11, 20, 0.95);
+      --tool-resp-bg: rgba(11, 17, 32, 0.95);
+      --tool-resp-body-bg: #070b14;
+      --bubble-sys-bg: rgba(30, 41, 59, 0.6);
+      --modal-bg: rgba(7, 11, 20, 0.85);
+    }
+
+    [data-theme="light"] {
+      --bg-darkest: #f1f5f9;
+      --bg-dark: #ffffff;
+      --bg-surface: #f8fafc;
+      --bg-surface-hover: #e2e8f0;
+      --border-color: #cbd5e1;
+      --border-focus: #6366f1;
+      --brand-primary: #6366f1;
+      --brand-hover: #4f46e5;
+      --brand-light: #312e81;
+      --brand-muted: #c7d2fe;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --accent-green: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      
+      --header-bg: rgba(255, 255, 255, 0.96);
+      --handle-bg: #e0e7ff;
+      --tool-bg: #f8fafc;
+      --tool-top-bg: rgba(238, 242, 255, 0.9);
+      --tool-body-bg: #ffffff;
+      --tool-resp-bg: #f1f5f9;
+      --tool-resp-body-bg: #ffffff;
+      --bubble-sys-bg: rgba(226, 232, 240, 0.8);
+      --modal-bg: rgba(15, 23, 42, 0.5);
+    }
+
+    [data-theme="nord"] {
+      --bg-darkest: #242933;
+      --bg-dark: #2e3440;
+      --bg-surface: #3b4252;
+      --bg-surface-hover: #434c5e;
+      --border-color: #4c566a;
+      --border-focus: #88c0d0;
+      --brand-primary: #5e81ac;
+      --brand-hover: #81a1c1;
+      --brand-light: #eceff4;
+      --brand-muted: #3b4252;
+      --text-main: #eceff4;
+      --text-muted: #d8dee9;
+      --text-dim: #9aa5b8;
+      --accent-green: #a3be8c;
+      --accent-amber: #ebcb8b;
+      --accent-rose: #bf616a;
+      
+      --header-bg: rgba(46, 52, 64, 0.95);
+      --handle-bg: #3b4252;
+      --tool-bg: #1e222a;
+      --tool-top-bg: rgba(46, 52, 64, 0.85);
+      --tool-body-bg: #242933;
+      --tool-resp-bg: #2e3440;
+      --tool-resp-body-bg: #1e222a;
+      --bubble-sys-bg: rgba(59, 66, 82, 0.6);
+      --modal-bg: rgba(36, 41, 51, 0.85);
+    }
+
+    [data-theme="cyberpunk"] {
+      --bg-darkest: #0d091a;
+      --bg-dark: #17112c;
+      --bg-surface: #221844;
+      --bg-surface-hover: #312160;
+      --border-color: #3b2873;
+      --border-focus: #f43f5e;
+      --brand-primary: #ec4899;
+      --brand-hover: #db2777;
+      --brand-light: #fce7f3;
+      --brand-muted: #831843;
+      --text-main: #fdf2f8;
+      --text-muted: #f472b6;
+      --text-dim: #9d71a5;
+      --accent-green: #06b6d4;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      
+      --header-bg: rgba(23, 17, 44, 0.95);
+      --handle-bg: #37184f;
+      --tool-bg: #0d091a;
+      --tool-top-bg: rgba(59, 24, 82, 0.7);
+      --tool-body-bg: #120b22;
+      --tool-resp-bg: #190f30;
+      --tool-resp-body-bg: #0d091a;
+      --bubble-sys-bg: rgba(34, 24, 68, 0.7);
+      --modal-bg: rgba(13, 9, 26, 0.85);
+    }
+
+    [data-theme="matrix"] {
+      --bg-darkest: #030804;
+      --bg-dark: #071209;
+      --bg-surface: #0f2413;
+      --bg-surface-hover: #16361c;
+      --border-color: #194622;
+      --border-focus: #10b981;
+      --brand-primary: #10b981;
+      --brand-hover: #059669;
+      --brand-light: #d1fae5;
+      --brand-muted: #064e3b;
+      --text-main: #ecfdf5;
+      --text-muted: #6ee7b7;
+      --text-dim: #347d53;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      
+      --header-bg: rgba(7, 18, 9, 0.95);
+      --handle-bg: #0d2812;
+      --tool-bg: #040a05;
+      --tool-top-bg: rgba(15, 36, 19, 0.8);
+      --tool-body-bg: #030804;
+      --tool-resp-bg: #071209;
+      --tool-resp-body-bg: #020503;
+      --bubble-sys-bg: rgba(15, 36, 19, 0.7);
+      --modal-bg: rgba(3, 8, 4, 0.85);
+    }
+
+    /* Additional Theme Polish for Light Mode */
+    [data-theme="light"] .diff-removed { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+    [data-theme="light"] .diff-added { background: #dcfce7; border-color: #86efac; color: #166534; }
+    [data-theme="light"] .tool-call-header { color: var(--text-main); }
+    [data-theme="light"] .tool-call-body { color: var(--text-main); }
+    [data-theme="light"] .tool-response-body { color: var(--text-muted); }
+    [data-theme="light"] .tool-response-header:hover { background: rgba(0, 0, 0, 0.04); }
+    [data-theme="light"] .code-editor { background: #ffffff; color: #0f172a; }
+    [data-theme="light"] .prompt-textarea { background: #ffffff; color: #0f172a; }
+    [data-theme="light"] .input-control { background: #ffffff; color: #0f172a; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-sans); font-size: 13px; }
+    
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* App Shell */
+    .app-container { display: flex; flex-direction: column; height: 100vh; height: 100dvh; width: 100vw; }
+    header { height: 52px; background: var(--header-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; flex-shrink: 0; z-index: 20; }
+    
+    .brand-group { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background: var(--brand-primary); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+    .brand-title { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 0.5rem; }
+    .badge { font-size: 11px; font-weight: normal; padding: 2px 8px; border-radius: 9999px; background: rgba(76, 29, 149, 0.5); color: var(--brand-light); border: 1px solid rgba(124, 58, 237, 0.4); }
+    
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; background: transparent; color: var(--text-main); white-space: nowrap; }
+    .btn:hover { background: var(--bg-surface-hover); }
+    .btn-primary { background: var(--brand-primary); color: #fff; box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3); }
+    .btn-primary:hover { background: var(--brand-hover); }
+    .btn-outline { background: var(--bg-surface); border-color: var(--border-color); color: var(--text-muted); }
+    .btn-outline:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+
+    /* Mobile Navigation Tabs (Hidden on Desktop) */
+    .mobile-nav-tabs { display: none; }
+
+    /* Workspace & Resizable Grid Layout */
+    .workspace {
+      --split-x: 50%;
+      --split-y: 50%;
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Centre Intersection Cross-Shaped Handle */
+    .cross-handle {
+      position: absolute;
+      left: var(--split-x, 50%);
+      top: var(--split-y, 50%);
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      background: var(--handle-bg);
+      border: 2px solid var(--brand-primary);
+      border-radius: 50%;
+      color: var(--brand-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: all-scroll;
+      z-index: 50;
+      box-shadow: 0 0 0 2px var(--bg-darkest), 0 4px 14px rgba(0, 0, 0, 0.65);
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+      user-select: none;
+      touch-action: none;
+    }
+    .cross-handle:hover,
+    .cross-handle.active {
+      background: var(--brand-primary);
+      color: #ffffff;
+      border-color: #c4b5fd;
+      transform: translate(-50%, -50%) scale(1.15);
+      box-shadow: 0 0 0 2px var(--bg-darkest), 0 0 16px rgba(124, 58, 237, 0.9);
+    }
+    
+    .pane-col-left {
+      width: var(--split-x, 50%);
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .pane-col-right {
+      width: calc(100% - var(--split-x, 50%));
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
+      background: var(--bg-darkest);
+    }
+
+    /* Top Left: Files Pane */
+    .pane-files {
+      height: var(--split-y, 50%);
+      flex: none;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .file-tree { flex: 1; overflow-y: auto; padding: 8px; }
+    .file-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-radius: 5px; cursor: pointer; color: var(--text-muted); font-size: 12px; margin-bottom: 2px; }
+    .file-item:hover { background: var(--bg-surface); color: var(--text-main); }
+    .file-item.active { background: rgba(124, 58, 237, 0.2); color: var(--brand-light); font-weight: 600; border: 1px solid rgba(124, 58, 237, 0.3); }
+
+    /* Bottom Left: Chat Pane */
+    .pane-chat {
+      height: calc(100% - var(--split-y, 50%));
+      flex: none;
+      background: var(--bg-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative;
+    }
+    .pane-header { padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: var(--bg-dark); flex-shrink: 0; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Scroll to bottom floating button */
+    .scroll-bottom-btn {
+      position: absolute;
+      bottom: 14px;
+      right: 18px;
+      background: var(--bg-surface);
+      color: var(--brand-light);
+      border: 1px solid var(--brand-primary);
+      border-radius: 9999px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .scroll-bottom-btn:hover {
+      background: var(--brand-primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Messages & Reasoning */
+    .msg-wrap { display: flex; flex-direction: column; width: 100%; }
+    .msg-wrap.user { align-items: flex-end; }
+    .msg-wrap.assistant { align-items: flex-start; }
+    .bubble { max-width: 92%; border-radius: 10px; padding: 10px 14px; font-size: 12px; line-height: 1.5; word-break: break-word; }
+    .bubble.user { background: var(--brand-primary); color: #fff; border-bottom-right-radius: 2px; }
+    .bubble.assistant { background: var(--bg-surface); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--border-color); width: 100%; }
+    .bubble.system { width: 100%; background: var(--bubble-sys-bg); border: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); }
+
+    .thought-box { margin-bottom: 8px; border-radius: 8px; background: var(--tool-bg); border: 1px solid var(--border-color); overflow: hidden; }
+    .thought-header { width: 100%; padding: 6px 10px; background: var(--bg-surface); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: none; color: var(--text-muted); font-size: 11px; }
+    .thought-header:hover { background: var(--bg-surface-hover); color: var(--text-main); }
+    .thought-body { padding: 8px 10px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 220px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.6; border-color: rgba(124, 58, 237, 0.4); }
+      50% { opacity: 1; border-color: rgba(124, 58, 237, 1); }
+      100% { opacity: 0.6; border-color: rgba(124, 58, 237, 0.4); }
+    }
+
+    /* ==========================================================================
+       STACKED TOOL CALLS & RESPONSES
+       ========================================================================== */
+    .tool-call-item {
+      margin-top: 8px;
+      border-radius: 6px;
+      background: var(--tool-bg);
+      border: 1px solid var(--border-focus);
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .tool-call-item.tool-error {
+      border-color: rgba(244, 63, 94, 0.6);
+    }
+
+    /* Top: Tool Call */
+    .tool-call-top {
+      display: flex;
+      flex-direction: column;
+      background: var(--tool-top-bg);
+    }
+    .tool-call-header {
+      width: 100%;
+      padding: 6px 8px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--brand-light);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: left;
+      user-select: none;
+    }
+    .tool-call-header:hover {
+      background: rgba(124, 58, 237, 0.15);
+    }
+    .tool-call-header.streaming {
+      animation: pulseGlow 1.5s infinite ease-in-out;
+    }
+    .tool-call-title-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+      word-break: break-word;
+    }
+    .tool-call-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .tool-call-body {
+      padding: 8px;
+      border-top: 1px dashed var(--border-color);
+      background: var(--tool-body-bg);
+      max-height: 220px;
+      overflow-y: auto;
+      color: var(--text-main);
+      font-size: 11px;
+    }
+
+    /* Bottom: Tool Response */
+    .tool-response-bottom {
+      display: flex;
+      flex-direction: column;
+      border-top: 1px solid var(--border-color);
+      background: var(--tool-resp-bg);
+    }
+    .tool-response-bottom.error {
+      border-top-color: rgba(244, 63, 94, 0.5);
+      background: rgba(244, 63, 94, 0.1);
+    }
+    .tool-response-bottom.running {
+      background: var(--bg-surface);
+    }
+    .tool-response-header {
+      width: 100%;
+      padding: 6px 8px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tool-response-header:hover {
+      background: var(--bg-surface-hover);
+    }
+    .tool-response-summary {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+      flex: 1;
+      word-break: break-word;
+    }
+    .tool-response-body {
+      padding: 8px;
+      border-top: 1px dashed var(--border-color);
+      background: var(--tool-resp-body-bg);
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+    .tool-response-body.error {
+      color: var(--accent-rose);
+      border-top-color: rgba(244, 63, 94, 0.3);
+    }
+
+    .tool-diff-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 4px; margin-bottom: 2px; }
+    .diff-removed { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fca5a5; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+    .diff-added { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #86efac; padding: 6px; border-radius: 4px; max-height: 140px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+
+    /* Expandable Standalone Tool Results */
+    .tool-output-box { width: 100%; border-radius: 8px; background: var(--tool-bg); border: 1px solid var(--border-focus); overflow: hidden; font-family: var(--font-mono); margin-top: 6px; }
+    .tool-output-header { width: 100%; padding: 6px 10px; background: var(--bg-surface); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; cursor: pointer; border: none; color: var(--brand-light); font-size: 11px; font-family: var(--font-mono); text-align: left; }
+    .tool-output-header:hover { background: var(--bg-surface-hover); }
+    .tool-output-body { padding: 8px 10px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; max-height: 240px; overflow-y: auto; white-space: pre-wrap; line-height: 1.4; word-break: break-all; }
+
+    /* Chat Input */
+    .chat-input-area { padding: 10px; border-top: 1px solid var(--border-color); background: var(--bg-dark); flex-shrink: 0; }
+    .prompt-textarea { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-main); font-size: 12px; font-family: var(--font-sans); resize: none; outline: none; }
+    .prompt-textarea:focus { border-color: var(--brand-primary); }
+
+    /* Top Right: Editor Pane */
+    .editor-pane { height: var(--split-y, 50%); flex: none; display: flex; flex-direction: column; border-bottom: 1px solid var(--border-color); min-height: 0; }
+    .code-editor { flex: 1; width: 100%; height: 100%; padding: 12px; background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; border: none; outline: none; resize: none; }
+    
+    /* Bottom Right: Preview Pane */
+    .preview-pane { height: calc(100% - var(--split-y, 50%)); flex: none; display: flex; flex-direction: column; min-height: 0; background: var(--bg-dark); }
+    .preview-frame { width: 100%; height: 100%; border: none; background: #fff; }
+    .preview-frame.empty { background: var(--bg-dark); }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: var(--modal-bg); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-dialog { width: 100%; max-width: 520px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 80vh; overflow-y: auto; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .input-control { width: 100%; background: var(--bg-darkest); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--text-main); font-size: 12px; outline: none; }
+    .input-control:focus { border-color: var(--brand-primary); }
+
+    .status-bar { padding: 6px 12px; background: var(--bg-darkest); border-top: 1px solid var(--border-color); font-size: 11px; color: var(--brand-light); display: none; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .hidden { display: none !important; }
+
+    /* ==========================================================================
+       MOBILE RESPONSIVE OVERRIDES
+       ========================================================================== */
+    @media (max-width: 768px) {
+      header { padding: 0 8px; }
+      .brand-title span#modelBadge { display: none; }
+      .btn-label { display: none; }
+      header .btn { padding: 6px 8px; }
+
+      .mobile-nav-tabs {
+        display: flex;
+        background: var(--bg-dark);
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+        z-index: 25;
+      }
+      .mobile-tab-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 9px 4px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .mobile-tab-btn:hover { color: var(--text-main); }
+      .mobile-tab-btn.active {
+        color: var(--brand-light);
+        font-weight: 600;
+        border-bottom: 2px solid var(--brand-primary);
+        background: rgba(124, 58, 237, 0.12);
+      }
+
+      .cross-handle { display: none !important; }
+      .workspace { flex-direction: column !important; overflow: hidden !important; }
+      .pane-col-left, .pane-col-right { width: 100% !important; height: 100% !important; border: none !important; }
+
+      .pane-files, .pane-chat, .editor-pane, .preview-pane {
+        display: none !important;
+        width: 100% !important;
+        height: 100% !important;
+        border: none !important;
+      }
+
+      #workspace[data-mobile-tab="files"] .pane-col-left,
+      #workspace[data-mobile-tab="chat"] .pane-col-left { display: flex !important; }
+      #workspace[data-mobile-tab="files"] .pane-col-right,
+      #workspace[data-mobile-tab="chat"] .pane-col-right { display: none !important; }
+
+      #workspace[data-mobile-tab="editor"] .pane-col-right,
+      #workspace[data-mobile-tab="preview"] .pane-col-right { display: flex !important; }
+      #workspace[data-mobile-tab="editor"] .pane-col-left,
+      #workspace[data-mobile-tab="preview"] .pane-col-left { display: none !important; }
+
+      #workspace[data-mobile-tab="files"] .pane-files { display: flex !important; }
+      #workspace[data-mobile-tab="chat"] .pane-chat { display: flex !important; }
+      #workspace[data-mobile-tab="editor"] .editor-pane { display: flex !important; }
+      #workspace[data-mobile-tab="preview"] .preview-pane { display: flex !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- TOP HEADER -->
+    <header>
+      <div class="brand-group">
+        <div class="brand-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            WebPi
+            <span id="modelBadge" class="badge">local-model</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px;">
+        <!-- QUICK THEME SELECTOR -->
+        <select id="themeSelect" class="btn btn-outline" style="padding:4px 8px; font-size:12px; cursor:pointer;" onchange="changeTheme(this.value)" title="Select Theme">
+          <option value="dark">🌙 Dark</option>
+          <option value="light">☀️ Light</option>
+          <option value="nord">❄️ Nord</option>
+          <option value="cyberpunk">🔮 Cyberpunk</option>
+          <option value="matrix">⚡ Matrix</option>
+        </select>
+
+        <button class="btn btn-outline" onclick="exportSession()" title="Export Session (.json)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span class="btn-label">Save Session</span>
+        </button>
+        <label class="btn btn-outline" style="cursor:pointer;" title="Restore Session">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <span class="btn-label">Restore</span>
+          <input type="file" id="sessionFileInput" accept=".json" class="hidden" onchange="importSession(event)" />
+        </label>
+        <button class="btn btn-outline" onclick="downloadZip()" title="Export Entire Project as ZIP">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>
+          <span class="btn-label">Export ZIP</span>
+        </button>
+        <button class="btn btn-outline" onclick="openSettings()" title="Configuration">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MOBILE TABS BAR (VISIBLE ONLY ON MOBILE VIEW) -->
+    <nav class="mobile-nav-tabs" id="mobileNavTabs">
+      <button type="button" class="mobile-tab-btn active" data-tab="chat" onclick="switchMobileTab('chat')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Chat
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="files" onclick="switchMobileTab('files')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+        Files
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="editor" onclick="switchMobileTab('editor')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        Editor
+      </button>
+      <button type="button" class="mobile-tab-btn" data-tab="preview" onclick="switchMobileTab('preview')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        Preview
+      </button>
+    </nav>
+
+    <!-- WORKSPACE: FOUR VIEWS WITH CENTRE INTERSECTION CROSS RESIZE HANDLE -->
+    <main class="workspace" id="workspace" data-mobile-tab="chat">
+      <!-- CENTRE RESIZE HANDLE -->
+      <div id="centerResizeHandle" class="cross-handle" title="Drag to resize panes (Double-click to reset)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M2 12h20"/>
+          <path d="m9 5 3-3 3 3M9 19l3 3 3-3M5 9l-3 3 3 3M19 9l3 3-3 3"/>
+        </svg>
+      </div>
+
+      <!-- LEFT COLUMN: FILES (TOP) & AGENT CONVERSATION (BOTTOM) -->
+      <section class="pane-col-left">
+        <!-- FILES VIEW -->
+        <div class="pane-files">
+          <div class="pane-header">
+            <span style="font-weight:600; font-size:11px; text-transform:uppercase; color:var(--text-muted);">Files</span>
+            <div style="display:flex; gap:2px;">
+              <button class="btn" style="padding:2px 4px;" onclick="promptCreateFile()" title="New File">+</button>
+              <button class="btn" style="padding:2px 4px;" onclick="promptCreateFolder()" title="New Folder">📁+</button>
+              <button class="btn" style="padding:2px 4px;" onclick="promptMoveFile()" title="Move/Rename File">➔</button>
+            </div>
+          </div>
+
+          <!-- HISTORICAL ROLLBACK WARNING BANNER -->
+          <div id="rollbackBanner" style="background:rgba(245, 158, 11, 0.15); border-bottom:1px solid rgba(245, 158, 11, 0.3); padding:6px 8px; display:none; align-items:center; justify-content:space-between; font-size:11px; color:var(--text-main); flex-shrink:0;">
+            <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-right:6px;">
+              ⚠️ <span style="color:var(--accent-amber); font-weight:600;">Checkpoint:</span> <span id="rollbackCheckpointName" style="color:var(--text-muted);"></span>
+            </div>
+            <button type="button" class="btn" style="background:rgba(16, 185, 129, 0.25); border:1px solid rgba(16, 185, 129, 0.6); color:#86efac; font-weight:600; padding:2px 8px; font-size:11px; flex-shrink:0;" onclick="restoreLatestState()">
+              ⤴ Restore Latest
+            </button>
+          </div>
+
+          <div id="fileTreeList" class="file-tree"></div>
+          <div style="padding:8px; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:6px; font-size:11px; color:var(--text-dim);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span id="fileCountBadge">0 files</span>
+              <button class="btn" style="padding:0; color:var(--brand-primary); font-size:11px;" onclick="downloadActiveFile()">Download Active</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:4px;">
+              <span id="snapshotCountBadge" style="color:var(--text-dim);">0 snapshots</span>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button id="restoreLatestBtn" class="btn hidden" style="padding:0; color:var(--accent-green); font-size:11px; font-weight:600;" onclick="restoreLatestState()" title="Restore the latest version (undo all rollbacks)">⤴ Restore Latest</button>
+                <button class="btn" style="padding:0; color:var(--accent-amber); font-size:11px; font-weight:600;" onclick="openSnapshotsModal()" title="View and restore checkpoints">⏱ History</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAT PANE -->
+        <div class="pane-chat">
+          <div class="pane-header">
+            <span style="font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">Agent Conversation</span>
+            <button class="btn" onclick="clearChatHistory()" style="padding:2px 6px; font-size:11px; color:var(--text-dim);">Clear</button>
+          </div>
+
+          <div style="position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column;">
+            <div id="messagesContainer" class="chat-messages"></div>
+            <button id="scrollToBottomBtn" class="scroll-bottom-btn hidden" onclick="scrollChatToBottom()">
+              ↓ Latest
+            </button>
+          </div>
+
+          <div id="agentStatus" class="status-bar">
+            <span id="agentStatusText">WebPi is streaming...</span>
+            <button class="btn" style="color:var(--accent-rose); padding:0;" onclick="abortAgent()">Stop</button>
+          </div>
+
+          <div class="chat-input-area">
+            <form onsubmit="handleSendPrompt(event)" style="display:flex; flex-direction:column; gap:8px;">
+              <textarea
+                id="promptInput"
+                class="prompt-textarea"
+                rows="3"
+                placeholder="Ask WebPi to build, scaffold, or modify your application..."
+                onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); handleSendPrompt(event); }"
+              >Create a self-contained, single-file, responsive webpage about X. Make the webpage attractive and sophisticated. Give it a professional theme and an option to switch to a light theme mode a default dark mode. Use a descriptive, proper-cased single word to name the html file.</textarea>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:10px; color:var(--text-dim);">Shift+Enter for newline</span>
+                <button type="submit" class="btn btn-primary">
+                  Send
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: EDITOR (TOP) & PREVIEW (BOTTOM) -->
+      <section class="pane-col-right">
+        <!-- EDITOR -->
+        <div class="editor-pane">
+          <div class="pane-header">
+            <span id="activeFilePath" style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">(No file open)</span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-outline" style="padding:2px 8px; font-size:11px;" onclick="saveActiveFileFromEditor()">Save</button>
+              <button class="btn btn-primary" style="padding:2px 8px; font-size:11px;" onclick="refreshPreview()">Run Preview</button>
+            </div>
+          </div>
+          <textarea id="fileEditor" class="code-editor" spellcheck="false" placeholder="Workspace is empty. Create a file or ask WebPi to generate your project..." oninput="handleEditorInput()" disabled></textarea>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="preview-pane">
+          <div class="pane-header">
+            <span style="font-weight:600; font-size:11px; text-transform:uppercase; color:var(--text-muted);">Sandbox Preview</span>
+            <div style="display:flex; gap:4px;">
+              <button class="btn btn-outline" style="padding:2px 6px; font-size:11px;" onclick="refreshPreview()" title="Reload Frame">↻</button>
+              <button class="btn btn-outline" style="padding:2px 6px; font-size:11px;" onclick="openPreviewInNewTab()" title="Pop out">↗</button>
+            </div>
+          </div>
+          <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <!-- CONFIGURATION MODAL -->
+    <div id="settingsModal" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="pane-header">
+          <span style="font-weight:700;">WebPi Configuration</span>
+          <button class="btn" style="padding:2px 6px;" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <label class="input-label">Theme</label>
+            <select id="cfgTheme" class="input-control" onchange="changeTheme(this.value)">
+              <option value="dark">Dark (Default)</option>
+              <option value="light">Light</option>
+              <option value="nord">Nord</option>
+              <option value="cyberpunk">Cyberpunk</option>
+              <option value="matrix">Matrix</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Base URL</label>
+            <input type="text" id="cfgBaseUrl" class="input-control" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="input-group">
+              <label class="input-label">Protocol</label>
+              <select id="cfgApi" class="input-control">
+                <option value="openai-completions">openai-completions (/chat/completions)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label">API Key</label>
+              <input type="text" id="cfgApiKey" class="input-control" />
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="input-group">
+              <label class="input-label">Context Window (Tokens)</label>
+              <input type="number" id="cfgContextWindow" class="input-control" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Max Output Tokens</label>
+              <input type="number" id="cfgMaxTokens" class="input-control" />
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div class="input-group">
+              <label class="input-label">Model Identifier</label>
+              <input type="text" id="cfgModel" class="input-control" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Reasoning Effort (Thinking Level)</label>
+              <select id="cfgReasoningEffort" class="input-control">
+                <option value="default">Default (Model/Server decides)</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="none">None (Disable thinking)</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label class="input-label">System Prompt</label>
+            <textarea id="cfgSystemPrompt" class="input-control" rows="4" style="font-family:var(--font-mono); font-size:11px; resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="pane-header" style="justify-content:flex-end; gap:8px;">
+          <button class="btn btn-outline" onclick="closeSettings()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SNAPSHOTS / HISTORY MODAL -->
+    <div id="snapshotsModal" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="pane-header">
+          <span style="font-weight:700;">Workspace Snapshots Timeline</span>
+          <button class="btn" style="padding:2px 6px;" onclick="closeSnapshotsModal()">✕</button>
+        </div>
+        <div class="modal-body" id="snapshotsListContainer" style="gap:8px;">
+          <!-- Populated by JavaScript -->
+        </div>
+        <div class="pane-header" style="justify-content:space-between;">
+          <button class="btn btn-outline" style="color:var(--accent-rose);" onclick="clearAllSnapshots()">Clear History</button>
+          <button class="btn btn-primary" onclick="closeSnapshotsModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. EMBEDDED PURE-JS ZIP WRITER (ZERO DEPENDENCY PKZIP IMPLEMENTATION)
+       ========================================================================== */
+    class MinimalZip {
+      constructor() {
+        this.files = [];
+      }
+      add(name, content) {
+        const bytes = typeof content === 'string' ? new TextEncoder().encode(content) : content;
+        this.files.push({ name, bytes });
+      }
+      generateBlob() {
+        const crcTable = [];
+        for (let n = 0; n < 256; n++) {
+          let c = n;
+          for (let k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+          crcTable[n] = c >>> 0;
+        }
+        function getCRC(bytes) {
+          let crc = 0 ^ (-1);
+          for (let i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ crcTable[(crc ^ bytes[i]) & 0xff];
+          return (crc ^ (-1)) >>> 0;
+        }
+
+        const now = new Date();
+        const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+        const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+
+        const localHeaders = [];
+        const centralEntries = [];
+        let offset = 0;
+
+        for (const file of this.files) {
+          const nameBytes = new TextEncoder().encode(file.name);
+          const crc = getCRC(file.bytes);
+          const size = file.bytes.length;
+
+          // Local file header (30 bytes + name + data)
+          const lfh = new Uint8Array(30 + nameBytes.length);
+          const lView = new DataView(lfh.buffer);
+          lView.setUint32(0, 0x04034b50, true);
+          lView.setUint16(4, 20, true);
+          lView.setUint16(6, 0x0800, true);
+          lView.setUint16(8, 0, true);
+          lView.setUint16(10, dosTime, true);
+          lView.setUint16(12, dosDate, true);
+          lView.setUint32(14, crc, true);
+          lView.setUint32(18, size, true);
+          lView.setUint32(22, size, true);
+          lView.setUint16(26, nameBytes.length, true);
+          lView.setUint16(28, 0, true);
+          lfh.set(nameBytes, 30);
+
+          localHeaders.push(lfh, file.bytes);
+
+          // Central directory entry (46 bytes + name)
+          const cde = new Uint8Array(46 + nameBytes.length);
+          const cView = new DataView(cde.buffer);
+          cView.setUint32(0, 0x02014b50, true);
+          cView.setUint16(4, 20, true);
+          cView.setUint16(6, 20, true);
+          cView.setUint16(8, 0x0800, true);
+          cView.setUint16(10, 0, true);
+          cView.setUint16(12, dosTime, true);
+          cView.setUint16(14, dosDate, true);
+          cView.setUint32(16, crc, true);
+          cView.setUint32(20, size, true);
+          cView.setUint32(24, size, true);
+          cView.setUint16(28, nameBytes.length, true);
+          cView.setUint16(30, 0, true);
+          cView.setUint16(32, 0, true);
+          cView.setUint16(34, 0, true);
+          cView.setUint32(36, 0, true);
+          cView.setUint32(42, offset, true);
+          cde.set(nameBytes, 46);
+
+          centralEntries.push(cde);
+          offset += lfh.length + size;
+        }
+
+        const cdOffset = offset;
+        let cdSize = 0;
+        for (const cd of centralEntries) cdSize += cd.length;
+
+        const eocd = new Uint8Array(22);
+        const eView = new DataView(eocd.buffer);
+        eView.setUint32(0, 0x06054b50, true);
+        eView.setUint16(4, 0, true);
+        eView.setUint16(6, 0, true);
+        eView.setUint16(8, this.files.length, true);
+        eView.setUint16(10, this.files.length, true);
+        eView.setUint32(12, cdSize, true);
+        eView.setUint32(16, cdOffset, true);
+        eView.setUint16(20, 0, true);
+
+        return new Blob([...localHeaders, ...centralEntries, eocd], { type: "application/zip" });
+      }
+    }
+
+    /* ==========================================================================
+       2. STATE, CONFIGURATION, THEMES & SNAPSHOT REGISTRY
+       ========================================================================== */
+    const STORAGE_KEY = "webpi_config_settings_v1";
+
+    const DEFAULT_SETTINGS = {
+      theme: "dark",
+      baseUrl: "http://localhost:1234/v1",
+      api: "openai-completions",
+      apiKey: "apiKey",
+      model: "local-model",
+      reasoningEffort: "default",
+      contextWindow: 262144,
+      maxTokens: 98304,
+      systemPrompt: `You are WebPi, an autonomous coding agent.
+You can list, read, write, edit, delete, and move files to implement the requested software.
+Always inspect existing code before making edits. Use list_files to check files in workspace.
+When editing files with edit_file:
+- Ensure 'old_str' has sufficient unique lines of context so it only matches once.
+- If making multiple distinct changes to the same file, do them carefully, or use write_file if rewriting large portions of the file is cleaner.
+Keep reasoning concise and start tool execution directly once you have a plan.
+When creating web apps, make sure HTML, JS, and CSS files are properly structured and linked.
+Use the provided tools systematically to complete all user requests accurately.`
+    };
+
+    let settings = { ...DEFAULT_SETTINGS };
+    let files = {};
+    let folders = new Set();
+    let activeFilePath = "";
+
+    // State Snapshots (id -> { id, timestamp, description, files, folders, activeFilePath })
+    let snapshots = {};
+
+    // Latest State Tracking & Rollback Management
+    let latestState = null;
+    let isViewingRollback = false;
+    let currentRollbackCheckpoint = "";
+
+    let chatHistory = [];
+    let isAgentRunning = false;
+    let abortController = null;
+
+    function applyTheme(themeName) {
+      const validTheme = ["dark", "light", "nord", "cyberpunk", "matrix"].includes(themeName) ? themeName : "dark";
+      document.documentElement.setAttribute("data-theme", validTheme);
+      const sel = document.getElementById("themeSelect");
+      if (sel) sel.value = validTheme;
+      const cfgSel = document.getElementById("cfgTheme");
+      if (cfgSel) cfgSel.value = validTheme;
+      refreshPreview();
+    }
+
+    function changeTheme(themeName) {
+      settings.theme = themeName || "dark";
+      applyTheme(settings.theme);
+      persistSettings();
+    }
+
+    function loadPersistedSettings() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          settings = { ...DEFAULT_SETTINGS, ...parsed };
+        }
+      } catch (e) {
+        console.warn("Could not load stored configuration:", e);
+      }
+      applyTheme(settings.theme || "dark");
+    }
+
+    function persistSettings() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      } catch (e) {
+        console.warn("Could not persist configuration:", e);
+      }
+    }
+
+    /* ==========================================================================
+       3. WORKSPACE SNAPSHOT & ROLLBACK ENGINE
+       ========================================================================== */
+    function recordLatestState(description) {
+      latestState = {
+        timestamp: new Date().toLocaleTimeString(),
+        description: description || "Latest version",
+        files: JSON.parse(JSON.stringify(files)),
+        folders: Array.from(folders),
+        activeFilePath: activeFilePath
+      };
+    }
+
+    function updateRollbackUI() {
+      const banner = document.getElementById("rollbackBanner");
+      const cpName = document.getElementById("rollbackCheckpointName");
+      const restoreBtn = document.getElementById("restoreLatestBtn");
+
+      if (isViewingRollback && latestState) {
+        if (banner) {
+          banner.style.display = "flex";
+          if (cpName) cpName.innerText = currentRollbackCheckpoint || "Checkpoint";
+        }
+        if (restoreBtn) {
+          restoreBtn.classList.remove("hidden");
+        }
+      } else {
+        if (banner) banner.style.display = "none";
+        if (restoreBtn) {
+          restoreBtn.classList.add("hidden");
+        }
+      }
+    }
+
+    function captureSnapshot(description) {
+      const id = "snap_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
+      snapshots[id] = {
+        id,
+        timestamp: new Date().toLocaleTimeString(),
+        description: description || "State before tool execution",
+        files: JSON.parse(JSON.stringify(files)),
+        folders: Array.from(folders),
+        activeFilePath: activeFilePath
+      };
+      updateSnapshotCountBadge();
+      return id;
+    }
+
+    function restoreSnapshot(snapId, event) {
+      if (event) event.stopPropagation();
+      const snap = snapshots[snapId];
+      if (!snap) return alert("Snapshot checkpoint not found.");
+
+      if (!isViewingRollback || !latestState) {
+        recordLatestState("Latest version before rollback");
+      }
+
+      const fileCount = Object.keys(snap.files).length;
+      const ok = confirm(`↩ Roll back workspace files to checkpoint:\n\n"${snap.description}"\nCaptured at: ${snap.timestamp} (${fileCount} files)\n\nExisting files will be replaced with this checkpoint.\n\nYou can restore the latest version at any time using "Restore Latest".`);
+      if (!ok) return;
+
+      captureSnapshot(`State before rollback to: ${snap.description}`);
+
+      files = JSON.parse(JSON.stringify(snap.files));
+      folders = new Set(snap.folders || []);
+      activeFilePath = (snap.activeFilePath in files) ? snap.activeFilePath : (Object.keys(files)[0] || "");
+      isViewingRollback = true;
+      currentRollbackCheckpoint = snap.description;
+
+      renderFileTree();
+      loadFileToEditor(activeFilePath);
+      refreshPreview();
+      updateSnapshotCountBadge();
+      updateRollbackUI();
+
+      addChatMessage(
+        "system",
+        `↩ Restored workspace state to checkpoint: "${escapeHtml(snap.description)}" (${snap.timestamp}). <button class="btn" style="display:inline-flex; align-items:center; gap:3px; background:rgba(16,185,129,0.25); border:1px solid rgba(16,185,129,0.5); color:#86efac; font-weight:600; padding:2px 8px; font-size:11px; margin-left:6px; vertical-align:middle; border-radius:4px; cursor:pointer;" onclick="restoreLatestState()">⤴ Restore Latest Version</button>`,
+        null, null, null, null, true
+      );
+      closeSnapshotsModal();
+    }
+
+    function restoreLatestState(event) {
+      if (event) event.stopPropagation();
+      if (!latestState) {
+        return alert("No latest version recorded yet.");
+      }
+
+      const ok = confirm(`⤴ Restore workspace to the latest version?\n\nCaptured at: ${latestState.timestamp} (${Object.keys(latestState.files).length} files)\n\nAll historical rollbacks will be undone and your project will be returned to its head state.`);
+      if (!ok) return;
+
+      files = JSON.parse(JSON.stringify(latestState.files));
+      folders = new Set(latestState.folders || []);
+      activeFilePath = (latestState.activeFilePath in files) ? latestState.activeFilePath : (Object.keys(files)[0] || "");
+      isViewingRollback = false;
+      currentRollbackCheckpoint = "";
+
+      renderFileTree();
+      loadFileToEditor(activeFilePath);
+      refreshPreview();
+      updateSnapshotCountBadge();
+      updateRollbackUI();
+
+      addChatMessage("system", `⤴ Restored workspace to the latest version (${latestState.timestamp}).`);
+      closeSnapshotsModal();
+    }
+
+    function updateSnapshotCountBadge() {
+      const badge = document.getElementById("snapshotCountBadge");
+      const count = Object.keys(snapshots).length;
+      if (badge) badge.innerText = `${count} snapshot${count === 1 ? '' : 's'}`;
+    }
+
+    function openSnapshotsModal() {
+      const modal = document.getElementById("snapshotsModal");
+      const list = document.getElementById("snapshotsListContainer");
+      list.innerHTML = "";
+
+      if (latestState) {
+        const latestCard = document.createElement("div");
+        latestCard.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.4); border-radius:8px; margin-bottom:6px;";
+        const fileCount = Object.keys(latestState.files || {}).length;
+        latestCard.innerHTML = `
+          <div style="overflow:hidden; margin-right:8px;">
+            <div style="font-weight:700; color:#86efac; font-size:12px; display:flex; align-items:center; gap:6px;">
+              <span>★</span> Latest Version (Head)
+              ${!isViewingRollback ? '<span class="badge" style="background:rgba(16,185,129,0.25); color:#86efac; border-color:rgba(16,185,129,0.4); font-size:10px; padding:1px 6px;">Active</span>' : ''}
+            </div>
+            <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">
+              ${escapeHtml(latestState.timestamp)} &bull; ${fileCount} files &bull; Active: ${escapeHtml(latestState.activeFilePath || "(none)")}
+            </div>
+          </div>
+          ${isViewingRollback ? `
+            <button class="btn" style="background:rgba(16, 185, 129, 0.25); border:1px solid rgba(16, 185, 129, 0.6); color:#86efac; font-weight:600; font-size:11px; padding:4px 10px;" onclick="restoreLatestState(event)">
+              ⤴ Restore Latest
+            </button>
+          ` : `
+            <span style="font-size:11px; color:#86efac; font-weight:500;">Currently at latest</span>
+          `}
+        `;
+        list.appendChild(latestCard);
+      }
+
+      const snapList = Object.values(snapshots).reverse();
+
+      if (snapList.length === 0 && !latestState) {
+        list.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-dim);">No checkpoints captured yet. WebPi automatically takes a snapshot before every tool execution.</div>`;
+      } else {
+        snapList.forEach(snap => {
+          const item = document.createElement("div");
+          item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-darkest); border:1px solid var(--border-color); border-radius:8px;";
+          item.innerHTML = `
+            <div style="overflow:hidden; margin-right:8px;">
+              <div style="font-weight:600; color:var(--text-main); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                ${escapeHtml(snap.description)}
+              </div>
+              <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">
+                ${escapeHtml(snap.timestamp)} &bull; ${Object.keys(snap.files).length} files &bull; Active: ${escapeHtml(snap.activeFilePath || "(none)")}
+              </div>
+            </div>
+            <button class="btn" style="color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); font-size:11px; padding:3px 8px;" onclick="restoreSnapshot('${snap.id}', event)">
+              ↩ Restore
+            </button>
+          `;
+          list.appendChild(item);
+        });
+      }
+
+      modal.style.display = "flex";
+    }
+
+    function closeSnapshotsModal() {
+      document.getElementById("snapshotsModal").style.display = "none";
+    }
+
+    function clearAllSnapshots() {
+      if (confirm("Clear all captured workspace snapshots? (The current project state and latest version will remain intact)")) {
+        snapshots = {};
+        updateSnapshotCountBadge();
+        openSnapshotsModal();
+      }
+    }
+
+    /* ==========================================================================
+       4. TOOL DEFINITIONS & SAFE EXECUTOR
+       ========================================================================== */
+    const AGENT_TOOLS = [
+      {
+        type: "function",
+        function: {
+          name: "list_files",
+          description: "List all existing files and directory folders in the workspace.",
+          parameters: {
+            type: "object",
+            properties: {},
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "read_file",
+          description: "Read the full contents of a file from the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "write_file",
+          description: "Create a new file or overwrite an existing file with complete content.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" }, content: { type: "string" } },
+            required: ["path", "content"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "edit_file",
+          description: "Perform an exact search-and-replace on a target file. Provide enough unique surrounding context in old_str to ensure a single unique match.",
+          parameters: {
+            type: "object",
+            properties: {
+              path: { type: "string", description: "Path to the file to edit." },
+              old_str: { type: "string", description: "The exact existing text block to be replaced (including surrounding context)." },
+              new_str: { type: "string", description: "The new replacement text." }
+            },
+            required: ["path", "old_str", "new_str"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_file",
+          description: "Delete a file from the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "create_folder",
+          description: "Create a new folder directory in the workspace.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "delete_folder",
+          description: "Delete a folder and all files inside it.",
+          parameters: {
+            type: "object",
+            properties: { path: { type: "string" } },
+            required: ["path"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "move_file",
+          description: "Move or rename a file to another folder or filename.",
+          parameters: {
+            type: "object",
+            properties: { source_path: { type: "string" }, target_path: { type: "string" } },
+            required: ["source_path", "target_path"]
+          }
+        }
+      }
+    ];
+
+    function normalizePath(p) {
+      return p ? p.replace(/^\.\//, "").replace(/^\/+/, "").trim() : "";
+    }
+
+    function resolveToolName(rawName) {
+      if (!rawName) return "";
+      const clean = rawName.trim().toLowerCase();
+      const validNames = AGENT_TOOLS.map(t => t.function.name);
+      if (validNames.includes(clean)) return clean;
+      for (const valid of validNames) {
+        if (clean.startsWith(valid) || clean.includes(valid)) return valid;
+      }
+      return clean;
+    }
+
+    function executeTool(rawName, args) {
+      const name = resolveToolName(rawName);
+      console.log(`[WebPi Tool Call] Execution started: ${name}`, { tool: name, rawName, arguments: args });
+
+      if (name !== "read_file" && name !== "list_files" && isViewingRollback) {
+        isViewingRollback = false;
+        updateRollbackUI();
+      }
+
+      try {
+        let result;
+        switch (name) {
+          case "list_files": {
+            const fileList = Object.keys(files).sort();
+            const folderList = Array.from(folders).sort();
+            result = `Files (${fileList.length}):\n${fileList.join("\n") || "(none)"}\n\nFolders (${folderList.length}):\n${folderList.join("\n") || "(none)"}`;
+            break;
+          }
+          case "read_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist. Available files: ${Object.keys(files).join(", ") || "(none)"}`;
+            } else {
+              result = files[p];
+            }
+            break;
+          }
+          case "write_file": {
+            const p = normalizePath(args.path);
+            if (!p) {
+              result = `Error: No path provided.`;
+              break;
+            }
+            files[p] = args.content || "";
+            const parts = p.split("/");
+            if (parts.length > 1) {
+              for (let i = 1; i < parts.length; i++) folders.add(parts.slice(0, i).join("/"));
+            }
+            if (!activeFilePath) activeFilePath = p;
+            renderFileTree();
+            if (activeFilePath === p) loadFileToEditor(p);
+            refreshPreview();
+            recordLatestState(`After write_file (${p})`);
+            result = `Successfully wrote ${args.content?.length || 0} bytes to ${p}`;
+            break;
+          }
+          case "edit_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist.`;
+              break;
+            }
+            if (typeof args.old_str !== "string" || typeof args.new_str !== "string") {
+              result = `Error: 'old_str' and 'new_str' must both be strings.`;
+              break;
+            }
+
+            const currentNormalized = files[p].replace(/\r\n/g, "\n");
+            const oldNormalized = args.old_str.replace(/\r\n/g, "\n");
+            const newNormalized = args.new_str.replace(/\r\n/g, "\n");
+
+            const count = currentNormalized.split(oldNormalized).length - 1;
+
+            if (count === 0) {
+              result = `Error: 'old_str' was not found in '${p}'. Check exact whitespace, indentation, or call read_file to inspect current contents.`;
+              break;
+            }
+            if (count > 1) {
+              result = `Error: 'old_str' matched ${count} times in '${p}'. Please include more surrounding context lines in 'old_str' to make the match unique.`;
+              break;
+            }
+
+            files[p] = currentNormalized.replace(oldNormalized, () => newNormalized);
+            renderFileTree();
+            if (activeFilePath === p) loadFileToEditor(p);
+            refreshPreview();
+            recordLatestState(`After edit_file (${p})`);
+            result = `Successfully edited '${p}' (replaced 1 instance).`;
+            break;
+          }
+          case "delete_file": {
+            const p = normalizePath(args.path);
+            if (!(p in files)) {
+              result = `Error: File '${p}' does not exist.`;
+              break;
+            }
+            delete files[p];
+            if (activeFilePath === p) activeFilePath = Object.keys(files)[0] || "";
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            recordLatestState(`After delete_file (${p})`);
+            result = `Deleted file ${p}`;
+            break;
+          }
+          case "create_folder": {
+            const p = normalizePath(args.path);
+            folders.add(p);
+            renderFileTree();
+            recordLatestState(`After create_folder (${p})`);
+            result = `Created folder '${p}'`;
+            break;
+          }
+          case "delete_folder": {
+            const p = normalizePath(args.path);
+            let count = 0;
+            for (const f in files) {
+              if (f === p || f.startsWith(p + "/")) { delete files[f]; count++; }
+            }
+            folders.delete(p);
+            for (const fld of Array.from(folders)) {
+              if (fld.startsWith(p + "/")) folders.delete(fld);
+            }
+            renderFileTree();
+            if (!(activeFilePath in files)) activeFilePath = Object.keys(files)[0] || "";
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            recordLatestState(`After delete_folder (${p})`);
+            result = `Deleted folder '${p}' and ${count} contained files.`;
+            break;
+          }
+          case "move_file": {
+            const src = normalizePath(args.source_path);
+            let tgt = normalizePath(args.target_path);
+            if (!(src in files)) {
+              result = `Error: Source '${src}' does not exist.`;
+              break;
+            }
+            if (folders.has(tgt) || tgt.endsWith("/")) tgt = (tgt.endsWith("/") ? tgt : tgt + "/") + src.split("/").pop();
+            files[tgt] = files[src];
+            delete files[src];
+            if (activeFilePath === src) activeFilePath = tgt;
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            refreshPreview();
+            recordLatestState(`After move_file (${src} -> ${tgt})`);
+            result = `Moved '${src}' to '${tgt}'`;
+            break;
+          }
+          default:
+            result = `Error: Unknown tool '${rawName}'`;
+            break;
+        }
+        console.log(`[WebPi Tool Result] Completed: ${name}`, { tool: name, result });
+        return result;
+      } catch (err) {
+        console.error(`[WebPi Tool Error] Failed: ${name}`, { tool: name, error: err.message });
+        return `Execution error: ${err.message}`;
+      }
+    }
+
+    function getToolCallResponse(call, msgIdx) {
+      if (!call) return null;
+      if (call.response !== undefined && call.response !== null) {
+        return {
+          content: call.response,
+          snapshotId: call.snapshotId
+        };
+      }
+
+      if (call.id) {
+        const match = chatHistory.find(m => m.role === "tool" && m.tool_call_id === call.id);
+        if (match) {
+          return {
+            content: match.content,
+            snapshotId: match.snapshotId || call.snapshotId,
+            name: match.name
+          };
+        }
+      }
+
+      if (msgIdx !== undefined && msgIdx >= 0) {
+        for (let i = msgIdx + 1; i < chatHistory.length; i++) {
+          const nextMsg = chatHistory[i];
+          if (nextMsg.role === "assistant" || nextMsg.role === "user") break;
+          if (nextMsg.role === "tool" && (!nextMsg.tool_call_id || nextMsg.tool_call_id === call.id)) {
+            return {
+              content: nextMsg.content,
+              snapshotId: nextMsg.snapshotId || call.snapshotId,
+              name: nextMsg.name
+            };
+          }
+        }
+      }
+
+      return null;
+    }
+
+    /* ==========================================================================
+       5. CONTEXT BUDGET ESTIMATOR & STREAMING AGENT LOOP
+       ========================================================================== */
+    function estimateTokens(text) {
+      if (!text) return 0;
+      return Math.ceil(text.length / 3.4);
+    }
+
+    function buildContextMessages(systemMessage) {
+      const maxCtx = parseInt(settings.contextWindow, 10) || 32768;
+      const maxOut = parseInt(settings.maxTokens, 10) || 4096;
+      
+      const reservedOutput = Math.min(maxOut, Math.floor(maxCtx * 0.35));
+      const budget = Math.max(4096, maxCtx - reservedOutput);
+
+      const firstUserIdx = chatHistory.findIndex(m => m.role === "user");
+      if (firstUserIdx === -1) return [systemMessage];
+
+      const conversationHistory = chatHistory.slice(firstUserIdx);
+
+      // SANITIZE & PRUNE PAST TURNS TO PROTECT PROMPT CACHE AND TOKEN BUDGET
+      const validHistory = conversationHistory
+        .filter(m => m.role !== "system" && m.role !== "ui-error")
+        .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
+        .map((m, idx, arr) => {
+          const isPastTurn = idx < arr.length - 2;
+          const item = { role: m.role, content: m.content || "" };
+
+          if (m.tool_calls) {
+            // Compress past huge file write payloads in older turns to avoid re-sending megabytes of code
+            item.tool_calls = m.tool_calls.map(tc => {
+              if (isPastTurn && (tc.function?.name === "write_file" || tc.function?.name === "edit_file")) {
+                try {
+                  const parsed = JSON.parse(tc.function.arguments);
+                  if (tc.function.name === "write_file") {
+                    return {
+                      ...tc,
+                      function: {
+                        ...tc.function,
+                        arguments: JSON.stringify({ path: parsed.path, content: `[Content committed to ${parsed.path} (${(parsed.content || "").length} chars)]` })
+                      }
+                    };
+                  } else if (tc.function.name === "edit_file") {
+                    return {
+                      ...tc,
+                      function: {
+                        ...tc.function,
+                        arguments: JSON.stringify({ path: parsed.path, old_str: "[diff applied]", new_str: "[diff applied]" })
+                      }
+                    };
+                  }
+                } catch (e) { return tc; }
+              }
+              return tc;
+            });
+          }
+
+          if (m.tool_call_id) {
+            item.tool_call_id = m.tool_call_id;
+            item.name = m.name;
+          }
+          return item;
+        });
+
+      if (validHistory.length === 0) return [systemMessage];
+
+      const initialUserMsg = validHistory[0];
+      const subsequentTurns = validHistory.slice(1);
+
+      function calcTokens(msgs) {
+        return msgs.reduce((acc, m) => {
+          return acc + estimateTokens(m.content) + estimateTokens(JSON.stringify(m.tool_calls || ""));
+        }, 0);
+      }
+
+      let totalEst = estimateTokens(systemMessage.content) +
+                     calcTokens([initialUserMsg]) +
+                     calcTokens(subsequentTurns);
+
+      while (subsequentTurns.length > 2 && totalEst > budget) {
+        const removed = subsequentTurns.shift();
+        totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
+      }
+
+      while (subsequentTurns.length > 0 && subsequentTurns[0].role === "tool") {
+        subsequentTurns.shift();
+      }
+
+      return [systemMessage, initialUserMsg, ...subsequentTurns];
+    }
+
+    async function handleSendPrompt(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("promptInput");
+      const userText = input.value.trim();
+      if (!userText || isAgentRunning) return;
+
+      input.value = "";
+      addChatMessage("user", userText);
+      await runAgentLoop();
+    }
+
+    async function runAgentLoop() {
+      isAgentRunning = true;
+      abortController = new AbortController();
+      setAgentStatus(true, "WebPi is thinking...");
+
+      // STATIC SYSTEM PROMPT PRESERVES LOCAL LLM PREFIX / KV CACHING ACROSS ALL TURNS
+      const systemMessage = {
+        role: "system",
+        content: settings.systemPrompt
+      };
+
+      let loopCount = 0;
+      const MAX_LOOPS = 25;
+
+      while (isAgentRunning && loopCount < MAX_LOOPS) {
+        loopCount++;
+
+        const payloadMessages = buildContextMessages(systemMessage);
+        const currentMsgIndex = chatHistory.length;
+
+        chatHistory.push({
+          role: "assistant",
+          content: "",
+          reasoning: "",
+          reasoningOpen: false,
+          tool_calls: null,
+          toolCallsOpen: {},
+          toolResponsesOpen: {}
+        });
+        renderChatMessages();
+
+        let streamedRawContent = "";
+        let streamedReasoning = "";
+        let toolCallMap = {};
+        let finishReason = null;
+
+        try {
+          setAgentStatus(true, `Streaming response (turn ${loopCount})...`);
+
+          const endpoint = `${settings.baseUrl.replace(/\/+$/, "")}/chat/completions`;
+          const tokenLimit = parseInt(settings.maxTokens, 10) || DEFAULT_SETTINGS.maxTokens;
+
+          const requestBody = {
+            model: settings.model || "local-model",
+            messages: payloadMessages,
+            tools: AGENT_TOOLS,
+            tool_choice: "auto",
+            stream: true,
+            max_tokens: tokenLimit,
+            max_completion_tokens: tokenLimit
+          };
+
+          if (settings.reasoningEffort && settings.reasoningEffort !== "default") {
+            requestBody.reasoning_effort = settings.reasoningEffort;
+          }
+
+          console.log(`[WebPi API Request] Turn ${loopCount}`, {
+            endpoint,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${settings.apiKey ? '***' : ''}`
+            },
+            body: requestBody
+          });
+
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${settings.apiKey}`
+            },
+            body: JSON.stringify(requestBody),
+            signal: abortController.signal
+          });
+
+          console.log(`[WebPi API Response] Turn ${loopCount}`, {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+          });
+
+          if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errBody}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder("utf-8");
+          let sseBuffer = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            sseBuffer += decoder.decode(value, { stream: true });
+            const lines = sseBuffer.split("\n");
+            sseBuffer = lines.pop();
+
+            for (const line of lines) {
+              const clean = line.trim();
+              if (!clean || clean.startsWith(":") || clean === "data: [DONE]") continue;
+
+              if (clean.startsWith("data: ")) {
+                try {
+                  const data = JSON.parse(clean.slice(6));
+                  const choice = data.choices?.[0];
+                  if (!choice) continue;
+
+                  if (choice.finish_reason) finishReason = choice.finish_reason;
+                  const delta = choice.delta;
+                  if (!delta) continue;
+
+                  if (delta.reasoning_content || delta.reasoning) {
+                    streamedReasoning += (delta.reasoning_content || delta.reasoning);
+                  }
+                  if (delta.content) {
+                    streamedRawContent += delta.content;
+                  }
+
+                  if (delta.tool_calls) {
+                    for (const tc of delta.tool_calls) {
+                      const idx = tc.index ?? 0;
+                      if (!toolCallMap[idx]) {
+                        toolCallMap[idx] = {
+                          id: tc.id || `call_${Date.now()}_${idx}`,
+                          type: "function",
+                          function: { name: "", arguments: "" }
+                        };
+                      }
+                      if (tc.id) toolCallMap[idx].id = tc.id;
+                      if (tc.function?.name) {
+                        const cur = toolCallMap[idx].function.name;
+                        const inc = tc.function.name;
+                        if (!cur) toolCallMap[idx].function.name = inc;
+                        else if (cur !== inc && !cur.includes(inc)) toolCallMap[idx].function.name += inc;
+                      }
+                      if (tc.function?.arguments) {
+                        toolCallMap[idx].function.arguments += tc.function.arguments;
+                      }
+                    }
+
+                    chatHistory[currentMsgIndex].tool_calls = Object.values(toolCallMap);
+                  }
+
+                  const parsed = separateThinking(streamedRawContent, streamedReasoning);
+                  chatHistory[currentMsgIndex].content = parsed.content;
+                  chatHistory[currentMsgIndex].reasoning = parsed.reasoning;
+
+                  updateStreamingDOM(currentMsgIndex, true);
+
+                  const activeCalls = Object.values(toolCallMap);
+                  if (activeCalls.length > 0) {
+                    const primary = activeCalls[0];
+                    const fnName = resolveToolName(primary.function.name) || primary.function.name || "tool";
+                    const argsLen = primary.function.arguments.length;
+                    const pathMatch = primary.function.arguments.match(/"path"\s*:\s*"([^"]+)"/);
+                    const targetFile = pathMatch ? pathMatch[1] : "";
+                    setAgentStatus(true, `Streaming ${fnName} ${targetFile ? '('+targetFile+')' : ''} [${argsLen.toLocaleString()} chars]...`);
+                  }
+
+                } catch (e) {}
+              }
+            }
+          }
+
+          if (finishReason === "length") {
+            chatHistory[currentMsgIndex].content += "\n\n⚠️ *[Stopped: Output reached maximum token limit. Increase 'Max Output Tokens' in Settings if needed.]*";
+          }
+
+          const toolCalls = Object.values(toolCallMap).map(tc => ({
+            ...tc,
+            function: { ...tc.function, name: resolveToolName(tc.function.name) }
+          }));
+
+          chatHistory[currentMsgIndex].tool_calls = toolCalls.length > 0 ? toolCalls : null;
+          renderChatMessages();
+
+          if (toolCalls.length > 0) {
+            for (const call of toolCalls) {
+              const name = resolveToolName(call.function.name);
+              let args = {};
+              try { args = JSON.parse(call.function.arguments); } catch (e) {
+                args = { raw: call.function.arguments };
+              }
+
+              const targetPath = args.path || args.source_path || "";
+              const snapDesc = `Before ${name}${targetPath ? ' (' + targetPath + ')' : ''}`;
+              const snapId = captureSnapshot(snapDesc);
+              call.snapshotId = snapId;
+
+              setAgentStatus(true, `Executing: ${name}...`);
+              console.log(`[WebPi Agent Tool Call] ${name}`, { id: call.id, tool: name, arguments: args, snapshotId: snapId });
+              const res = executeTool(name, args);
+              call.response = res;
+              addChatMessage("tool", res, null, call.id, name, snapId);
+            }
+            continue;
+          }
+
+          const fallback = parseFallbackCalls(chatHistory[currentMsgIndex].content);
+          if (fallback) {
+            const fallbackId = "call_fallback_" + Date.now();
+            const name = resolveToolName(fallback.name);
+            const targetPath = fallback.args?.path || fallback.args?.source_path || "";
+            const snapDesc = `Before ${name}${targetPath ? ' (' + targetPath + ')' : ''}`;
+            const snapId = captureSnapshot(snapDesc);
+
+            const fallbackCall = {
+              id: fallbackId,
+              type: "function",
+              function: {
+                name: name,
+                arguments: JSON.stringify(fallback.args)
+              },
+              snapshotId: snapId,
+              response: null
+            };
+
+            if (!chatHistory[currentMsgIndex].tool_calls) {
+              chatHistory[currentMsgIndex].tool_calls = [];
+            }
+            chatHistory[currentMsgIndex].tool_calls.push(fallbackCall);
+
+            setAgentStatus(true, `Executing: ${name}...`);
+            console.log(`[WebPi Fallback Tool Call] ${name}`, { tool: name, arguments: fallback.args, snapshotId: snapId });
+            const res = executeTool(name, fallback.args);
+            fallbackCall.response = res;
+            addChatMessage("tool", res, null, fallbackId, name, snapId);
+            continue;
+          }
+
+          break;
+
+        } catch (err) {
+          if (chatHistory[currentMsgIndex] && !chatHistory[currentMsgIndex].content && !chatHistory[currentMsgIndex].tool_calls) {
+            chatHistory.splice(currentMsgIndex, 1);
+          }
+
+          if (err.name === "AbortError") {
+            console.warn("[WebPi API Request Aborted by User]");
+            addChatMessage("system", "WebPi execution stopped by user.");
+          } else {
+            console.error("[WebPi API Request Error]", err);
+            addChatMessage("system", `⚠️ LLM Error: ${err.message}\nMake sure your endpoint (${settings.baseUrl}) is running with CORS enabled.`);
+          }
+          break;
+        }
+      }
+
+      setAgentStatus(false);
+      isAgentRunning = false;
+      abortController = null;
+
+      if (!isViewingRollback) {
+        recordLatestState("Latest version at conclusion of agent loop");
+      }
+    }
+
+    function separateThinking(raw, explicit) {
+      let reasoning = explicit || "";
+      let content = raw || "";
+
+      if (content.includes("<think>")) {
+        const parts = content.split(/<\/?think>/g);
+        if (parts.length >= 3) {
+          reasoning += (reasoning ? "\n\n" : "") + parts[1].trim();
+          content = (parts[0] + parts.slice(2).join("")).trim();
+        } else if (parts.length === 2) {
+          reasoning += (reasoning ? "\n\n" : "") + parts[1];
+          content = parts[0];
+        }
+      }
+      return { reasoning: reasoning.trim(), content };
+    }
+
+    function parseFallbackCalls(text) {
+      if (!text) return null;
+      const m = text.match(/```(?:tool:)?(\w+)\s*\n([\s\S]*?)```/);
+      if (m) {
+        const name = resolveToolName(m[1]);
+        if (AGENT_TOOLS.some(t => t.function.name === name)) {
+          try { return { name, args: JSON.parse(m[2].trim()) }; } catch(e){}
+        }
+      }
+      return null;
+    }
+
+    function abortAgent() {
+      if (abortController) abortController.abort();
+      setAgentStatus(false);
+      isAgentRunning = false;
+    }
+
+    /* ==========================================================================
+       6. CHAT UI RENDERING & SCROLLING MANAGEMENT
+       ========================================================================== */
+    function handleChatScroll() {
+      const container = document.getElementById("messagesContainer");
+      const btn = document.getElementById("scrollToBottomBtn");
+      if (!container || !btn) return;
+      
+      const isNearBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= 80;
+      if (isNearBottom) {
+        btn.classList.add("hidden");
+      } else {
+        btn.classList.remove("hidden");
+      }
+    }
+
+    function scrollChatToBottom() {
+      const container = document.getElementById("messagesContainer");
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+      const btn = document.getElementById("scrollToBottomBtn");
+      if (btn) btn.classList.add("hidden");
+    }
+
+    function toggleThoughtProcess(idx) {
+      if (chatHistory[idx]) {
+        chatHistory[idx].reasoningOpen = !chatHistory[idx].reasoningOpen;
+        const body = document.getElementById(`reasoning-body-${idx}`);
+        const lbl = document.getElementById(`reasoning-label-${idx}`);
+        if (body && lbl) {
+          const isOpen = chatHistory[idx].reasoningOpen;
+          body.classList.toggle("hidden", !isOpen);
+          lbl.innerText = isOpen ? "hide" : "show";
+        } else {
+          renderChatMessages();
+        }
+      }
+    }
+
+    function toggleToolOutput(idx) {
+      if (chatHistory[idx]) {
+        chatHistory[idx].toolOutputOpen = !chatHistory[idx].toolOutputOpen;
+        const body = document.getElementById(`tool-output-body-${idx}`);
+        const lbl = document.getElementById(`tool-output-label-${idx}`);
+        if (body && lbl) {
+          const isOpen = chatHistory[idx].toolOutputOpen;
+          body.classList.toggle("hidden", !isOpen);
+          lbl.innerText = isOpen ? "hide" : "show";
+        } else {
+          renderChatMessages();
+        }
+      }
+    }
+
+    function toggleToolCall(msgIdx, callIdx) {
+      if (chatHistory[msgIdx]) {
+        if (!chatHistory[msgIdx].toolCallsOpen) chatHistory[msgIdx].toolCallsOpen = {};
+        const cur = !!chatHistory[msgIdx].toolCallsOpen[callIdx];
+        const newState = !cur;
+        chatHistory[msgIdx].toolCallsOpen[callIdx] = newState;
+
+        const body = document.getElementById(`tool-call-body-${msgIdx}-${callIdx}`);
+        const arrow = document.getElementById(`tool-call-arrow-${msgIdx}-${callIdx}`);
+        if (body) {
+          body.classList.toggle("hidden", !newState);
+          if (newState) body.scrollTop = 0;
+        }
+        if (arrow) {
+          arrow.innerText = newState ? "▾" : "▸";
+        }
+      }
+    }
+
+    function toggleToolResponse(msgIdx, callIdx) {
+      if (chatHistory[msgIdx]) {
+        if (!chatHistory[msgIdx].toolResponsesOpen) chatHistory[msgIdx].toolResponsesOpen = {};
+        const cur = !!chatHistory[msgIdx].toolResponsesOpen[callIdx];
+        const newState = !cur;
+        chatHistory[msgIdx].toolResponsesOpen[callIdx] = newState;
+
+        const body = document.getElementById(`tool-response-body-${msgIdx}-${callIdx}`);
+        const arrow = document.getElementById(`tool-response-arrow-${msgIdx}-${callIdx}`);
+        if (body) {
+          body.classList.toggle("hidden", !newState);
+          if (newState) body.scrollTop = 0;
+        }
+        if (arrow) {
+          arrow.innerText = newState ? "▾" : "▸";
+        }
+      }
+    }
+
+    function addChatMessage(role, content, tool_calls = null, tool_call_id = null, name = null, snapshotId = null, allowHtml = false) {
+      chatHistory.push({
+        role,
+        content,
+        tool_calls,
+        tool_call_id,
+        name,
+        snapshotId,
+        allowHtml,
+        reasoning: "",
+        reasoningOpen: false,
+        toolOutputOpen: false,
+        toolCallsOpen: {},
+        toolResponsesOpen: {}
+      });
+      renderChatMessages(role === "user");
+    }
+
+    function renderChatMessages(forceScroll = false) {
+      const container = document.getElementById("messagesContainer");
+      if (!container) return;
+
+      const wasAtBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= 80;
+      const prevScrollTop = container.scrollTop;
+
+      const handledToolCallIds = new Set();
+      chatHistory.forEach(m => {
+        if (m.tool_calls && Array.isArray(m.tool_calls)) {
+          m.tool_calls.forEach(tc => {
+            if (tc.id) handledToolCallIds.add(tc.id);
+          });
+        }
+      });
+
+      container.innerHTML = "";
+      chatHistory.forEach((msg, idx) => {
+        if (msg.role === "tool" && msg.tool_call_id && handledToolCallIds.has(msg.tool_call_id)) {
+          return;
+        }
+        container.appendChild(createMessageDOM(msg, idx, false));
+      });
+
+      if (forceScroll || wasAtBottom) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        container.scrollTop = prevScrollTop;
+      }
+      handleChatScroll();
+    }
+
+    function generateToolArgsHtml(fnName, argsRaw, isStreaming = false) {
+      let parsed = null;
+      try {
+        parsed = JSON.parse(argsRaw);
+      } catch (e) {
+        parsed = null;
+      }
+
+      if (parsed) {
+        if (fnName === "list_files") {
+          return `<div><em>List workspace files & folders</em></div>`;
+        } else if (fnName === "read_file") {
+          return `<div><strong>File:</strong> ${escapeHtml(parsed.path || "")}</div>`;
+        } else if (fnName === "write_file") {
+          return `
+            <div style="margin-bottom:6px;"><strong>File:</strong> ${escapeHtml(parsed.path || "")} (${(parsed.content || "").length.toLocaleString()} chars)</div>
+            <div class="tool-diff-tag" style="color:var(--accent-green);">File Content:</div>
+            <pre class="diff-added">${escapeHtml(parsed.content || "")}</pre>`;
+        } else if (fnName === "edit_file") {
+          return `
+            <div style="margin-bottom:6px;"><strong>File:</strong> ${escapeHtml(parsed.path || "")}</div>
+            <div class="tool-diff-tag" style="color:var(--accent-rose);">Search Block (old_str):</div>
+            <pre class="diff-removed">${escapeHtml(parsed.old_str || "")}</pre>
+            <div class="tool-diff-tag" style="color:var(--accent-green); margin-top:6px;">Replacement Block (new_str):</div>
+            <pre class="diff-added">${escapeHtml(parsed.new_str || "")}</pre>`;
+        } else {
+          return `<pre style="margin:0; font-size:11px;">${escapeHtml(JSON.stringify(parsed, null, 2))}</pre>`;
+        }
+      } else {
+        const liveBadge = isStreaming ? `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:10px; color:var(--text-dim);"><span>Streaming Arguments</span><span style="color:var(--brand-light); font-weight:600;">● Live</span></div>` : "";
+        return `${liveBadge}<pre style="margin:0; font-size:11px; white-space:pre-wrap; word-break:break-all;">${escapeHtml(argsRaw || "(waiting for arguments...)")}</pre>`;
+      }
+    }
+
+    function renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming = false) {
+      const fnName = resolveToolName(t.function?.name) || t.function?.name || "tool";
+      const argsRaw = t.function?.arguments || "";
+      const respObj = getToolCallResponse(t, msgIdx);
+      const hasResponse = !!respObj;
+      const isError = hasResponse && (
+        respObj.content.startsWith("Error:") ||
+        respObj.content.startsWith("Execution error:") ||
+        respObj.content.includes("Execution error")
+      );
+
+      if (!msg.toolCallsOpen) msg.toolCallsOpen = {};
+      if (!msg.toolResponsesOpen) msg.toolResponsesOpen = {};
+
+      if (msg.toolResponsesOpen[callIdx] === undefined && isError) {
+        msg.toolResponsesOpen[callIdx] = true;
+      }
+
+      const isCallOpen = !!msg.toolCallsOpen[callIdx];
+      const isRespOpen = !!msg.toolResponsesOpen[callIdx];
+
+      let pathTag = "";
+      const pathMatch = argsRaw.match(/"path"\s*:\s*"([^"]+)"/);
+      if (pathMatch) {
+        pathTag = ` <span style="color:var(--text-main); font-weight:600;">(${escapeHtml(pathMatch[1])})</span>`;
+      }
+      const sizeTag = argsRaw.length > 0 ? ` <span style="opacity:0.7; font-size:10px;">${argsRaw.length.toLocaleString()} chars</span>` : "";
+      const streamClass = isStreaming ? "streaming" : "";
+
+      const effectiveSnapId = t.snapshotId || respObj?.snapshotId;
+      const rollbackBtn = effectiveSnapId ? `
+        <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px; line-height:1.4;" onclick="restoreSnapshot('${effectiveSnapId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
+
+      const argsHtml = generateToolArgsHtml(fnName, argsRaw, isStreaming);
+
+      let responseIcon = '<span style="color:var(--accent-amber); font-weight:bold;">⚙</span>';
+      let responseStatusTitle = "Status";
+      let responseSummary = "Waiting for tool execution...";
+      let respContent = "";
+      let showDetailsToggle = false;
+
+      if (hasResponse) {
+        respContent = respObj.content || "";
+        const lines = respContent.trim().split("\n");
+        responseSummary = lines[0] || (isError ? "Execution failed" : "Completed");
+        showDetailsToggle = lines.length > 1 || respContent.length > 70;
+
+        if (isError) {
+          responseIcon = '<span style="color:var(--accent-rose); font-weight:bold;">✕</span>';
+          responseStatusTitle = "Error";
+        } else {
+          responseIcon = '<span style="color:var(--accent-green); font-weight:bold;">✓</span>';
+          responseStatusTitle = "Result";
+        }
+      } else if (isStreaming) {
+        responseIcon = '<span style="color:var(--brand-light); font-weight:bold;">⏳</span>';
+        responseStatusTitle = "Pending";
+        responseSummary = "Streaming tool arguments...";
+      } else {
+        responseIcon = '<span style="color:var(--accent-amber); font-weight:bold;">⏳</span>';
+        responseStatusTitle = "Running";
+        responseSummary = "Executing in workspace...";
+      }
+
+      return `
+        <div id="tool-call-item-${msgIdx}-${callIdx}" class="tool-call-item ${isError ? 'tool-error' : ''}">
+          <!-- TOP SECTION: TOOL CALL -->
+          <div class="tool-call-top">
+            <div id="tool-call-header-${msgIdx}-${callIdx}" class="tool-call-header ${streamClass}" onclick="toggleToolCall(${msgIdx}, ${callIdx})">
+              <div class="tool-call-title-group">
+                <span>⚙</span>
+                <strong>${escapeHtml(fnName)}</strong>
+                ${pathTag}
+                ${sizeTag}
+              </div>
+              <div class="tool-call-actions">
+                ${rollbackBtn}
+                <span id="tool-call-arrow-${msgIdx}-${callIdx}" style="font-size:11px; opacity:0.75; padding:0 2px;">${isCallOpen ? '▾' : '▸'}</span>
+              </div>
+            </div>
+            <div id="tool-call-body-${msgIdx}-${callIdx}" class="tool-call-body ${isCallOpen ? '' : 'hidden'}">
+              <div id="tool-call-content-${msgIdx}-${callIdx}">${argsHtml}</div>
+            </div>
+          </div>
+
+          <!-- BOTTOM SECTION: STACKED TOOL RESPONSE -->
+          <div class="tool-response-bottom ${isError ? 'error' : (hasResponse ? '' : 'running')}">
+            <div id="tool-response-header-${msgIdx}-${callIdx}" class="tool-response-header" onclick="${showDetailsToggle ? `toggleToolResponse(${msgIdx}, ${callIdx})` : ''}" style="${showDetailsToggle ? '' : 'cursor:default;'}">
+              <div class="tool-response-summary">
+                ${responseIcon}
+                <span style="font-weight:600; color:${isError ? 'var(--accent-rose)' : (hasResponse ? 'var(--accent-green)' : 'var(--accent-amber)')};">
+                  ${responseStatusTitle}:
+                </span>
+                <span style="color:var(--text-main); font-weight:normal;">${escapeHtml(responseSummary)}</span>
+              </div>
+              <div style="flex-shrink:0; margin-left:6px;">
+                ${showDetailsToggle ? `<span id="tool-response-arrow-${msgIdx}-${callIdx}" style="font-size:11px; opacity:0.75; color:var(--brand-light); padding:0 2px;">${isRespOpen ? '▾' : '▸'}</span>` : ''}
+              </div>
+            </div>
+            <div id="tool-response-body-${msgIdx}-${callIdx}" class="tool-response-body ${isError ? 'error' : ''} ${isRespOpen && showDetailsToggle ? '' : 'hidden'}">
+              ${escapeHtml(respContent)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderToolCallsToContainer(toolsDiv, msg, msgIdx, isStreaming = false) {
+      const toolCalls = msg.tool_calls;
+      if (!toolCalls || toolCalls.length === 0) {
+        toolsDiv.innerHTML = "";
+        return;
+      }
+      toolsDiv.innerHTML = toolCalls.map((t, callIdx) => renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming)).join("");
+    }
+
+    function formatToolCalls(msg, msgIdx, isStreaming = false) {
+      const toolCalls = msg.tool_calls;
+      if (!toolCalls || toolCalls.length === 0) return "";
+      return toolCalls.map((t, callIdx) => renderToolCardHtml(t, msgIdx, callIdx, msg, isStreaming)).join("");
+    }
+
+    function createMessageDOM(msg, idx, isStreaming = false) {
+      const wrap = document.createElement("div");
+      wrap.id = `msg-${idx}`;
+      wrap.className = `msg-wrap ${msg.role}`;
+
+      if (msg.role === "system") {
+        wrap.innerHTML = `<div class="bubble system">${msg.allowHtml ? msg.content : escapeHtml(msg.content)}</div>`;
+        return wrap;
+      }
+
+      if (msg.role === "tool") {
+        const isOpen = !!msg.toolOutputOpen;
+        const firstLine = (msg.content || "").trim().split("\n")[0] || "completed";
+        const shortPreview = firstLine.length > 45 ? firstLine.slice(0, 45) + "..." : firstLine;
+
+        const rollbackBtn = msg.snapshotId ? `
+          <button type="button" class="btn" style="padding:1px 6px; font-size:10px; color:var(--accent-amber); border:1px solid rgba(245,158,11,0.4); border-radius:4px;" onclick="restoreSnapshot('${msg.snapshotId}', event)" title="Roll back workspace to state immediately before this tool ran">↩ Rollback</button>` : "";
+
+        wrap.innerHTML = `
+          <div class="tool-output-box">
+            <button type="button" class="tool-output-header" onclick="toggleToolOutput(${idx})">
+              <span>✓ <strong>${escapeHtml(msg.name || "Tool Result")}</strong> <span style="color:var(--text-dim); margin-left:6px; font-weight:normal;">${escapeHtml(shortPreview)}</span></span>
+              <div style="display:flex; align-items:center;">
+                ${rollbackBtn}
+                <span id="tool-output-label-${idx}" style="font-size:10px; color:var(--brand-light); opacity:0.8;">${isOpen ? "hide" : "show"}</span>
+              </div>
+            </button>
+            <div id="tool-output-body-${idx}" class="tool-output-body ${isOpen ? '' : 'hidden'}">
+              <pre style="white-space:pre-wrap; font-size:11px; margin:0;">${escapeHtml(msg.content)}</pre>
+            </div>
+          </div>`;
+        return wrap;
+      }
+
+      const isUser = msg.role === "user";
+      const toolCallsHtml = formatToolCalls(msg, idx, isStreaming);
+
+      let thoughtHtml = "";
+      if (msg.reasoning) {
+        const isOpen = !!msg.reasoningOpen;
+        thoughtHtml = `
+          <div class="thought-box">
+            <button type="button" class="thought-header" onclick="toggleThoughtProcess(${idx})">
+              <span>🧠 Thought Process</span>
+              <span id="reasoning-label-${idx}" style="font-size:10px; color:var(--text-dim);">${isOpen ? "hide" : "show"}</span>
+            </button>
+            <div id="reasoning-body-${idx}" class="thought-body ${isOpen ? '' : 'hidden'}">${escapeHtml(msg.reasoning)}</div>
+          </div>`;
+      }
+
+      wrap.innerHTML = `
+        <div class="bubble ${isUser ? 'user' : 'assistant'}">
+          <div id="msg-thought-holder-${idx}">${thoughtHtml}</div>
+          <div id="msg-content-${idx}" style="white-space:pre-wrap;">${escapeHtml(msg.content)}</div>
+          <div id="msg-tools-${idx}">${toolCallsHtml}</div>
+        </div>`;
+      return wrap;
+    }
+
+    function updateStreamingDOM(idx, isStreaming = true) {
+      const msg = chatHistory[idx];
+      if (!msg) return;
+
+      const container = document.getElementById("messagesContainer");
+      if (!container) return;
+
+      const isNearBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) <= 80;
+
+      let elem = document.getElementById(`msg-${idx}`);
+
+      if (!elem) {
+        elem = createMessageDOM(msg, idx, isStreaming);
+        container.appendChild(elem);
+      } else {
+        const cDiv = document.getElementById(`msg-content-${idx}`);
+        const tHolder = document.getElementById(`msg-thought-holder-${idx}`);
+        const toolsDiv = document.getElementById(`msg-tools-${idx}`);
+
+        if (cDiv) cDiv.innerText = msg.content;
+
+        if (msg.reasoning && tHolder && !tHolder.innerHTML.trim()) {
+          const isOpen = !!msg.reasoningOpen;
+          tHolder.innerHTML = `
+            <div class="thought-box">
+              <button type="button" class="thought-header" onclick="toggleThoughtProcess(${idx})">
+                <span>🧠 Thought Process</span>
+                <span id="reasoning-label-${idx}" style="font-size:10px; color:var(--text-dim);">${isOpen ? "hide" : "show"}</span>
+              </button>
+              <div id="reasoning-body-${idx}" class="thought-body ${isOpen ? '' : 'hidden'}">${escapeHtml(msg.reasoning)}</div>
+            </div>`;
+        } else if (msg.reasoning) {
+          const body = document.getElementById(`reasoning-body-${idx}`);
+          if (body) body.innerText = msg.reasoning;
+        }
+
+        if (toolsDiv) {
+          renderToolCallsToContainer(toolsDiv, msg, idx, isStreaming);
+        }
+      }
+
+      if (isNearBottom) {
+        container.scrollTop = container.scrollHeight;
+      }
+      handleChatScroll();
+    }
+
+    function setAgentStatus(active, text = "") {
+      const bar = document.getElementById("agentStatus");
+      const txt = document.getElementById("agentStatusText");
+      if (active) {
+        bar.style.display = "flex";
+        txt.innerText = text;
+      } else {
+        bar.style.display = "none";
+      }
+    }
+
+    function clearChatHistory() {
+      if (confirm("Clear conversation history?")) {
+        chatHistory = [];
+        renderChatMessages(true);
+      }
+    }
+
+    /* ==========================================================================
+       7. FILE EXPLORER & EDITOR
+       ========================================================================== */
+    function renderFileTree() {
+      const tree = document.getElementById("fileTreeList");
+      const count = document.getElementById("fileCountBadge");
+      tree.innerHTML = "";
+
+      const paths = Object.keys(files).sort();
+      count.innerText = `${paths.length} file${paths.length === 1 ? '' : 's'}`;
+
+      if (paths.length === 0 && folders.size === 0) {
+        tree.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-dim); font-size:11px;">Workspace is empty</div>`;
+        return;
+      }
+
+      folders.forEach(folder => {
+        const fDiv = document.createElement("div");
+        fDiv.className = "file-item";
+        fDiv.innerHTML = `
+          <span>📁 ${escapeHtml(folder)}</span>
+          <button class="btn" style="padding:0; color:var(--accent-rose);" onclick="deleteFolderPrompt('${escapeHtml(folder)}')">✕</button>`;
+        tree.appendChild(fDiv);
+      });
+
+      paths.forEach(p => {
+        const isActive = p === activeFilePath;
+        const item = document.createElement("div");
+        item.className = `file-item ${isActive ? 'active' : ''}`;
+        item.onclick = (e) => { 
+          if (!e.target.closest("button")) {
+            loadFileToEditor(p);
+            if (window.innerWidth <= 768) switchMobileTab('editor');
+          }
+        };
+        item.innerHTML = `
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📄 ${escapeHtml(p)}</span>
+          <div style="display:flex; gap:4px;">
+            <button class="btn" style="padding:0;" onclick="downloadSpecificFile('${escapeHtml(p)}')" title="Download">↓</button>
+            <button class="btn" style="padding:0; color:var(--accent-rose);" onclick="deleteFilePrompt('${escapeHtml(p)}')" title="Delete">✕</button>
+          </div>`;
+        tree.appendChild(item);
+      });
+    }
+
+    function loadFileToEditor(path) {
+      activeFilePath = path;
+      const editor = document.getElementById("fileEditor");
+      const label = document.getElementById("activeFilePath");
+
+      if (path && (path in files)) {
+        label.innerText = path;
+        label.style.color = "var(--text-main)";
+        editor.value = files[path];
+        editor.disabled = false;
+      } else {
+        label.innerText = "(No file open)";
+        label.style.color = "var(--text-dim)";
+        editor.value = "";
+        editor.disabled = true;
+      }
+      renderFileTree();
+    }
+
+    function handleEditorInput() {}
+
+    function saveActiveFileFromEditor() {
+      if (!activeFilePath) return;
+      captureSnapshot(`Manual edit of ${activeFilePath}`);
+      files[activeFilePath] = document.getElementById("fileEditor").value;
+      refreshPreview();
+      isViewingRollback = false;
+      updateRollbackUI();
+      recordLatestState(`Manual edit of ${activeFilePath}`);
+    }
+
+    function promptCreateFile() {
+      const p = prompt("New file path (e.g. index.html):");
+      if (p) {
+        const norm = normalizePath(p);
+        if (!(norm in files)) {
+          captureSnapshot(`Create file ${norm}`);
+          files[norm] = "";
+          loadFileToEditor(norm);
+          renderFileTree();
+          refreshPreview();
+          isViewingRollback = false;
+          updateRollbackUI();
+          recordLatestState(`Create file ${norm}`);
+          if (window.innerWidth <= 768) switchMobileTab('editor');
+        }
+      }
+    }
+
+    function promptCreateFolder() {
+      const f = prompt("New folder name:");
+      if (f) {
+        captureSnapshot(`Create folder ${f}`);
+        folders.add(normalizePath(f));
+        renderFileTree();
+        isViewingRollback = false;
+        updateRollbackUI();
+        recordLatestState(`Create folder ${f}`);
+      }
+    }
+
+    function promptMoveFile() {
+      if (!activeFilePath) return alert("Select a file first.");
+      const tgt = prompt(`Move '${activeFilePath}' to:`, activeFilePath);
+      if (tgt && tgt !== activeFilePath) {
+        captureSnapshot(`Move ${activeFilePath} to ${tgt}`);
+        executeTool("move_file", { source_path: activeFilePath, target_path: tgt });
+      }
+    }
+
+    function deleteFilePrompt(path) {
+      if (confirm(`Delete '${path}'?`)) {
+        captureSnapshot(`Delete file ${path}`);
+        executeTool("delete_file", { path });
+      }
+    }
+
+    function deleteFolderPrompt(path) {
+      if (confirm(`Delete folder '${path}' and all its files?`)) {
+        captureSnapshot(`Delete folder ${path}`);
+        executeTool("delete_folder", { path });
+      }
+    }
+
+    /* ==========================================================================
+       8. SANDBOX LIVE PREVIEW
+       ========================================================================== */
+    function refreshPreview() {
+      const frame = document.getElementById("previewFrame");
+      let html = files["index.html"] || (activeFilePath.endsWith(".html") ? files[activeFilePath] : "");
+
+      if (!html) {
+        frame.classList.add("empty");
+        const styles = getComputedStyle(document.documentElement);
+        const bgDark = styles.getPropertyValue("--bg-dark").trim() || "#0f172a";
+        const textDim = styles.getPropertyValue("--text-dim").trim() || "#64748b";
+        const textMuted = styles.getPropertyValue("--text-muted").trim() || "#94a3b8";
+
+        frame.srcdoc = `<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:${textDim};background:${bgDark};text-align:center;"><div><h3 style="color:${textMuted};">Sandbox Preview</h3><p style="font-size:12px;">Select an html file and click Run Preview.</p></div></body></html>`;
+        return;
+      }
+
+      frame.classList.remove("empty");
+      let bundled = html;
+      bundled = bundled.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi, (match, href) => {
+        const n = normalizePath(href);
+        return (n in files) ? `<style data-inlined="${n}">\n${files[n]}\n</style>` : match;
+      });
+
+      bundled = bundled.replace(/<script\s+[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi, (match, src) => {
+        const n = normalizePath(src);
+        return (n in files) ? `<script data-inlined="${n}">\n${files[n]}\n<\/script>` : match;
+      });
+
+      frame.srcdoc = bundled;
+    }
+
+    function openPreviewInNewTab() {
+      const frame = document.getElementById("previewFrame");
+      const blob = new Blob([frame.srcdoc], { type: "text/html" });
+      window.open(URL.createObjectURL(blob), "_blank");
+    }
+
+    /* ==========================================================================
+       9. EXPORT / IMPORT
+       ========================================================================== */
+    function downloadSpecificFile(path) {
+      if (!(path in files)) return;
+      const blob = new Blob([files[path]], { type: "text/plain;charset=utf-8" });
+      triggerDownload(blob, path.split("/").pop());
+    }
+
+    function downloadActiveFile() {
+      if (activeFilePath) downloadSpecificFile(activeFilePath);
+      else alert("No active file selected.");
+    }
+
+    function downloadZip() {
+      const keys = Object.keys(files);
+      if (keys.length === 0) return alert("Workspace is empty. Nothing to export.");
+      const zip = new MinimalZip();
+      for (const [p, content] of Object.entries(files)) zip.add(p, content);
+      triggerDownload(zip.generateBlob(), "webpi-project.zip");
+    }
+
+    function exportSession() {
+      const data = {
+        version: "1.0",
+        app: "WebPi",
+        timestamp: new Date().toISOString(),
+        settings,
+        folders: Array.from(folders),
+        files,
+        chatHistory,
+        activeFilePath,
+        snapshots,
+        latestState,
+        isViewingRollback,
+        currentRollbackCheckpoint
+      };
+      triggerDownload(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), `webpi-session-${new Date().toISOString().slice(0,10)}.json`);
+    }
+
+    function importSession(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (data.files !== undefined && data.chatHistory !== undefined) {
+            files = data.files;
+            folders = new Set(data.folders || []);
+            chatHistory = data.chatHistory;
+            snapshots = data.snapshots || {};
+            latestState = data.latestState || null;
+            isViewingRollback = !!data.isViewingRollback;
+            currentRollbackCheckpoint = data.currentRollbackCheckpoint || "";
+
+            if (!latestState) {
+              recordLatestState("Imported session state");
+            }
+
+            if (data.settings) {
+              settings = { ...settings, ...data.settings };
+              persistSettings();
+              applyTheme(settings.theme || "dark");
+            }
+            activeFilePath = data.activeFilePath || Object.keys(files)[0] || "";
+            updateSettingsUI();
+            updateSnapshotCountBadge();
+            updateRollbackUI();
+            renderFileTree();
+            loadFileToEditor(activeFilePath);
+            renderChatMessages();
+            refreshPreview();
+            alert("Session restored successfully!");
+          }
+        } catch (err) {
+          alert("Error restoring session: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
+    function triggerDownload(blob, name) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ==========================================================================
+       10. SETTINGS MANAGEMENT (FULL LOCALSTORAGE SUPPORT)
+       ========================================================================== */
+    function openSettings() {
+      document.getElementById("cfgTheme").value = settings.theme || "dark";
+      document.getElementById("cfgBaseUrl").value = settings.baseUrl;
+      document.getElementById("cfgApiKey").value = settings.apiKey;
+      document.getElementById("cfgApi").value = settings.api;
+      document.getElementById("cfgModel").value = settings.model;
+      document.getElementById("cfgReasoningEffort").value = settings.reasoningEffort || "default";
+      document.getElementById("cfgContextWindow").value = settings.contextWindow;
+      document.getElementById("cfgMaxTokens").value = settings.maxTokens;
+      document.getElementById("cfgSystemPrompt").value = settings.systemPrompt;
+      document.getElementById("settingsModal").style.display = "flex";
+    }
+
+    function closeSettings() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+
+    function saveSettings() {
+      const rawTheme = document.getElementById("cfgTheme").value;
+      const rawBase = document.getElementById("cfgBaseUrl").value.trim();
+      const rawKey = document.getElementById("cfgApiKey").value.trim();
+      const rawApi = document.getElementById("cfgApi").value;
+      const rawModel = document.getElementById("cfgModel").value.trim();
+      const rawReasoning = document.getElementById("cfgReasoningEffort").value;
+      const rawCtx = parseInt(document.getElementById("cfgContextWindow").value, 10);
+      const rawMaxTok = parseInt(document.getElementById("cfgMaxTokens").value, 10);
+      const rawSys = document.getElementById("cfgSystemPrompt").value;
+
+      settings.theme = rawTheme || DEFAULT_SETTINGS.theme;
+      settings.baseUrl = rawBase || DEFAULT_SETTINGS.baseUrl;
+      settings.apiKey = rawKey !== "" ? rawKey : DEFAULT_SETTINGS.apiKey;
+      settings.api = rawApi || DEFAULT_SETTINGS.api;
+      settings.model = rawModel || DEFAULT_SETTINGS.model;
+      settings.reasoningEffort = rawReasoning || DEFAULT_SETTINGS.reasoningEffort;
+      settings.contextWindow = !isNaN(rawCtx) && rawCtx > 0 ? rawCtx : DEFAULT_SETTINGS.contextWindow;
+      settings.maxTokens = !isNaN(rawMaxTok) && rawMaxTok > 0 ? rawMaxTok : DEFAULT_SETTINGS.maxTokens;
+      settings.systemPrompt = rawSys !== "" ? rawSys : DEFAULT_SETTINGS.systemPrompt;
+
+      applyTheme(settings.theme);
+      persistSettings();
+      updateSettingsUI();
+      closeSettings();
+    }
+
+    function updateSettingsUI() {
+      document.getElementById("modelBadge").innerText = settings.model;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    /* ==========================================================================
+       11. DRAGGABLE CENTRE CROSS-HANDLE RESIZING & MOBILE TABS
+       ========================================================================== */
+    function switchMobileTab(tab) {
+      const ws = document.getElementById("workspace");
+      if (ws) ws.setAttribute("data-mobile-tab", tab);
+      document.querySelectorAll(".mobile-tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-tab") === tab);
+      });
+      if (tab === "preview") refreshPreview();
+    }
+
+    function initResizeHandle() {
+      const handle = document.getElementById("centerResizeHandle");
+      const workspace = document.getElementById("workspace");
+      if (!handle || !workspace) return;
+
+      let isDragging = false;
+
+      function onPointerDown(e) {
+        if (window.innerWidth <= 768) return;
+        isDragging = true;
+        handle.classList.add("active");
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "all-scroll";
+
+        const preview = document.getElementById("previewFrame");
+        if (preview) preview.style.pointerEvents = "none";
+
+        try {
+          handle.setPointerCapture(e.pointerId);
+        } catch (err) {}
+
+        e.preventDefault();
+      }
+
+      function onPointerMove(e) {
+        if (!isDragging) return;
+        const rect = workspace.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const px = ((e.clientX - rect.left) / rect.width) * 100;
+        const py = ((e.clientY - rect.top) / rect.height) * 100;
+
+        const clampedX = Math.max(15, Math.min(85, px));
+        const clampedY = Math.max(15, Math.min(85, py));
+
+        workspace.style.setProperty("--split-x", `${clampedX}%`);
+        workspace.style.setProperty("--split-y", `${clampedY}%`);
+      }
+
+      function onPointerUp(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        handle.classList.remove("active");
+        document.body.style.userSelect = "";
+        document.body.style.cursor = "";
+
+        const preview = document.getElementById("previewFrame");
+        if (preview) preview.style.pointerEvents = "auto";
+
+        try {
+          handle.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+      }
+
+      handle.addEventListener("dblclick", () => {
+        workspace.style.setProperty("--split-x", "50%");
+        workspace.style.setProperty("--split-y", "50%");
+      });
+
+      handle.addEventListener("pointerdown", onPointerDown);
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      window.addEventListener("pointercancel", onPointerUp);
+    }
+
+    /* ==========================================================================
+       12. INITIALIZATION
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      loadPersistedSettings();
+      updateSettingsUI();
+      recordLatestState("Initial workspace state");
+      updateSnapshotCountBadge();
+      updateRollbackUI();
+      renderFileTree();
+      loadFileToEditor(activeFilePath);
+      refreshPreview();
+      initResizeHandle();
+      
+      const messagesContainer = document.getElementById("messagesContainer");
+      if (messagesContainer) {
+        messagesContainer.addEventListener("scroll", handleChatScroll, { passive: true });
+      }
+
+      addChatMessage("assistant", "Hello! I am WebPi, your autonomous coding agent running sandboxed, 100% in the browser. Only a local AI server is needed (see settings). Tell me what you'd like to build!");
+    });
+  </script>
+</body>
+</html>
