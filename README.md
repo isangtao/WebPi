@@ -34,7 +34,7 @@ Based on the Pi Coding Agent concept by Mario Zechner and written by Gemini3.8Fl
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Documentation** | System overview & technical documentation | [**Read Docs**](https://isangtao.github.io/WebPi/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LlamaCPP Runner** | Optimized launch script (See details below) | [**Script**](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh) |
+| **LlamaCPP Runner** | Optimized launch script (See details below) | [**Download Script**](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh) |
 | **AgentCraft** | Prompt generation tool | [**Open AgentCraft**](https://isangtao.github.io/WebPi/AgentCraft%20%28Gemini3.8Flash%29.html) |
 | **ePub2Mobi Converter** | Stand-alone eBook conversion utility | [**Convert eBooks**](https://isangtao.github.io/WebPi/epub2mobi.html) |
 
