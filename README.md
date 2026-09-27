@@ -13,12 +13,13 @@
 
 ## 📌 Overview
 
-**WebPi** is a single-file, self-contained autonomous coding agent running sandboxed, 100% in the browser. No installation is required. Just point it to any AI server (local recommended). 
+**WebPi** is a single-file, self-contained autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local recommended). 
 
-* It has no access outside of its sandbox.
+* No direct access outside of its sandbox.
+   * Access only to in-browser virtual file system
    * No web-search functionality
-   * Manually copy and paste text files to import them.
-   * Tools: List, Read, Write, Edit, Move, Delete.
+   * Manually copy and paste text files to import them
+   * Tools: List, Read, Write, Edit, Move, Delete
 * Save and restore sessions (see samples in the Sessions directory of this repo)
 * Text editor
 * Preview pane (html files)
