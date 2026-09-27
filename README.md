@@ -18,8 +18,10 @@
 * It has no access outside of its sandbox.
    * No web-search functionality
    * Manually copy and paste text files to import them.
-   * Tools: List, Read, Edit, Move, Delete.
+   * Tools: List, Read, Write, Edit, Move, Delete.
 * Save and restore sessions (see samples in the Sessions directory of this repo)
+* Text editor
+* Preview pane (html files)
 
 ---
 
