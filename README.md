@@ -59,4 +59,4 @@ Features and limitations:
   * **Model:** Qwen3.8 27B Q4KM GGUF
   * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed) on 2 RTX 5060 ti 16GB GPUs
   * **Context Window:** 262k
-  * **Memory Footprint:** 18GB + KV Cache + Overhead = 32GB VRAM
+  * **Memory Footprint:** 18GB + KV Cache + Overhead ~ 31.5GB VRAM
