@@ -58,7 +58,7 @@ Features and limitations:
   High-performance shell script, optimized by Gemini3.8Flash, configured for running quantized models via CUDA-compiled `llama.cpp` on Ubuntu 26.04:
   * **Model:** Qwen3.8 27B Q4KM GGUF
   * **Context Window:** 262k
-  * **Memory Footprint:** 18GB + KV Cache + Overhead ~ 31.5GB VRAM
+  * **Memory Footprint:** Model + KV Cache + Overhead ~ 31GiB VRAM
   * **Target Throughput:** ~60 tokens/sec (initial speed on a short prompt) on 2 RTX 5060 ti 16GB GPUs. For example...
 
 ```
