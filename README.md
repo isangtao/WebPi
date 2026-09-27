@@ -32,7 +32,7 @@ Based on Pi Coding Agent concept, **WebPi** is a single-file, self-contained, mi
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Documentation** | System overview & technical documentation | [**Read Docs**](https://isangtao.github.io/WebPi/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LlamaCPP Runner** | Optimized launch script (Qwen3.8-27B-Q4KM running ~60tps @ 262K context on 2 RTX 5060 ti 16GB GPUs) | [**Script**](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh) |
+| **LlamaCPP Runner** | Optimized launch script (See details below) | [**Script**](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh) |
 | **AgentCraft** | Prompt generation tool | [**Open AgentCraft**](https://isangtao.github.io/WebPi/AgentCraft%20%28Gemini3.8Flash%29.html) |
 | **ePub2Mobi Converter** | Stand-alone eBook conversion utility | [**Convert eBooks**](https://isangtao.github.io/WebPi/epub2mobi.html) |
 
@@ -53,7 +53,7 @@ Based on Pi Coding Agent concept, **WebPi** is a single-file, self-contained, mi
 * **[LlamaCPP Configuration Script](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh)**  
   High-performance shell script configured for running quantized models via `llama.cpp`:
   * **Model:** Qwen3.8 27B Q4KM GGUF
-  * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed)
+  * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed) on 2 RTX 5060 ti 16GB GPUs
   * **Context Window:** 262k
   * **Memory Footprint:** 18GB + KV Cache + Overhead = 32GB VRAM
 
