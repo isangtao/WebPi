@@ -1,6 +1,6 @@
 # 🌐 WebPi 
 
-**(Based on Pi Coding Agent concept) Autonomous coding agent running sandboxed, 100% in the browser. Only a local AI server is needed.**
+**Autonomous coding agent running sandboxed, 100% in the browser. Only a local AI server is needed.**
 **All files are stand-alone and work on an air-gapped, off-line PC**
 
 [![Live Demo](https://img.shields.io/badge/Launch-WebPi%20App-0078D4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://isangtao.github.io/WebPi/WebPi.html)
@@ -13,7 +13,7 @@
 
 ## 📌 Overview
 
-**WebPi** is a single-file, self-contained autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local recommended). 
+(Based on Pi Coding Agent concept) **WebPi** is a single-file, self-contained autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local recommended). 
 
 * No direct access outside of its sandbox.
    * Access only to in-browser virtual file system
