@@ -60,3 +60,17 @@ Features and limitations:
   * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed) on 2 RTX 5060 ti 16GB GPUs
   * **Context Window:** 262k
   * **Memory Footprint:** 18GB + KV Cache + Overhead ~ 31.5GB VRAM
+
+---
+
+## 📄 License
+
+Distributed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for more information.
+
+Copyright 2026 IsangTao
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
