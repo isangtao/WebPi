@@ -55,7 +55,7 @@ Features and limitations:
 * **[WebPi Documentation (Gemini 3.8 Flash Edition)](https://isangtao.github.io/WebPi/WebPiDoc%20%28Gemini3.8Flash%29.html)**  
   Comprehensive technical documentation detailing architecture, integration steps, and system capabilities.
 * **[LlamaCPP Configuration Script](https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh)**  
-  High-performance shell script configured for running quantized models via CUDA-compiled `llama.cpp` on Ubuntu 26.04:
+  High-performance shell script, optimized by Gemini3.8Flash, configured for running quantized models via CUDA-compiled `llama.cpp` on Ubuntu 26.04:
   * **Model:** Qwen3.8 27B Q4KM GGUF
   * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed) on 2 RTX 5060 ti 16GB GPUs
   * **Context Window:** 262k
