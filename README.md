@@ -67,7 +67,7 @@ Features and limitations:
 
 Distributed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for more information.
 
-Copyright 2026 IsangTao
+Copyright 2026 IsangTao. AI-Assisted Development (Human designs architecture, edits code, debugs, combines components)
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
