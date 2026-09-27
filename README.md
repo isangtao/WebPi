@@ -58,9 +58,3 @@ Based on the Pi Coding Agent concept by Mario Zechner, **WebPi** is a single-fil
   * **Target Throughput:** ~60 tokens/sec (Short prompt, initial speed) on 2 RTX 5060 ti 16GB GPUs
   * **Context Window:** 262k
   * **Memory Footprint:** 18GB + KV Cache + Overhead = 32GB VRAM
-
-```bash
-# Quick usage:
-curl -O https://isangtao.github.io/WebPi/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh
-chmod +x LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh
-./LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh
