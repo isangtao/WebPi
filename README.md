@@ -13,15 +13,15 @@
 
 ## 📌 Overview
 
-Based on the Pi Coding Agent concept by Mario Zechner, **WebPi** is a single-file, self-contained, minimal, autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local Qwen3.8-27B recommended). 
+Based on the Pi Coding Agent concept by Mario Zechner, **WebPi** is a single-file, self-contained, minimal, autonomous coding agent running sandboxed, 100% in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local Qwen3.8-27B recommended). Features and limitations:
 
 * No direct access outside of its sandbox.
    * Access only to in-browser virtual file system
-   * No web-search functionality
    * Manually copy and paste text files to import them
-   * Tools: List, Read, Write, Edit, Move, Delete
+   * Tools are limited to : List, Read, Write, Edit, Move, Delete (There no web-search functionality, etc)
+   * Webpi functionality can only be extended by modifying the html code directly
 * Save and restore sessions (see samples in the Sessions directory of this repo)
-* Text editor
+* Text editor pane
 * Preview pane (html files)
 
 ---
