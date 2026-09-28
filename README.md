@@ -59,9 +59,9 @@ Features and limitations:
 * **[LlamaCPP Configuration Script](https://isangtao.github.io/WebPi/Tools/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh)**  
   High-performance shell script, optimized by Gemini3.8Flash, configured for running quantized models via CUDA-compiled `llama.cpp` on Ubuntu 26.04:
   * **Model:** [Qwen3.8 27B Q4KM GGUF](https://huggingface.co/bartowski/Qwen3.8-27B-GGUF/tree/main)
-  * **Context Window:** 262k
+  * **Context Window:** 262144
   * **Memory Footprint:** Model + KV Cache + Overhead ~ 31GiB VRAM
-  * **Target Throughput:** ~60 tokens/sec (initial speed on a short prompt) on 2 RTX 5060 ti 16GB GPUs. For example...
+  * **Target Throughput:** ~60 tokens/sec (initial speed on a short prompt) on 2 RTX 5060 ti 16GB GPUs.
 
 ```
 161.46.849.476 I slot print_timing: id  2 | task 42167 | n_gen =  63333, tg =  63.83 t/s, tg_3s =  72.18 t/s
