@@ -1,6 +1,6 @@
 # 🌐 WebPi 
 
-![WebPi Screenshot](https://isangtao.github.io/WebPi/WebPiScreenshot.png)
+![WebPi Screenshot](https://isangtao.github.io/WebPi/Images/WebPiScreenshot.png)
 
 **Autonomous coding agent running sandboxed in the browser. Only a local AI server is needed.**
 
@@ -75,7 +75,7 @@ Features and limitations:
 
 ## 📄 License
 
-Distributed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for more information.
+Distributed under the Apache License, Version 2.0. See [`LICENSE`](https://isangtao.github.io/WebPi/Licence/LICENCE) for more information.
 
 Copyright 2026 IsangTao. AI-Assisted Development (Human designs architecture, edits code, debugs, combines components)
 
