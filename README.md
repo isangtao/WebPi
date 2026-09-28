@@ -28,7 +28,7 @@ Features and limitations:
    * Text files must be manually copied and pasted to "import" them
    * Webpi functionality can only be extended by modifying the html code directly (There no web-search functionality, etc)
 
-**With a local AI server, WebPi delivers a sovereign, air-gapped, local agentic framework, ensuring complete privacy, cloud independence, unlimited usage, and total ownership.**
+**With an air-gapped, local AI server, WebPi delivers a sovereign agentic framework, ensuring complete privacy, cloud independence, unlimited usage, and total ownership.**
 
 ---
 
