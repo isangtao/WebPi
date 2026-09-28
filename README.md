@@ -75,7 +75,7 @@ Features and limitations:
 
 ## 📄 License
 
-Distributed under the Apache License, Version 2.0. See [`LICENSE`](LICENCE) for more information.
+Distributed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for more information.
 
 Copyright 2026 IsangTao. AI-Assisted Development (Human designs architecture, edits code, debugs, combines components)
 
