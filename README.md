@@ -1,6 +1,6 @@
 # 🌐 WebPi 
 
-![WebPi Screenshot](https://isangtao.github.io/WebPi/Images/WebPiScreenshot.png)
+![WebPi Screenshot](https://isangtao.github.io/WebPi/Images/WebPi.png)
 
 **Autonomous coding agent running sandboxed in the browser. Only a local AI server is needed.**
 
