@@ -52,7 +52,7 @@ Features and limitations:
 
 ### 2. 📖 Documentation & Setup
 
-* **[WebPi Documentation (Gemini3.8Flash Edition)](https://isangtao.github.io/WebPi/WebPiDoc%20%28Gemini3.8Flash%29.html)**  
+* **[WebPi Documentation (Gemini3.8Flash Edition)](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html)**  
   Comprehensive technical documentation detailing architecture, integration steps, and system capabilities.
 * **[LlamaCPP Configuration Script](https://isangtao.github.io/WebPi/Tools/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh)**  
   High-performance shell script, optimized by Gemini3.8Flash, configured for running quantized models via CUDA-compiled `llama.cpp` on Ubuntu 26.04:
