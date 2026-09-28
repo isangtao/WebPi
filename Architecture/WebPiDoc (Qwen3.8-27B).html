@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebPi — Technical Documentation</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-darkest: #070b14;
+      --bg-dark: #0f172a;
+      --bg-surface: #1e293b;
+      --border-color: #243049;
+      --brand-primary: #7c3aed;
+      --brand-light: #ede9fe;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg-darkest); color: var(--text-main); font-family: var(--font-sans); line-height: 1.65; font-size: 15px; }
+    a { color: var(--brand-light); }
+
+    .hero { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%); border-bottom: 1px solid var(--border-color); padding: 2.5rem 1.5rem 2rem; }
+    .hero-inner { max-width: 1080px; margin: 0 auto; }
+    .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+    .hero h1 .accent { color: #a78bfa; }
+    .hero p.sub { color: var(--text-muted); margin-top: 0.4rem; max-width: 720px; }
+    .hero .tags { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(124,58,237,0.18); color: var(--brand-light); border: 1px solid rgba(124,58,237,0.4); font-family: var(--font-mono); }
+
+    main { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    .toc { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
+    .toc h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .toc ol { margin-left: 1.2rem; columns: 2; column-gap: 2.5rem; }
+    .toc li { margin-bottom: 4px; font-size: 14px; break-inside: avoid; }
+    .toc a { text-decoration: none; color: var(--text-muted); }
+    .toc a:hover { color: var(--brand-light); }
+
+    section { margin-bottom: 3rem; }
+    section > h2 { font-size: 1.4rem; font-weight: 700; padding-bottom: 0.5rem; border-bottom: 2px solid var(--brand-primary); margin-bottom: 1rem; }
+    section > h2 .num { color: #a78bfa; font-family: var(--font-mono); margin-right: 0.5rem; }
+    p { margin-bottom: 0.9rem; color: #cbd5e1; }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-surface); color: var(--brand-light); padding: 1px 6px; border-radius: 4px; }
+    ul.points { margin: 0 0 1rem 1.3rem; color: #cbd5e1; }
+    ul.points li { margin-bottom: 0.35rem; }
+    ul.points li::marker { color: #a78bfa; }
+
+    .diagram { background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin: 1.25rem 0; overflow-x: auto; }
+    .diagram pre.mermaid { background: transparent !important; }
+    .diagram .cap { font-size: 12px; color: var(--text-dim); margin-top: 0.75rem; font-family: var(--font-mono); }
+
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 13.5px; }
+    th, td { border: 1px solid var(--border-color); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: var(--bg-surface); color: var(--brand-light); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    tr:nth-child(even) td { background: rgba(30,41,59,0.4); }
+    td code { white-space: nowrap; }
+
+    .callout { border-left: 3px solid var(--accent-amber); background: rgba(245,158,11,0.08); padding: 0.75rem 1rem; border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 14px; }
+    .callout.purple { border-color: var(--brand-primary); background: rgba(124,58,237,0.08); }
+    .callout.green { border-color: var(--accent-green); background: rgba(16,185,129,0.08); }
+
+    footer { border-top: 1px solid var(--border-color); padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 13px; }
+    @media (max-width: 720px) { .toc ol { columns: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>WebPi <span class="accent">— Technical Documentation</span></h1>
+      <p class="sub">
+        A complete architectural walkthrough of <a href="WebPi.html"><strong>WebPi.html</strong></a> — an autonomous,
+        browser-sandboxed coding agent. Everything (UI, agent loop, virtual file system, snapshot engine, and a
+        from-scratch ZIP writer) lives in a single HTML file with zero runtime dependencies.
+      </p>
+      <div class="tags">
+        <span class="tag">single-file app</span>
+        <span class="tag">OpenAI-compatible /chat/completions</span>
+        <span class="tag">SSE streaming</span>
+        <span class="tag">function calling</span>
+        <span class="tag">virtual filesystem</span>
+        <span class="tag">snapshots + rollback</span>
+        <span class="tag">pure-JS PKZIP</span>
+        <span class="tag">sandboxed iframe preview</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+
+    <nav class="toc">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#overview">Overview &amp; design goals</a></li>
+        <li><a href="#arch">High-level architecture (component view)</a></li>
+        <li><a href="#data">Data model (class view)</a></li>
+        <li><a href="#loop">Agent loop — stream, decide, act (sequence)</a></li>
+        <li><a href="#sse">SSE stream parsing (activity)</a></li>
+        <li><a href="#tools">Tool execution pipeline (flowchart)</a></li>
+        <li><a href="#budget">Context-window budgeting (activity)</a></li>
+        <li><a href="#states">Agent lifecycle (state diagram)</a></li>
+        <li><a href="#snap">Snapshots &amp; rollback (sequence)</a></li>
+        <li><a href="#zip">MinimalZip — hand-rolled PKZIP (flowchart)</a></li>
+        <li><a href="#map">Source code section map</a></li>
+      </ol>
+    </nav>
+
+    <!-- ================================================================ -->
+    <section id="overview">
+      <h2><span class="num">01</span>Overview &amp; design goals</h2>
+      <p>
+        <strong>WebPi</strong> is a web-based autonomous coding agent. The user describes what they want to build in a
+        chat box; an LLM (any OpenAI-compatible server, e.g. a local one at <code>http://localhost:1234/v1</code>)
+        responds with <em>text</em> and <em>function calls</em>. Function calls are executed against a <strong>virtual
+        file system that exists purely in browser memory</strong> (<code>files</code> object + <code>folders</code> Set),
+        and the results are streamed back to the model until it stops calling tools — the classic
+        <em>reason → act → observe → repeat</em> agent loop.
+      </p>
+      <ul class="points">
+        <li><strong>Air-gapped core:</strong> all application logic, CSS and the ZIP writer are embedded; the only network call is the LLM API request itself.</li>
+        <li><strong>Four-pane IDE layout:</strong> Files (top-left), Chat (bottom-left), Editor (top-right), live Preview (bottom-right), split by a draggable cross-handle (CSS custom properties <code>--split-x</code> / <code>--split-y</code>); on mobile the panes collapse into tabs.</li>
+        <li><strong>Safe-by-default tooling:</strong> every mutating operation first captures a deep-copy <em>snapshot</em>, and every tool call in the chat gets a one-click <em>↩ Rollback</em> button.</li>
+        <li><strong>Live sandbox preview:</strong> the generated app runs in a sandboxed <code>&lt;iframe&gt;</code> whose HTML has the project's own <code>&lt;link rel="stylesheet"&gt;</code> and <code>&lt;script src&gt;</code> assets <em>inlined</em>, so multi-file projects render without a server.</li>
+        <li><strong>Persistence without a backend:</strong> settings persist to <code>localStorage</code>; whole sessions (files, chat, snapshots) can be exported/imported as JSON; the project can be exported as a real <code>.zip</code> built byte-by-byte by a hand-written PKZIP implementation.</li>
+      </ul>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="arch">
+      <h2><span class="num">02</span>High-level architecture (component view)</h2>
+      <p>
+        The single HTML file contains three cooperating layers. The <strong>UI layer</strong> (header, panes, modals)
+        only ever talks to the <strong>agent core</strong> through a handful of global functions. The agent core
+        orchestrates the <strong>in-memory workspace</strong>, which is the single source of truth: the file tree,
+        editor and preview are all just projections of the <code>files</code> / <code>folders</code> state.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TB
+    subgraph WEBPI["WebPi.html — single file, zero external dependencies"]
+        subgraph UI["UI LAYER"]
+            HDR["Header: Save Session, Restore, Export ZIP, Settings"]
+            PN1["Files pane — file and folder tree"]
+            PN2["Chat pane — agent conversation"]
+            PN3["Editor pane — code textarea"]
+            PN4["Preview pane — sandboxed iframe"]
+            MOD["Modals: settings + snapshot timeline"]
+            MOB["Drag resize cross-handle + mobile tabs"]
+        end
+        subgraph CORE["AGENT CORE"]
+            LOP["runAgentLoop — max 25 turns"]
+            CTX["buildContextMessages — token budget"]
+            SSE["SSE stream parser"]
+            FBA["parseFallbackCalls — legacy code-block tools"]
+            EXE["executeTool — 7 workspace tools"]
+            SNP["Snapshot + rollback engine"]
+        end
+        subgraph DATA["IN-MEMORY WORKSPACE"]
+            FIL[("files object: path to content")]
+            FOL[("folders Set")]
+            SNA[("snapshots map")]
+            HIS[("chatHistory array")]
+            LST[("localStorage settings")]
+        end
+        ZIP["MinimalZip — pure JS PKZIP writer"]
+    end
+    LLM[("LLM server /v1/chat/completions via SSE")]
+
+    PN2 -- user prompt --> LOP
+    LOP --> CTX
+    LOP -- POST stream --> LLM
+    LLM -- SSE deltas --> SSE
+    SSE -- content and tool_calls --> LOP
+    LOP -- when tool_calls present --> EXE
+    FBA -- when model emits code blocks --> EXE
+    EXE -- deep copy before each op --> SNP
+    SNP -- stores checkpoint --> SNA
+    EXE -- mutates --> FIL
+    EXE -- mutates --> FOL
+    LST -- settings --> LOP
+    LOP -- appends messages --> HIS
+    HIS -- rendered --> PN2
+    FIL -- listed --> PN1
+    FIL -- loaded into --> PN3
+    PN3 -- manual save --> FIL
+    FIL -- bundled into iframe --> PN4
+    FIL -- packaged --> ZIP
+    SNA -- restore replaces --> FIL
+        </pre>
+        <div class="cap">Figure 1 — Component diagram: UI layer, agent core, in-memory workspace and the external LLM endpoint.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="data">
+      <h2><span class="num">03</span>Data model (class view)</h2>
+      <p>
+        The code is plain procedural JavaScript (one class: <code>MinimalZip</code>), but the implicit data
+        structures are clear. <code>chatHistory</code> is the backbone: it stores <em>user</em>, <em>assistant</em>,
+        <em>tool</em> and <em>system</em> messages, each carrying the OpenAI tool-calling metadata
+        (<code>tool_calls</code> / <code>tool_call_id</code> / <code>name</code>) plus UI state (which panels are
+        expanded) and a back-reference to the <strong>snapshot taken just before</strong> the tool ran — which is what
+        powers the per-call Rollback buttons.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+classDiagram
+    class AgentSettings {
+        +string baseUrl
+        +string api
+        +string apiKey
+        +string model
+        +string reasoningEffort
+        +int contextWindow
+        +int maxTokens
+        +string systemPrompt
+    }
+    class WorkspaceState {
+        +object files
+        +Set folders
+        +string activeFilePath
+    }
+    class Snapshot {
+        +string id
+        +string timestamp
+        +string description
+        +object files
+        +string[] folders
+        +string activeFilePath
+    }
+    class ChatMessage {
+        +string role
+        +string content
+        +string reasoning
+        +array tool_calls
+        +string tool_call_id
+        +string name
+        +string snapshotId
+        +bool reasoningOpen
+        +bool toolOutputOpen
+    }
+    class ToolCall {
+        +string id
+        +string type
+        +string functionName
+        +string functionArgsJson
+        +string snapshotId
+    }
+    class MinimalZip {
+        +array files
+        +add(name, content)
+        +generateBlob() Blob
+    }
+    class AgentLoop {
+        +handleSendPrompt(e)
+        +runAgentLoop()
+        +buildContextMessages(system)
+        +estimateTokens(text) int
+        +separateThinking(raw, explicit)
+        +parseFallbackCalls(text)
+        +abortAgent()
+    }
+    class ToolExecutor {
+        +array AGENT_TOOLS
+        +executeTool(name, args) string
+        +normalizePath(p) string
+        +resolveToolName(raw) string
+    }
+    AgentLoop --> AgentSettings : reads and persists
+    AgentLoop --> ToolExecutor : executeTool per call
+    AgentLoop --> ChatMessage : pushes into chatHistory
+    ChatMessage o-- ToolCall
+    ToolExecutor --> WorkspaceState : mutates files and folders
+    ToolExecutor --> Snapshot : captures before each op
+    Snapshot ..> WorkspaceState : deep-copies state
+    Snapshot ..> ToolCall : id referenced for rollback
+    AgentLoop ..> MinimalZip : exports project zip
+    WorkspaceState ..> MinimalZip : files packaged
+        </pre>
+        <div class="cap">Figure 2 — Class diagram of the core data structures and the two conceptual service clusters.</div>
+      </div>
+      <p>
+        The seven tools exposed to the model are: <code>read_file</code>, <code>write_file</code>, <code>edit_file</code>
+        (exact, uniqueness-checked search-and-replace), <code>delete_file</code>, <code>create_folder</code>,
+        <code>delete_folder</code> and <code>move_file</code>. Their JSON-Schema definitions live in <code>AGENT_TOOLS</code>
+        and are sent with every request.
+      </p>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="loop">
+      <h2><span class="num">04</span>Agent loop — stream, decide, act (sequence)</h2>
+      <p>
+        Pressing <em>Send</em> calls <code>handleSendPrompt()</code> → <code>runAgentLoop()</code>. The loop runs for at
+        most <strong>25 turns</strong>. Each turn: build a budgeted message payload, POST to
+        <code>/chat/completions</code> with <code>stream: true</code> and the tool schemas, consume the SSE stream while
+        incrementally updating the DOM, then — if the model emitted <code>tool_calls</code> — snapshot and execute each
+        one, append the results as <code>role: "tool"</code> messages, and iterate. No tool calls means the task is done.
+        A <code>Stop</code> button aborts the in-flight request through an <code>AbortController</code>.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant C as Chat pane
+    participant L as runAgentLoop
+    participant B as buildContextMessages
+    participant API as LLM endpoint
+    participant E as executeTool
+    participant S as Snapshot engine
+    participant W as files and folders
+
+    U->>C: type prompt, press Enter
+    C->>L: handleSendPrompt()
+    L->>C: status bar: thinking
+    loop up to 25 turns or Stop
+        L->>B: system message + pruned history
+        B-->>L: messages within token budget
+        L->>API: POST /chat/completions with tools and stream
+        API-->>L: SSE: reasoning and content deltas
+        API-->>L: SSE: tool_calls deltas accumulated by index
+        L->>C: live-update streaming DOM
+        alt finish with tool_calls
+            loop per tool call
+                L->>S: captureSnapshot(before tool)
+                S-->>L: snapshot id
+                L->>E: executeTool(name, args)
+                E->>W: read / write / edit / move / delete
+                W-->>E: result text
+                E-->>L: success or error message
+                L->>C: tool result box with Rollback button
+            end
+            Note over L: loop continues with tool results
+        else plain assistant reply
+            Note over L: break - task complete
+        end
+    end
+    L->>C: hide status, agent idle
+        </pre>
+        <div class="cap">Figure 3 — Sequence diagram of one full user prompt through the agentic tool loop.</div>
+      </div>
+      <div class="callout purple">
+        <strong>Fallback mode.</strong> If the model ignores the tool-calling API but prints a
+        <code>```tool_name … ```</code> fenced code block in its text, <code>parseFallbackCalls()</code> extracts and
+        executes it anyway — so non-tool-aware local models still work.
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="sse">
+      <h2><span class="num">05</span>SSE stream parsing (activity)</h2>
+      <p>
+        The response body is consumed with <code>response.body.getReader()</code> + a <code>TextDecoder</code>. Because
+        chunks can split anywhere, bytes are appended to an <code>sseBuffer</code>, split on <code>\n</code>, and the
+        <em>last</em> (possibly incomplete) line is kept for the next chunk. Each <code>data:</code> line is JSON-parsed;
+        deltas of <code>reasoning_content</code>/<code>reasoning</code>, <code>content</code> and
+        <code>tool_calls</code> are merged. Tool calls arrive fragmentary — name and argument JSON are concatenated per
+        stream index into a <code>toolCallMap</code> until the stream ends, when the complete calls are validated and
+        normalized.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    A([fetch response OK]) --> B["getReader plus TextDecoder, loop read"]
+    B --> C["append chunk bytes to sseBuffer"]
+    C --> D["split on newline, keep last partial line"]
+    D --> E{line starts with data?}
+    E -- no --> D2["skip blank, comment or DONE lines"]
+    D2 --> B
+    E -- yes --> F["JSON.parse the payload"]
+    F --> G["store finish_reason if present"]
+    G --> H["delta.reasoning? append to thinking buffer"]
+    H --> I["delta.content? append to raw buffer"]
+    I --> J["delta.tool_calls? concatenate by stream index"]
+    J --> K["separateThinking: lift think tags out of content"]
+    K --> L["update streaming DOM + status bar"]
+    L --> B
+    B -- reader done --> M([stream finished])
+        </pre>
+        <div class="cap">Figure 4 — Activity diagram of the incremental Server-Sent-Events parser.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="tools">
+      <h2><span class="num">06</span>Tool execution pipeline (flowchart)</h2>
+      <p>
+        <code>executeTool(name, args)</code> is a pure dispatcher with defensive semantics: it never throws to the
+        model — every failure becomes a descriptive <em>error string</em> the LLM can react to. Note two robustness
+        tricks: <code>resolveToolName()</code> lower-cases and fuzzy-matches tool names (so <code>"Write_File!"</code>
+        still resolves), and <code>edit_file</code> normalizes CRLF→LF on both sides before counting occurrences of
+        <code>old_str</code> — it refuses to run unless the match is <em>exactly one</em>.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    A([tool call received]) --> N["normalizePath + resolveToolName (trim, lowercase, fuzzy match)"]
+    N --> D{tool?}
+    D -- read_file --> R{path exists?}
+    R -- yes --> R1["return file content"]
+    R -- no --> R2["error + list of available files"]
+    D -- write_file --> W1["files[path] = content"]
+    W1 --> W2["auto-derive parent folders"]
+    W2 --> W3["render tree, load editor, refresh preview"]
+    D -- edit_file --> E1["normalize CRLF to LF on all three strings"]
+    E1 --> E2{occurrences of old_str?}
+    E2 -- 0 --> E3["error: not found, hint to read_file first"]
+    E2 -- more than 1 --> E4["error: not unique, request more context"]
+    E2 -- exactly 1 --> E5["single string.replace via callback (safe $ patterns)"]
+    E5 --> E6["render tree, editor, preview"]
+    D -- delete_file --> DF["remove entry, repair activeFilePath"]
+    D -- create_folder --> CF["folders.add(path)"]
+    D -- delete_folder --> DF2["remove folder + every path inside it"]
+    D -- move_file --> MV["files[target] = files[source], delete source"]
+    R1 --> RET([result string returned to the LLM])
+    R2 --> RET
+    W3 --> RET
+    E3 --> RET
+    E4 --> RET
+    E6 --> RET
+    DF --> RET
+    CF --> RET
+    DF2 --> RET
+    MV --> RET
+        </pre>
+        <div class="cap">Figure 5 — Control flow of executeTool across all seven workspace operations.</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Tool</th><th>Behaviour</th><th>UI side-effect</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>read_file</code></td><td>Returns full contents; on miss, lists available files so the model self-corrects.</td><td>None (read-only).</td></tr>
+          <tr><td><code>write_file</code></td><td>Create/overwrite; auto-registers all parent folders; opens the file if the editor was empty.</td><td>Tree + editor + preview refresh.</td></tr>
+          <tr><td><code>edit_file</code></td><td>Exact, unique-match search-replace; rejects 0 or &gt;1 matches with guidance.</td><td>Tree + editor + preview refresh.</td></tr>
+          <tr><td><code>delete_file</code></td><td>Deletes; re-points <code>activeFilePath</code> at a remaining file.</td><td>Full refresh.</td></tr>
+          <tr><td><code>create_folder</code> / <code>delete_folder</code></td><td>Folder bookkeeping; folder delete cascades to all contained paths.</td><td>Tree refresh.</td></tr>
+          <tr><td><code>move_file</code></td><td>Rename/move; if target is an existing folder, the file is moved into it keeping its basename.</td><td>Full refresh, active file follows.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="budget">
+      <h2><span class="num">07</span>Context-window budgeting (activity)</h2>
+      <p>
+        Local models have finite context, so before every turn <code>buildContextMessages()</code> rebuilds the payload
+        from scratch: tokens are estimated as <code>length / 3.4</code> (a cheap heuristic), a reserve
+        (<code>min(maxTokens, 35% of window)</code>) is kept for the model's output, and if the history exceeds the
+        budget the <em>oldest intermediate turns are dropped first</em>. The original user prompt is always anchored,
+        and leading orphan <code>tool</code> messages are trimmed so the API never sees a result without its call.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    S([start of turn]) --> A["read contextWindow and maxTokens from settings"]
+    A --> B["reservedOutput = min(maxTokens, 35% of contextWindow)"]
+    B --> C["budget = max(4096, contextWindow - reservedOutput)"]
+    C --> D["locate the first real user message"]
+    D --> E["slice chatHistory from that point"]
+    E --> F["drop system, ui-error and empty turns"]
+    F --> G["anchor first user message, rest = subsequentTurns"]
+    G --> H["estimate tokens: chars / 3.4 for content and tool_calls JSON"]
+    H --> I{total above budget?}
+    I -- yes --> J{more than 2 later turns left?}
+    J -- yes --> K["drop the oldest intermediate turn"]
+    K --> H
+    J -- no --> L{first leftover is a tool message?}
+    I -- no --> L
+    L -- yes --> M["shift orphan tool message out"]
+    M --> L
+    L -- no --> O([return: system + first user + kept turns])
+        </pre>
+        <div class="cap">Figure 6 — Context-window management: how the payload is pruned to fit the model.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="states">
+      <h2><span class="num">08</span>Agent lifecycle (state diagram)</h2>
+      <p>
+        The loop is guarded by <code>isAgentRunning</code>, a single <code>AbortController</code> and the 25-iteration
+        cap. Errors (HTTP failure, CORS, network) are surfaced as a system chat bubble with a hint to check the local
+        endpoint; user-initiated stops are reported cleanly.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Running: prompt submitted
+    Running --> StreamingTurn: POST stream started
+    StreamingTurn --> Idle: reply without tool_calls
+    StreamingTurn --> Executing: tool_calls finished
+    Executing --> StreamingTurn: tool results appended, next turn
+    Running --> Aborted: Stop button
+    StreamingTurn --> Aborted: Stop button
+    Aborted --> Idle: status cleared, controller released
+    Running --> Failed: HTTP or network error
+    StreamingTurn --> Failed: HTTP or network error
+    Failed --> Idle: error bubble shown
+    note right of Executing
+        every tool call is snapshotted first
+    end note
+        </pre>
+        <div class="cap">Figure 7 — State machine of the agent between turns.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="snap">
+      <h2><span class="num">09</span>Snapshots &amp; rollback (sequence)</h2>
+      <p>
+        <code>captureSnapshot()</code> deep-copies <code>files</code> (via JSON round-trip), the <code>folders</code> Set
+        and the active file path into a timestamped entry. It fires <em>automatically before every agent tool call</em>
+        and before every manual user mutation (save, new file, move, delete). Each resulting tool message therefore
+        stores its <code>snapshotId</code>, and both the tool-call card and the tool-result card expose a
+        <strong>↩ Rollback</strong> button; the ⏱ History modal lists all checkpoints for bulk restore.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+sequenceDiagram
+    participant A as Agent or user
+    participant S as Snapshot engine
+    participant M as History modal
+    participant W as Workspace state
+    participant U as UI: tree, editor, preview
+
+    A->>S: captureSnapshot(description)
+    S->>W: deep-copy files, folders, activeFilePath
+    S-->>A: snapshot id
+    Note over A,S: auto-called before every tool and manual action
+
+    A->>M: openSnapshotsModal()
+    M->>S: read snapshots, newest first
+    M-->>A: list rows with Restore buttons
+    A->>S: restoreSnapshot(id)
+    S->>A: confirm dialog
+    S->>W: replace files, folders, activeFilePath
+    S->>U: renderFileTree + loadFileToEditor + refreshPreview
+    S->>U: system message: Restored checkpoint
+        </pre>
+        <div class="cap">Figure 8 — Snapshot capture and user-initiated rollback flow.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="zip">
+      <h2><span class="num">10</span>MinimalZip — hand-rolled PKZIP (flowchart)</h2>
+      <p>
+        To keep the file dependency-free, ZIP export is implemented from scratch. Entries are written with the
+        <em>store</em> method (no compression): a 30-byte <strong>local file header</strong> (magic
+        <code>0x04034b50</code>) followed by filename and raw bytes; then the <strong>central directory</strong> (one
+        46-byte entry per file, magic <code>0x02014b50</code>); and finally the 22-byte
+        <strong>end-of-central-directory</strong> record (<code>0x06054b50</code>). A 256-entry CRC-32 table
+        (polynomial <code>0xEDB88320</code>) provides integrity checksums; timestamps are packed into DOS format.
+        The final byte stream is wrapped in a <code>Blob</code> of type <code>application/zip</code> — fully compatible
+        with any unzip tool.
+      </p>
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart LR
+    A["add(name, content) x N files"] --> B["generateBlob()"]
+    B --> C["build CRC-32 lookup table (256 entries)"]
+    C --> D["per file: Local File Header 30 bytes + name + raw bytes"]
+    D --> E["per file: Central Directory Entry 46 bytes + name"]
+    E --> F["End Of Central Directory record, 22 bytes"]
+    F --> G["Blob: application/zip, store method, no compression"]
+        </pre>
+        <div class="cap">Figure 9 — Byte layout produced by the embedded ZIP writer.</div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="map">
+      <h2><span class="num">11</span>Source code section map</h2>
+      <p>The <code>&lt;script&gt;</code> block of <code>WebPi.html</code> is organized into 12 numbered sections:</p>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Section</th><th>Key elements</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Pure-JS ZIP writer</td><td><code>MinimalZip</code> — CRC-32 table, local headers, central directory, EOCD</td></tr>
+          <tr><td>2</td><td>State, config &amp; registry</td><td><code>files</code>, <code>folders</code>, <code>activeFilePath</code>, <code>chatHistory</code>, <code>DEFAULT_SETTINGS</code>, <code>localStorage</code> persistence</td></tr>
+          <tr><td>3</td><td>Snapshot &amp; rollback engine</td><td><code>captureSnapshot</code>, <code>restoreSnapshot</code>, <code>openSnapshotsModal</code>, count badge</td></tr>
+          <tr><td>4</td><td>Tool definitions &amp; executor</td><td><code>AGENT_TOOLS</code> (7 schemas), <code>normalizePath</code>, <code>resolveToolName</code>, <code>executeTool</code></td></tr>
+          <tr><td>5</td><td>Context budget &amp; agent loop</td><td><code>estimateTokens</code>, <code>buildContextMessages</code>, <code>runAgentLoop</code>, SSE parser, <code>separateThinking</code>, <code>parseFallbackCalls</code>, <code>abortAgent</code></td></tr>
+          <tr><td>6</td><td>Chat UI rendering</td><td><code>createMessageDOM</code>, <code>updateStreamingDOM</code>, <code>formatToolCalls</code>, expand/collapse toggles, status bar</td></tr>
+          <tr><td>7</td><td>File explorer &amp; editor</td><td><code>renderFileTree</code>, <code>loadFileToEditor</code>, create/move/delete prompts, <code>saveActiveFileFromEditor</code></td></tr>
+          <tr><td>8</td><td>Sandbox live preview</td><td><code>refreshPreview</code> (inlines <code>&lt;link&gt;</code>/<code>&lt;script src&gt;</code> assets into <code>srcdoc</code>), <code>openPreviewInNewTab</code></td></tr>
+          <tr><td>9</td><td>Export / import</td><td><code>downloadZip</code>, <code>exportSession</code> / <code>importSession</code> (full JSON state), <code>triggerDownload</code></td></tr>
+          <tr><td>10</td><td>Settings management</td><td>Config modal, <code>saveSettings</code>, <code>persistSettings</code>, <code>updateSettingsUI</code>, <code>escapeHtml</code></td></tr>
+          <tr><td>11</td><td>Layout interaction</td><td>Pointer-event cross-handle drag (sets <code>--split-x/y</code>, clamped 15–85%, double-click reset), <code>switchMobileTab</code></td></tr>
+          <tr><td>12</td><td>Initialization</td><td><code>DOMContentLoaded</code> bootstrap: load settings, render tree, seed greeting, init resize handle</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout green">
+        <strong>Request anatomy.</strong> Every turn POSTs
+        <code>{ model, messages, tools, tool_choice: "auto", stream: true, max_tokens, max_completion_tokens,
+        reasoning_effort? }</code> to <code>&lt;baseUrl&gt;/chat/completions</code> with a <code>Bearer</code> key — the
+        standard OpenAI chat-completions contract, which is what makes any compatible server (Ollama, llama.cpp,
+        vLLM, LM Studio, …) a drop-in backend.
+      </div>
+
+      <div class="callout">
+        <strong>Security model.</strong> Generated code runs inside
+        <code>&lt;iframe sandbox="allow-scripts allow-modals allow-forms allow-same-origin allow-popups"&gt;</code>;
+        all user-generated HTML injected into the chat/tree UI passes through <code>escapeHtml()</code>; the agent
+        can only touch the in-memory workspace — nothing ever leaves the browser except the API request.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    WebPi technical documentation · generated for <a href="WebPi.html">WebPi.html</a> · diagrams rendered with
+    <a href="https://mermaid.js.org" target="_blank" rel="noopener">Mermaid</a> (requires network for the CDN script)
+  </footer>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: { curve: 'basis', htmlLabels: true },
+      sequence: { mirrorActors: false, wrap: true },
+      themeVariables: {
+        darkMode: true,
+        background: '#0f172a',
+        primaryColor: '#312e81',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#8b5cf6',
+        lineColor: '#8b5cf6',
+        secondaryColor: '#1e1b4b',
+        tertiaryColor: '#0b1120',
+        mainBkg: '#312e81',
+        nodeBorder: '#8b5cf6',
+        clusterBkg: 'rgba(30, 41, 59, 0.45)',
+        clusterBorder: '#475569',
+        titleColor: '#c4b5fd',
+        edgeLabelBackground: '#0f172a',
+        textColor: '#e2e8f0',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+        sequenceActorBkg: '#312e81',
+        sequenceActorBorder: '#8b5cf6',
+        sequenceActorTextColor: '#ffffff',
+        sequenceBoxBkgColor: '#1e1b4b',
+        sequenceBoxBorderColor: '#7c3aed',
+        noteBkgColor: '#312e81',
+        noteBorderColor: '#7c3aed',
+        noteTextColor: '#e2e8f0',
+        activationBkgColor: '#4c1d95',
+        activationBorderColor: '#7c3aed',
+        actorTextColor: '#e2e8f0',
+        signalColor: '#c4b5fd',
+        labelBoxBkgColor: '#1e1b4b',
+        labelBoxBorderColor: '#7c3aed',
+        labelTextColor: '#e2e8f0',
+        classAttributeIcon: ''
+      }
+    });
+  </script>
+</body>
+</html>
