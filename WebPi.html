@@ -1538,27 +1538,18 @@ Use the provided tools systematically to complete all user requests accurately.`
 
           if (m.tool_calls) {
             // Compress past huge file write payloads in older turns to avoid re-sending megabytes of code
+            // (Note: edit_file is preserved intact to prevent confusing the model with dummy placeholder diffs)
             item.tool_calls = m.tool_calls.map(tc => {
-              if (isPastTurn && (tc.function?.name === "write_file" || tc.function?.name === "edit_file")) {
+              if (isPastTurn && tc.function?.name === "write_file") {
                 try {
                   const parsed = JSON.parse(tc.function.arguments);
-                  if (tc.function.name === "write_file") {
-                    return {
-                      ...tc,
-                      function: {
-                        ...tc.function,
-                        arguments: JSON.stringify({ path: parsed.path, content: `[Content committed to ${parsed.path} (${(parsed.content || "").length} chars)]` })
-                      }
-                    };
-                  } else if (tc.function.name === "edit_file") {
-                    return {
-                      ...tc,
-                      function: {
-                        ...tc.function,
-                        arguments: JSON.stringify({ path: parsed.path, old_str: "[diff applied]", new_str: "[diff applied]" })
-                      }
-                    };
-                  }
+                  return {
+                    ...tc,
+                    function: {
+                      ...tc.function,
+                      arguments: JSON.stringify({ path: parsed.path, content: `// [Content committed to ${parsed.path} (${(parsed.content || "").length} chars)]` })
+                    }
+                  };
                 } catch (e) { return tc; }
               }
               return tc;
@@ -2458,7 +2449,7 @@ Use the provided tools systematically to complete all user requests accurately.`
 
     /* ==========================================================================
        8. SANDBOX LIVE PREVIEW
-       ========================================================================== */
+       ========================================================================= */
     function refreshPreview() {
       const frame = document.getElementById("previewFrame");
       let html = files["index.html"] || (activeFilePath.endsWith(".html") ? files[activeFilePath] : "");
