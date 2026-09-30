@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attention Demystified: The QKV Mechanism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+
+      /* Dark Theme (Default) */
+      --bg-primary: #090d16;
+      --bg-secondary: #0f172a;
+      --bg-tertiary: #1e293b;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-color: #334155;
+      --border-subtle: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+
+      /* Semantic Colors for Q, K, V */
+      --color-q: #38bdf8;        /* Sky Blue */
+      --color-q-bg: rgba(56, 189, 248, 0.12);
+      --color-q-border: rgba(56, 189, 248, 0.35);
+
+      --color-k: #34d399;        /* Emerald */
+      --color-k-bg: rgba(52, 211, 153, 0.12);
+      --color-k-border: rgba(52, 211, 153, 0.35);
+
+      --color-v: #fbbf24;        /* Amber */
+      --color-v-bg: rgba(251, 191, 36, 0.12);
+      --color-v-border: rgba(251, 191, 36, 0.35);
+
+      --color-attn: #a855f7;     /* Purple */
+      --color-attn-bg: rgba(168, 85, 247, 0.12);
+      --color-attn-border: rgba(168, 85, 247, 0.35);
+
+      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #a855f7 50%, #f43f5e 100%);
+    }
+
+    html.light {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-card-hover: #ffffff;
+      --border-color: #e2e8f0;
+      --border-subtle: #edf2f7;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #94a3b8;
+      --shadow-soft: 0 12px 32px -8px rgba(15, 23, 42, 0.08);
+
+      --color-q: #0284c7;
+      --color-q-bg: rgba(2, 132, 199, 0.08);
+      --color-q-border: rgba(2, 132, 199, 0.3);
+
+      --color-k: #059669;
+      --color-k-bg: rgba(5, 150, 105, 0.08);
+      --color-k-border: rgba(5, 150, 105, 0.3);
+
+      --color-v: #d97706;
+      --color-v-bg: rgba(217, 119, 6, 0.08);
+      --color-v-border: rgba(217, 119, 6, 0.3);
+
+      --color-attn: #7c3aed;
+      --color-attn-bg: rgba(124, 58, 237, 0.08);
+      --color-attn-border: rgba(124, 58, 237, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Ambient dynamic glow */
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 850px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(168, 85, 247, 0.1) 40%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background-color: rgba(9, 13, 22, 0.82);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 100;
+    }
+    html.light header {
+      background-color: rgba(248, 250, 252, 0.85);
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-badge {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 0.9rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .theme-toggle:hover {
+      border-color: var(--text-muted);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 5rem 0 3.5rem 0;
+      text-align: center;
+    }
+
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--color-q);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.3rem, 5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 1.15rem;
+      color: var(--text-muted);
+    }
+
+    /* Section Styles */
+    section {
+      margin-bottom: 5rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 750px;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Tri-color Concept Cards */
+    .qkv-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .concept-card {
+      padding: 1.75rem;
+      border-radius: 14px;
+      position: relative;
+    }
+    .concept-card.q {
+      background: var(--color-q-bg);
+      border: 1px solid var(--color-q-border);
+    }
+    .concept-card.k {
+      background: var(--color-k-bg);
+      border: 1px solid var(--color-k-border);
+    }
+    .concept-card.v {
+      background: var(--color-v-bg);
+      border: 1px solid var(--color-v-border);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .concept-card.q .badge { background: var(--color-q); color: #000; }
+    .concept-card.k .badge { background: var(--color-k); color: #000; }
+    .concept-card.v .badge { background: var(--color-v); color: #000; }
+
+    .concept-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .concept-card p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Formula Banner */
+    .formula-banner {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .math-q { color: var(--color-q); font-weight: 700; }
+    .math-k { color: var(--color-k); font-weight: 700; }
+    .math-v { color: var(--color-v); font-weight: 700; }
+    .math-attn { color: var(--color-attn); font-weight: 700; }
+
+    /* Interactive Demo 1: The Pipeline */
+    .token-selector-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      align-items: center;
+    }
+
+    .token-btn {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      position: relative;
+    }
+    .token-btn:hover {
+      border-color: var(--color-q);
+    }
+    .token-btn.active {
+      background: var(--color-q-bg);
+      border-color: var(--color-q);
+      color: var(--color-q);
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+
+    .interactive-stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 860px) {
+      .interactive-stage {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stage-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .stage-panel h4 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .score-label {
+      width: 70px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .score-bar-wrapper {
+      flex: 1;
+      height: 28px;
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .score-bar {
+      height: 100%;
+      background: linear-gradient(90deg, rgba(168, 85, 247, 0.4), var(--color-attn));
+      width: 0%;
+      transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 6px;
+    }
+
+    .score-val {
+      position: absolute;
+      right: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Vector visualizer representation */
+    .vector-box {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--bg-tertiary);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+
+    .vector-pill {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .vector-pill.q { background: var(--color-q-bg); color: var(--color-q); border: 1px solid var(--color-q-border); }
+    .vector-pill.k { background: var(--color-k-bg); color: var(--color-k); border: 1px solid var(--color-k-border); }
+    .vector-pill.v { background: var(--color-v-bg); color: var(--color-v); border: 1px solid var(--color-v-border); }
+
+    /* Interactive Demo 2: Statistical Derivation */
+    .stats-container {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .corpus-preview {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .corpus-line {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+    }
+    .corpus-line mark {
+      background: var(--color-q-bg);
+      color: var(--color-q);
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+    }
+
+    .training-slider-wrap {
+      margin: 1.5rem 0;
+      padding: 1.25rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-tertiary);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-q);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    .matrix-display {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 1rem;
+    }
+
+    .matrix-cell {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.5rem 0.25rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .matrix-cell-label {
+      font-size: 0.68rem;
+      color: var(--text-subtle);
+      margin-bottom: 0.2rem;
+    }
+
+    /* Explanation Breakdown Blocks */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .step-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: var(--color-q);
+    }
+
+    .step-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Canvas Vector Simulator */
+    .canvas-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    canvas {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 440px;
+      height: 280px;
+    }
+
+    .canvas-controls {
+      display: flex;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 440px;
+      margin-top: 1rem;
+    }
+
+    .canvas-ctrl-item {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color);
+      padding: 3rem 0;
+      text-align: center;
+      color: var(--text-subtle);
+      font-size: 0.9rem;
+    }
+
+    /* Utility icons */
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <header>
+    <div class="container nav-bar">
+      <div class="logo">
+        <svg class="icon" viewBox="0 0 24 24" style="color: #38bdf8;">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>Transformer<span class="logo-badge">Attention</span></span>
+      </div>
+
+      <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+        <svg class="icon sun-icon" style="display:none;" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon moon-icon" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span id="themeToggleText">Light Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="pill-tag">
+        <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Core Mechanics of LLMs
+      </div>
+      <h1>Demystifying Query, Key, & Value</h1>
+      <p>
+        Attention gives language models the superpower to dynamically contextualize words. 
+        Instead of treating words in isolation, each word asks questions, inspects other words, 
+        and extracts the exact information it needs.
+      </p>
+
+      <div class="formula-banner">
+        <span>Attention(</span>
+        <span class="math-q">Q</span>,
+        <span class="math-k">K</span>,
+        <span class="math-v">V</span>
+        <span>) = softmax(</span>
+        <span class="math-q">Q</span>
+        <span>&sdot;</span>
+        <span class="math-k">K</span><sup>T</sup>
+        <span>/ &radic;d<sub>k</sub>)</span>
+        <span class="math-v">V</span>
+      </div>
+    </section>
+
+    <!-- THE ANALOGY -->
+    <section>
+      <h2 class="section-title">1. The Intuitive Analogy: Video Search</h2>
+      <p class="section-desc">
+        Think of attention like searching on YouTube or an archive library. You enter a search query, 
+        the database compares it against video metadata tags, and then plays the matching video stream.
+      </p>
+
+      <div class="qkv-grid">
+        <div class="concept-card q">
+          <span class="badge">QUERY (Q)</span>
+          <h3>What am I looking for?</h3>
+          <p>
+            The prompt or focus vector generated by the current token. It represents what contextual 
+            information this token needs to understand its role.
+          </p>
+          <div style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-q);">
+            e.g., "bank" asks: "Am I a financial institution or a river slope?"
+          </div>
+        </div>
+
+        <div class="concept-card k">
+          <span class="badge">KEY (K)</span>
+          <h3>What do I offer?</h3>
+          <p>
+            The label or index card carried by every other token in the sentence. It answers whether 
+            it has information relevant to what any Query might seek.
+          </p>
+          <div style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-k);">
+            e.g., "money" advertises: "I provide finance/monetary context."
+          </div>
+        </div>
+
+        <div class="concept-card v">
+          <span class="badge">VALUE (V)</span>
+          <h3>What content do I transmit?</h3>
+          <p>
+            The actual semantic payload. If a Query matches a Key, this is the information transferred 
+            to enrich the original token's embedding.
+          </p>
+          <div style="margin-top: 1rem; font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-v);">
+            e.g., "finance" payload is added to the representation of "bank".
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE DEMO 1: SENTENCE PIPELINE -->
+    <section>
+      <h2 class="section-title">2. Interactive Sandbox: Attention in Action</h2>
+      <p class="section-desc">
+        Select a token in the sentence below to see its Query probe every other token's Key, calculate compatibility scores, and aggregate the Values.
+      </p>
+
+      <div class="card">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+          Select Active Focus Token (generates Query):
+        </div>
+
+        <!-- Token selector -->
+        <div class="token-selector-bar" id="tokenButtons">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="interactive-stage">
+          <!-- Left stage: Matching Process -->
+          <div class="stage-panel">
+            <h4>
+              <span>Attention Distribution (Softmax)</span>
+              <span id="activeTokenName" style="color: var(--color-q); font-family: var(--font-mono);"></span>
+            </h4>
+            
+            <div id="attentionBars">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div style="margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+              <strong>Mathematical Step:</strong> Dot-product <span class="math-q">Q</span> &middot; <span class="math-k">K</span> 
+              measures vector alignment (angle & magnitude), scaled by <code>&radic;d<sub>k</sub></code> to avoid exploding gradients, then normalized via <code>softmax()</code> so all weights sum to 100%.
+            </div>
+          </div>
+
+          <!-- Right stage: Vector Inspection -->
+          <div class="stage-panel">
+            <h4>Vector Projections & Context Blend</h4>
+
+            <div class="vector-box">
+              <span class="vector-pill q">Query Vector (Q)</span>
+              <div id="qVectorDisplay" style="color: var(--text-muted); margin-top: 0.35rem;"></div>
+            </div>
+
+            <div class="vector-box">
+              <span class="vector-pill attn">Contextualized Output (Z)</span>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
+                Weighted combination: <span style="font-family: var(--font-mono);">&Sigma; (Weight &times; Value)</span>
+              </p>
+              <div id="outputInterpretation" style="margin-top: 0.5rem; font-weight: 500; color: var(--text-main);"></div>
+            </div>
+
+            <!-- Geometric Canvas -->
+            <div class="canvas-container">
+              <div style="font-size: 0.75rem; color: var(--text-muted); align-self: flex-start; margin-bottom: 0.4rem;">
+                Vector Space Projection (2D Principal Slice):
+              </div>
+              <canvas id="vectorCanvas" width="400" height="260"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- STEP-BY-STEP BREAKDOWN -->
+    <section>
+      <h2 class="section-title">3. The 4 Structural Transformations</h2>
+      <p class="section-desc">
+        Where do Q, K, and V come from? They are generated by multiplying the input embedding $X$ with three distinct learned weight matrices: $W_Q, W_K, W_V$.
+      </p>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h4>Linear Projection</h4>
+          <p>
+            The raw token vector $X$ is multiplied by weights:
+            <code>Q = X &sdot; W<sub>Q</sub></code>, <code>K = X &sdot; W<sub>K</sub></code>, and <code>V = X &sdot; W<sub>V</sub></code>.
+            This gives the word different representations for questioning, indexing, and communicating.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h4>Dot-Product Matching</h4>
+          <p>
+            We take the dot product of <span class="math-q">Q</span> with all <span class="math-k">K</span>s.
+            A higher dot product means the vectors point in similar directions in latent space, indicating high semantic relevance.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h4>Scaling & Softmax</h4>
+          <p>
+            We divide by the square root of the dimension ($\sqrt{d_k}$) so large vectors don't saturate the softmax function into binary zero-or-one outputs, preserving fluid gradients.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h4>Value Synthesis</h4>
+          <p>
+            Each token's <span class="math-v">Value</span> vector is multiplied by its softmax score. Adding them produces a new, rich vector that replaces the naive static dictionary definition with full context.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: HOW STATISTICAL TRAINING SHAPES ATTENTION -->
+    <section>
+      <h2 class="section-title">4. How is Attention Statistically Derived from Training Data?</h2>
+      <p class="section-desc">
+        Matrices $W_Q, W_K, W_V$ are not handcrafted by engineers. They start as pure Gaussian noise. Here is how millions of corpus sentences statistically mold them.
+      </p>
+
+      <div class="card">
+        <div class="stats-container">
+          <!-- Left: Explanation & Corpus -->
+          <div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.75rem;">Language Statistics & Co-occurrence</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+              When training on millions of articles, the model plays next-token prediction:
+              <em>"Given previous tokens, what comes next?"</em>
+            </p>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.25rem;">
+              If the word <strong>"bank"</strong> appears near <strong>"river"</strong>, <strong>"water"</strong>, and <strong>"flow"</strong>, next-token prediction requires resolving "bank" as natural geography. 
+              The training loss pushes $W_Q$ and $W_K$ via gradient descent to maximize dot products between co-occurring contextual clues.
+            </p>
+
+            <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-subtle);">
+              Training Corpus Excerpts:
+            </div>
+            <div class="corpus-preview">
+              <div class="corpus-line">1. "The <mark>river</mark> overflowed its steep <mark>bank</mark> after heavy spring rains."</div>
+              <div class="corpus-line">2. "They sat by the green <mark>bank</mark> listening to the flowing <mark>stream</mark>."</div>
+              <div class="corpus-line">3. "The financial <mark>bank</mark> approved the commercial <mark>loan</mark> today."</div>
+              <div class="corpus-line">4. "Depositors queued outside the local <mark>bank</mark> branch to withdraw <mark>cash</mark>."</div>
+              <div class="corpus-line">5. "Water rushed down the rocky <mark>river</mark> <mark>bank</mark> into the lake."</div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Training Simulator -->
+          <div>
+            <div class="training-slider-wrap">
+              <div class="slider-header">
+                <span>Training Progress: <span id="epochLabel" style="color: var(--color-q);">Step 0 (Random Initialized)</span></span>
+              </div>
+              <input type="range" id="epochSlider" min="0" max="100" value="0" />
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-subtle); margin-top: 0.35rem;">
+                <span>Random Weights</span>
+                <span>Early Co-occurrence</span>
+                <span>Optimized Latent Geometry</span>
+              </div>
+            </div>
+
+            <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">
+              Learned Q-K Correlation Heatmap for Query: <code>"bank"</code>
+            </div>
+
+            <!-- Heatmap simulation -->
+            <div class="matrix-display" id="matrixGrid">
+              <!-- Dynamically rendered -->
+            </div>
+
+            <div style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <strong style="color: var(--text-main);">Statistical Insight:</strong>
+              <span id="statisticalInsightText">
+                At Step 0, attention is uniform noise. The dot products $Q \cdot K^T$ show zero semantic awareness because $W_Q$ and $W_K$ have not updated.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE 2D VECTOR MATH PLAYGROUND -->
+    <section>
+      <h2 class="section-title">5. Geometric Intuition: The Dot Product Engine</h2>
+      <p class="section-desc">
+        At the core of Attention is the dot product: $\mathbf{u} \cdot \mathbf{v} = |\mathbf{u}| |\mathbf{v}| \cos(\theta)$.
+        Drag the sliders to change the angle between a Query and Key to observe how alignment dictates attention score.
+      </p>
+
+      <div class="card">
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: center;">
+          <div style="flex: 1; min-width: 280px;">
+            <div style="margin-bottom: 1.5rem;">
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                Query Direction Angle (&theta;<sub>Q</sub>): <span id="qAngleVal" style="color: var(--color-q);">45&deg;</span>
+              </label>
+              <input type="range" id="qAngleSlider" min="0" max="360" value="45" />
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                Key Direction Angle (&theta;<sub>K</sub>): <span id="kAngleVal" style="color: var(--color-k);">65&deg;</span>
+              </label>
+              <input type="range" id="kAngleSlider" min="0" max="360" value="65" />
+            </div>
+
+            <div class="vector-box" style="margin-bottom: 0;">
+              <div>Angle Difference (&Delta;&theta;): <strong id="deltaAngleVal" style="color: var(--text-main);">20&deg;</strong></div>
+              <div>Dot Product (Similarity): <strong id="dotProductResult" style="color: var(--color-attn);">0.94</strong></div>
+              <div style="margin-top: 0.5rem; font-size: 0.78rem; color: var(--text-subtle);">
+                Higher cosine alignment = Exponentially higher attention weight after Softmax.
+              </div>
+            </div>
+          </div>
+
+          <div style="width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="interactiveUnitCanvas" width="280" height="280"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Attention Mechanism Deep-Dive &bull; Designed for Clarity & Mathematical Rigor</p>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       THEME TOGGLE SYSTEM
+    ========================================================= */
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleText = document.getElementById('themeToggleText');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    const htmlElem = document.documentElement;
+
+    function applyTheme(isLight) {
+      if (isLight) {
+        htmlElem.classList.remove('dark');
+        htmlElem.classList.add('light');
+        themeToggleText.textContent = 'Dark Mode';
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+      } else {
+        htmlElem.classList.remove('light');
+        htmlElem.classList.add('dark');
+        themeToggleText.textContent = 'Light Mode';
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+      }
+      renderVectorCanvas();
+      drawUnitCircle();
+    }
+
+    let isLight = false;
+    themeToggleBtn.addEventListener('click', () => {
+      isLight = !isLight;
+      applyTheme(isLight);
+    });
+
+    /* =========================================================
+       DEMO 1: SENTENCE PIPELINE & QKV INTERACTION
+    ========================================================= */
+    const sentenceData = [
+      {
+        token: "The",
+        q: [0.12, 0.05],
+        k: [0.10, 0.08],
+        v: "Definite Article",
+        weights: { "The": 0.04, "animal": 0.12, "didn't": 0.05, "cross": 0.08, "the": 0.03, "street": 0.11, "because": 0.07, "it": 0.10, "was": 0.05, "too": 0.05, "tired": 0.30 },
+        desc: "Syntactic determiner looking for following noun."
+      },
+      {
+        token: "animal",
+        q: [0.85, 0.45],
+        k: [0.88, 0.52],
+        v: "Subject: Biological Animate Entity",
+        weights: { "The": 0.05, "animal": 0.22, "didn't": 0.08, "cross": 0.18, "the": 0.04, "street": 0.09, "because": 0.04, "it": 0.12, "was": 0.03, "too": 0.03, "tired": 0.12 },
+        desc: "Subject noun. Focuses on actions and states related to animate actors."
+      },
+      {
+        token: "didn't",
+        q: [-0.42, 0.65],
+        k: [-0.38, 0.70],
+        v: "Negation Operator",
+        weights: { "The": 0.02, "animal": 0.14, "didn't": 0.15, "cross": 0.42, "the": 0.03, "street": 0.06, "because": 0.08, "it": 0.03, "was": 0.02, "too": 0.02, "tired": 0.03 },
+        desc: "Negator. Primarily attaches to the verb 'cross'."
+      },
+      {
+        token: "cross",
+        q: [0.35, 0.82],
+        k: [0.40, 0.80],
+        v: "Action: Transitive Movement",
+        weights: { "The": 0.03, "animal": 0.28, "didn't": 0.21, "cross": 0.14, "the": 0.04, "street": 0.22, "because": 0.04, "it": 0.02, "was": 0.01, "too": 0.01, "tired": 0.00 },
+        desc: "Primary predicate verb, actively binding the agent ('animal') and destination ('street')."
+      },
+      {
+        token: "the",
+        q: [0.08, 0.11],
+        k: [0.09, 0.09],
+        v: "Definite Article",
+        weights: { "The": 0.02, "animal": 0.05, "didn't": 0.02, "cross": 0.08, "the": 0.06, "street": 0.65, "because": 0.03, "it": 0.02, "was": 0.02, "too": 0.02, "tired": 0.03 },
+        desc: "Determiner specifying 'street'."
+      },
+      {
+        token: "street",
+        q: [0.15, -0.65],
+        k: [0.18, -0.60],
+        v: "Object: Physical Infrastructure",
+        weights: { "The": 0.03, "animal": 0.10, "didn't": 0.08, "cross": 0.35, "the": 0.12, "street": 0.22, "because": 0.03, "it": 0.02, "was": 0.01, "too": 0.02, "tired": 0.02 },
+        desc: "Spatial landmark, linking backward to traversal."
+      },
+      {
+        token: "because",
+        q: [-0.60, 0.30],
+        k: [-0.55, 0.28],
+        v: "Causal Conjunction",
+        weights: { "The": 0.02, "animal": 0.11, "didn't": 0.18, "cross": 0.15, "the": 0.02, "street": 0.05, "because": 0.12, "it": 0.08, "was": 0.05, "too": 0.06, "tired": 0.16 },
+        desc: "Logical connector anchoring the cause-and-effect clauses."
+      },
+      {
+        token: "it",
+        q: [0.92, 0.60],
+        k: [0.85, 0.58],
+        v: "Pronoun Referent",
+        weights: { "The": 0.02, "animal": 0.58, "didn't": 0.04, "cross": 0.06, "the": 0.02, "street": 0.08, "because": 0.04, "it": 0.05, "was": 0.02, "too": 0.02, "tired": 0.07 },
+        desc: "Classic Winograd Schema: 'it' resolves directly to 'animal' due to tired-animal semantic compatibility!"
+      },
+      {
+        token: "was",
+        q: [-0.10, -0.20],
+        k: [-0.08, -0.18],
+        v: "Auxiliary State",
+        weights: { "The": 0.02, "animal": 0.10, "didn't": 0.05, "cross": 0.04, "the": 0.02, "street": 0.04, "because": 0.08, "it": 0.25, "was": 0.10, "too": 0.10, "tired": 0.20 },
+        desc: "Past tense copula linking 'it' to predicate 'tired'."
+      },
+      {
+        token: "too",
+        q: [-0.30, -0.45],
+        k: [-0.28, -0.42],
+        v: "Degree Adverb",
+        weights: { "The": 0.01, "animal": 0.04, "didn't": 0.05, "cross": 0.05, "the": 0.02, "street": 0.03, "because": 0.05, "it": 0.05, "was": 0.08, "too": 0.12, "tired": 0.50 },
+        desc: "Intensifier modifying condition 'tired'."
+      },
+      {
+        token: "tired",
+        q: [0.78, 0.35],
+        k: [0.80, 0.40],
+        v: "State: Biological Fatigue",
+        weights: { "The": 0.02, "animal": 0.45, "didn't": 0.06, "cross": 0.12, "the": 0.02, "street": 0.04, "because": 0.04, "it": 0.15, "was": 0.03, "too": 0.05, "tired": 0.02 },
+        desc: "Biological state; projects strongly to physical animate agents."
+      }
+    ];
+
+    let currentTokenIndex = 7; // Start with "it"
+    const tokenButtonsContainer = document.getElementById('tokenButtons');
+    const attentionBarsContainer = document.getElementById('attentionBars');
+    const activeTokenName = document.getElementById('activeTokenName');
+    const qVectorDisplay = document.getElementById('qVectorDisplay');
+    const outputInterpretation = document.getElementById('outputInterpretation');
+
+    function buildTokenUI() {
+      tokenButtonsContainer.innerHTML = '';
+      sentenceData.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = `token-btn ${index === currentTokenIndex ? 'active' : ''}`;
+        btn.innerHTML = `<span>${item.token}</span>`;
+        btn.addEventListener('click', () => {
+          currentTokenIndex = index;
+          updateTokenSelection();
+        });
+        tokenButtonsContainer.appendChild(btn);
+      });
+    }
+
+    function updateTokenSelection() {
+      const activeData = sentenceData[currentTokenIndex];
+
+      // Update button styles
+      const buttons = tokenButtonsContainer.querySelectorAll('.token-btn');
+      buttons.forEach((b, i) => {
+        b.classList.toggle('active', i === currentTokenIndex);
+      });
+
+      activeTokenName.textContent = `Token: "${activeData.token}"`;
+      qVectorDisplay.innerHTML = `[${activeData.q[0].toFixed(2)}, ${activeData.q[1].toFixed(2)}] &mdash; <em>${activeData.desc}</em>`;
+      outputInterpretation.innerHTML = `Blended Context: Synthesized mostly from <span style="color:var(--color-attn); font-weight:700;">${getDominantTokens(activeData.weights)}</span> values.`;
+
+      // Update Attention Bars
+      attentionBarsContainer.innerHTML = '';
+      sentenceData.forEach(item => {
+        const weight = activeData.weights[item.token] || 0.03;
+        const percentage = (weight * 100).toFixed(1);
+
+        const row = document.createElement('div');
+        row.className = 'score-row';
+        row.innerHTML = `
+          <div class="score-label">${item.token}</div>
+          <div class="score-bar-wrapper">
+            <div class="score-bar" style="width: ${percentage}%;"></div>
+            <div class="score-val">${percentage}%</div>
+          </div>
+        `;
+        attentionBarsContainer.appendChild(row);
+      });
+
+      renderVectorCanvas();
+    }
+
+    function getDominantTokens(weights) {
+      return Object.entries(weights)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(entry => `"${entry[0]}" (${(entry[1]*100).toFixed(0)}%)`)
+        .join(' & ');
+    }
+
+    /* 2D Canvas Representation */
+    const vCanvas = document.getElementById('vectorCanvas');
+    const ctx = vCanvas.getContext('2d');
+
+    function renderVectorCanvas() {
+      const isLightMode = htmlElem.classList.contains('light');
+      const w = vCanvas.width;
+      const h = vCanvas.height;
+      const originX = w / 2;
+      const originY = h / 2;
+      const scale = 110;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw Grid Axes
+      ctx.strokeStyle = isLightMode ? '#e2e8f0' : '#1e293b';
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(0, originY);
+      ctx.lineTo(w, originY);
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, h);
+      ctx.stroke();
+
+      // Draw active Query Vector
+      const activeData = sentenceData[currentTokenIndex];
+      const qX = originX + activeData.q[0] * scale;
+      const qY = originY - activeData.q[1] * scale;
+
+      drawVector(originX, originY, qX, qY, isLightMode ? '#0284c7' : '#38bdf8', 3, `Q ("${activeData.token}")`);
+
+      // Draw Keys of related tokens
+      sentenceData.forEach((item, idx) => {
+        const weight = activeData.weights[item.token] || 0.05;
+        if (weight > 0.09) { // Only draw significant keys
+          const kX = originX + item.k[0] * scale;
+          const kY = originY - item.k[1] * scale;
+          const alpha = Math.min(1, weight * 2.2);
+          drawVector(originX, originY, kX, kY, `rgba(52, 211, 153, ${alpha})`, 2, `K: ${item.token}`);
+        }
+      });
+    }
+
+    function drawVector(fromX, fromY, toX, toY, color, width, label) {
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+
+      ctx.beginPath();
+      ctx.moveTo(fromX, fromY);
+      ctx.lineTo(toX, toY);
+      ctx.stroke();
+
+      // Arrow head
+      const angle = Math.atan2(toY - fromY, toX - fromX);
+      const headlen = 8;
+      ctx.beginPath();
+      ctx.moveTo(toX, toY);
+      ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+      ctx.fill();
+
+      // Label
+      if (label) {
+        ctx.font = '11px Fira Code';
+        ctx.fillText(label, toX + 6, toY - 4);
+      }
+    }
+
+    /* =========================================================
+       DEMO 2: STATISTICAL TRAINING SLIDER SIMULATOR
+    ========================================================= */
+    const epochSlider = document.getElementById('epochSlider');
+    const epochLabel = document.getElementById('epochLabel');
+    const matrixGrid = document.getElementById('matrixGrid');
+    const statisticalInsightText = document.getElementById('statisticalInsightText');
+
+    const vocabulary = ["river", "money", "water", "loan"];
+    // Ground truth statistical co-occurrence with "bank":
+    // "bank" naturally co-occurs highly with "river", "water" in nature context, and "money", "loan" in financial context.
+    // Untrained: random ~0.25 each. Trained: differentiated contextual heads.
+
+    function updateMatrixSimulation(epoch) {
+      const t = epoch / 100; // 0.0 to 1.0
+
+      if (epoch === "0") {
+        epochLabel.textContent = "Step 0 (Random Initialized)";
+        statisticalInsightText.innerHTML = "At Step 0, attention is uniform noise. The dot products $Q \\cdot K^T$ show zero semantic awareness because $W_Q$ and $W_K$ have not updated.";
+      } else if (epoch < 50) {
+        epochLabel.textContent = `Step ${epoch} (Broad Statistical Association)`;
+        statisticalInsightText.innerHTML = `At Step ${epoch}, backpropagation from next-token cross-entropy loss begins pulling words with high Pointwise Mutual Information (PMI) closer in $QK^T$ space.`;
+      } else {
+        epochLabel.textContent = `Step ${epoch} (Specialized Subspace Alignment)`;
+        statisticalInsightText.innerHTML = `At Step ${epoch}, projection weights $W_Q$ and $W_K$ successfully factorize the statistical co-occurrence patterns. Natural river words and financial loan words form sharp cluster alignments.`;
+      }
+
+      // Compute simulated dot-product scores for Query = "bank"
+      // Target profile: River Context Head
+      const baseScores = [
+        0.25 + 0.65 * t, // river
+        0.25 - 0.18 * t, // money
+        0.25 + 0.55 * t, // water
+        0.25 - 0.20 * t  // loan
+      ];
+
+      matrixGrid.innerHTML = '';
+      vocabulary.forEach((word, idx) => {
+        // Add subtle jitter if low epoch
+        const noise = (1 - t) * (Math.sin(idx * 4 + t * 10) * 0.15);
+        const score = Math.max(0.02, Math.min(0.99, baseScores[idx] + noise));
+        const cell = document.createElement('div');
+        cell.className = 'matrix-cell';
+
+        // dynamic background intensity
+        const intensity = Math.round(score * 255);
+        cell.style.borderColor = `rgba(168, 85, 247, ${0.2 + score * 0.8})`;
+        cell.style.background = `rgba(168, 85, 247, ${0.05 + score * 0.35})`;
+
+        cell.innerHTML = `
+          <div class="matrix-cell-label">${word}</div>
+          <div style="font-weight:700; color:var(--text-main);">${score.toFixed(2)}</div>
+        `;
+        matrixGrid.appendChild(cell);
+      });
+    }
+
+    epochSlider.addEventListener('input', (e) => {
+      updateMatrixSimulation(e.target.value);
+    });
+
+    /* =========================================================
+       DEMO 3: GEOMETRIC DOT PRODUCT ENGINE
+    ========================================================= */
+    const qAngleSlider = document.getElementById('qAngleSlider');
+    const kAngleSlider = document.getElementById('kAngleSlider');
+    const qAngleVal = document.getElementById('qAngleVal');
+    const kAngleVal = document.getElementById('kAngleVal');
+    const deltaAngleVal = document.getElementById('deltaAngleVal');
+    const dotProductResult = document.getElementById('dotProductResult');
+    const unitCanvas = document.getElementById('interactiveUnitCanvas');
+    const uCtx = unitCanvas.getContext('2d');
+
+    function drawUnitCircle() {
+      const isLightMode = htmlElem.classList.contains('light');
+      const w = unitCanvas.width;
+      const h = unitCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = 95;
+
+      const qDeg = parseFloat(qAngleSlider.value);
+      const kDeg = parseFloat(kAngleSlider.value);
+
+      qAngleVal.textContent = `${qDeg}°`;
+      kAngleVal.textContent = `${kDeg}°`;
+
+      const diff = Math.abs(qDeg - kDeg);
+      const normalizedDiff = diff > 180 ? 360 - diff : diff;
+      deltaAngleVal.textContent = `${normalizedDiff.toFixed(0)}°`;
+
+      const radQ = (qDeg * Math.PI) / 180;
+      const radK = (kDeg * Math.PI) / 180;
+
+      // Cosine similarity
+      const dotProd = Math.cos(((qDeg - kDeg) * Math.PI) / 180);
+      dotProductResult.textContent = dotProd.toFixed(3);
+
+      uCtx.clearRect(0, 0, w, h);
+
+      // Circle
+      uCtx.strokeStyle = isLightMode ? '#cbd5e1' : '#334155';
+      uCtx.lineWidth = 1.5;
+      uCtx.beginPath();
+      uCtx.arc(cx, cy, r, 0, 2 * Math.PI);
+      uCtx.stroke();
+
+      // Axis lines
+      uCtx.strokeStyle = isLightMode ? '#f1f5f9' : '#1e293b';
+      uCtx.beginPath();
+      uCtx.moveTo(cx - r - 15, cy);
+      uCtx.lineTo(cx + r + 15, cy);
+      uCtx.moveTo(cx, cy - r - 15);
+      uCtx.lineTo(cx, cy + r + 15);
+      uCtx.stroke();
+
+      // Draw Q Vector
+      const qx = cx + r * Math.cos(radQ);
+      const qy = cy - r * Math.sin(radQ);
+      drawVector(cx, cy, qx, qy, isLightMode ? '#0284c7' : '#38bdf8', 3, 'Q');
+
+      // Draw K Vector
+      const kx = cx + r * Math.cos(radK);
+      const ky = cy - r * Math.sin(radK);
+      drawVector(cx, cy, kx, ky, isLightMode ? '#059669' : '#34d399', 3, 'K');
+
+      // Draw arc between them
+      uCtx.strokeStyle = 'rgba(168, 85, 247, 0.7)';
+      uCtx.lineWidth = 2;
+      uCtx.beginPath();
+      const startAngle = -Math.max(radQ, radK);
+      const endAngle = -Math.min(radQ, radK);
+      uCtx.arc(cx, cy, r * 0.35, -radQ, -radK, radQ < radK);
+      uCtx.stroke();
+    }
+
+    qAngleSlider.addEventListener('input', drawUnitCircle);
+    kAngleSlider.addEventListener('input', drawUnitCircle);
+
+    /* =========================================================
+       INITIALIZATION
+    ========================================================= */
+    window.addEventListener('DOMContentLoaded', () => {
+      buildTokenUI();
+      updateTokenSelection();
+      updateMatrixSimulation(0);
+      drawUnitCircle();
+    });
+  </script>
+</body>
+</html>

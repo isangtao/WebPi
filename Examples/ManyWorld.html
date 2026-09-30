@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="A self-contained technical brief on the Many-Worlds Interpretation of quantum mechanics: postulates, formalism, decoherence, an interactive branching simulator, comparisons, history and open problems.">
+<title>The Many-Worlds Interpretation — Technical Brief</title>
+<style>
+/* ============================================================
+   MANY-WORLDS / EVERETT BRIEF
+   Single-file, zero-dependency technical document
+   ============================================================ */
+:root{
+  --bg:        #05070c;
+  --bg-2:      #080c14;
+  --panel:     #0a101b;
+  --panel-2:   #0d1421;
+  --line:      rgba(126,168,214,.14);
+  --line-2:    rgba(126,168,214,.28);
+  --text:      #dbe6f3;
+  --muted:     #7e8ea4;
+  --faint:     #4d5a6c;
+  --accent:    #3be0ff;
+  --accent-dim:#1a94ad;
+  --amber:     #ffc46e;
+  --red:       #ff7a6e;
+  --green:     #5ce6a1;
+  --mono:      ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans:      -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif:     "Iowan Old Style", Georgia, "Times New Roman", serif;
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.68;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{ background:rgba(59,224,255,.28); color:#fff; }
+a{ color:var(--accent); text-decoration:none; }
+a:hover{ color:#8df0ff; }
+img{ max-width:100%; }
+section{ scroll-margin-top:92px; }
+
+.wrap{ max-width:1120px; margin:0 auto; padding:0 clamp(1.1rem,4vw,2rem); }
+.mono{ font-family:var(--mono); }
+
+/* ---------- nav ---------- */
+.site-nav{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(5,7,12,.82);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:1120px; margin:0 auto;
+  padding:.8rem clamp(1.1rem,4vw,2rem);
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+}
+.brand{ display:flex; align-items:center; gap:.7rem; color:var(--text); }
+.brand:hover{ color:#fff; }
+.brand-mark{
+  font-family:var(--serif); font-style:italic; font-size:1.35rem; line-height:1;
+  color:var(--accent);
+  border:1px solid var(--line-2); border-radius:6px;
+  width:38px; height:38px; display:grid; place-items:center;
+  background:linear-gradient(160deg, rgba(59,224,255,.12), transparent 60%);
+  box-shadow:0 0 18px rgba(59,224,255,.12) inset;
+}
+.brand-text{ font-family:var(--mono); font-size:.82rem; letter-spacing:.14em; }
+.brand-sub{ display:block; font-size:.6rem; letter-spacing:.22em; color:var(--faint); margin-top:2px; }
+.nav-links{ display:flex; align-items:center; gap:.35rem; }
+.nav-links a{
+  font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); padding:.45rem .65rem; border-radius:4px; transition:color .2s, background .2s;
+}
+.nav-links a:hover{ color:var(--text); background:rgba(126,168,214,.08); }
+.nav-links a.active{ color:var(--accent); }
+.nav-toggle{
+  display:none; background:none; border:1px solid var(--line-2); color:var(--muted);
+  font-size:1.1rem; border-radius:6px; padding:.35rem .65rem; cursor:pointer;
+}
+.nav-progress{
+  position:absolute; left:0; bottom:-1px; height:2px; width:0%;
+  background:linear-gradient(90deg, var(--accent), #9ff3ff);
+  box-shadow:0 0 12px rgba(59,224,255,.7);
+  transition:width .1s linear;
+}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative; min-height:100svh;
+  display:flex; align-items:center;
+  overflow:hidden;
+  background:
+    radial-gradient(1100px 500px at 75% 10%, rgba(59,224,255,.07), transparent 60%),
+    radial-gradient(900px 600px at 15% 90%, rgba(255,196,110,.05), transparent 60%),
+    var(--bg);
+}
+#heroCanvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.hero::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(5,7,12,.55) 0%, rgba(5,7,12,.1) 35%, rgba(5,7,12,.85) 100%);
+}
+.hero-content{ position:relative; z-index:2; padding:8.5rem 0 5rem; max-width:820px; }
+.kicker{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.28em; color:var(--accent);
+  text-transform:uppercase; display:flex; align-items:center; gap:.7rem; margin-bottom:1.6rem;
+}
+.kicker .tick{ display:inline-block; width:9px; height:9px; background:var(--accent);
+  box-shadow:0 0 10px var(--accent); animation:blink 1.6s steps(2) infinite; }
+@keyframes blink{ 50%{ opacity:.25; } }
+.hero h1{
+  font-size:clamp(2.5rem, 7.2vw, 5rem);
+  line-height:1.04; font-weight:800; letter-spacing:-.025em; color:#f4f9ff;
+}
+.hero h1 .grad{
+  background:linear-gradient(92deg, var(--accent) 10%, #9ff3ff 55%, rgba(59,224,255,.25) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.lede{
+  margin-top:1.5rem; max-width:640px;
+  font-size:clamp(1rem, 1.6vw, 1.15rem); color:var(--muted);
+}
+.lede b{ color:var(--text); font-weight:600; }
+.hero-cta{ margin-top:2.2rem; display:flex; gap:.9rem; flex-wrap:wrap; }
+.btn{
+  font-family:var(--mono); font-size:.74rem; letter-spacing:.16em; text-transform:uppercase;
+  padding:.85rem 1.5rem; border-radius:6px; border:1px solid var(--line-2);
+  color:var(--text); display:inline-block; transition:all .22s;
+}
+.btn-primary{
+  background:linear-gradient(160deg, rgba(59,224,255,.16), rgba(59,224,255,.04));
+  border-color:rgba(59,224,255,.5); color:var(--accent);
+  box-shadow:0 0 24px rgba(59,224,255,.12);
+}
+.btn-primary:hover{ color:#fff; background:rgba(59,224,255,.22); box-shadow:0 0 34px rgba(59,224,255,.25); }
+.btn-ghost:hover{ border-color:var(--muted); }
+.hero-stats{
+  margin-top:3.2rem; display:grid; grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--line); background:rgba(8,12,20,.72);
+  backdrop-filter:blur(6px); border-radius:8px; overflow:hidden;
+}
+.stat{ padding:1.1rem 1.2rem; border-right:1px solid var(--line); }
+.stat:last-child{ border-right:none; }
+.stat b{
+  display:block; font-family:var(--mono); font-size:clamp(1.15rem,2.4vw,1.6rem);
+  color:var(--accent); font-weight:600; letter-spacing:-.01em;
+}
+.stat span{ font-family:var(--mono); font-size:.6rem; letter-spacing:.18em; color:var(--faint); text-transform:uppercase; }
+.stat.amber b{ color:var(--amber); }
+
+/* ---------- section scaffolding ---------- */
+.sec{ padding:clamp(4.2rem,9vw,7rem) 0; position:relative; }
+.sec.alt{ background:var(--bg-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.sec-head{ display:flex; gap:clamp(1rem,3vw,2rem); align-items:flex-start; margin-bottom:clamp(2rem,5vw,3.4rem); }
+.sec-index{
+  font-family:var(--mono); font-size:clamp(2.4rem,5vw,3.6rem); font-weight:700; line-height:.9;
+  color:transparent; -webkit-text-stroke:1px rgba(59,224,255,.4);
+  min-width:2.4ch;
+}
+.sec-head h2{ font-size:clamp(1.55rem,3.4vw,2.35rem); font-weight:750; letter-spacing:-.02em; color:#f2f8ff; line-height:1.15; }
+.sec-sub{ color:var(--muted); margin-top:.5rem; max-width:620px; font-size:.98rem; }
+.sec-head::after{ content:""; }
+
+/* reveal on scroll */
+.reveal{ opacity:0; transform:translateY(26px); transition:opacity .75s ease, transform .75s ease; transition-delay:var(--d,0s); }
+.reveal.visible{ opacity:1; transform:none; }
+
+/* ---------- overview ---------- */
+.ov-grid{ display:grid; grid-template-columns:1.45fr .9fr; gap:clamp(1.5rem,4vw,3rem); align-items:start; }
+.ov-grid p{ color:var(--muted); margin-bottom:1.15rem; font-size:1.02rem; }
+.ov-grid p b, .ov-grid p strong{ color:var(--text); font-weight:600; }
+.hl{ color:var(--accent); }
+.spec{
+  border:1px solid var(--line); border-radius:8px; overflow:hidden;
+  background:var(--panel);
+}
+.spec-title{
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--faint); padding:.85rem 1.1rem; border-bottom:1px solid var(--line);
+  display:flex; justify-content:space-between;
+}
+.spec-title i{ font-style:normal; color:var(--green); }
+.spec dl{ padding:.4rem 0; }
+.spec .row{ display:flex; justify-content:space-between; gap:1rem; padding:.62rem 1.1rem; border-bottom:1px solid rgba(126,168,214,.07); }
+.spec .row:last-child{ border-bottom:none; }
+.spec dt{ font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; color:var(--faint); text-transform:uppercase; padding-top:2px; }
+.spec dd{ font-family:var(--mono); font-size:.78rem; color:var(--text); text-align:right; }
+.spec dd.ok{ color:var(--green); }
+.spec dd.no{ color:var(--red); }
+.spec dd.acc{ color:var(--accent); }
+.codeblock{
+  margin-top:1.4rem; border:1px solid var(--line); border-left:3px solid var(--accent-dim);
+  border-radius:6px; background:#060a11; padding:1.2rem 1.3rem;
+  font-family:var(--mono); font-size:.82rem; line-height:1.9; color:#9fd8ff; overflow-x:auto;
+}
+.codeblock .c{ color:var(--faint); }
+.codeblock .a{ color:var(--accent); }
+.codeblock .b{ color:var(--amber); }
+
+/* ---------- postulate cards ---------- */
+.cards{ display:grid; gap:1.1rem; }
+.cards.c4{ grid-template-columns:repeat(auto-fit, minmax(235px,1fr)); }
+.card{
+  position:relative; border:1px solid var(--line); border-radius:8px;
+  background:linear-gradient(165deg, var(--panel-2), var(--panel) 55%);
+  padding:1.6rem 1.4rem 1.5rem;
+  transition:transform .25s, border-color .25s, box-shadow .25s;
+}
+.card:hover{ transform:translateY(-4px); border-color:rgba(59,224,255,.45); box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(59,224,255,.12); }
+.card::before, .card::after{
+  content:""; position:absolute; width:14px; height:14px; pointer-events:none;
+  transition:border-color .25s;
+}
+.card::before{ top:-1px; left:-1px; border-top:2px solid rgba(59,224,255,.55); border-left:2px solid rgba(59,224,255,.55); border-top-left-radius:8px; }
+.card::after{ bottom:-1px; right:-1px; border-bottom:2px solid rgba(59,224,255,.55); border-right:2px solid rgba(59,224,255,.55); border-bottom-right-radius:8px; }
+.card .tag{
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent); display:inline-flex; align-items:center; gap:.5rem; margin-bottom:.9rem;
+}
+.card .tag::before{ content:""; width:7px; height:7px; background:var(--accent); box-shadow:0 0 8px var(--accent); }
+.card h3{ font-size:1.02rem; font-weight:650; letter-spacing:-.01em; margin-bottom:.55rem; color:#eef5fd; }
+.card p{ font-size:.9rem; color:var(--muted); }
+
+/* ---------- formalism ---------- */
+.eq-stack{ display:grid; gap:1.3rem; }
+.eq-panel{
+  border:1px solid var(--line); border-radius:8px; background:var(--panel);
+  padding:1.5rem clamp(1.2rem,3vw,2rem) 1.7rem;
+}
+.eq-chip{
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--faint); margin-bottom:1.1rem; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap;
+}
+.eq-chip::before{ content:""; width:8px; height:8px; background:var(--accent); box-shadow:0 0 8px var(--accent); flex:none; }
+.eq-chip .note{ color:var(--faint); letter-spacing:.05em; text-transform:none; }
+.eq{
+  font-family:var(--serif); font-style:italic; text-align:center;
+  font-size:clamp(1.05rem, 2.6vw, 1.5rem); color:#eaf3fc; line-height:2.1; letter-spacing:.02em;
+}
+.eq .op{ font-style:normal; color:var(--accent); }
+.eq .sub, .eq .sup{ font-size:.62em; }
+.eq .ket{ white-space:nowrap; }
+.eq .arrow{
+  display:inline-block; margin:0 .6em; font-family:var(--mono); font-style:normal;
+  font-size:.68em; color:var(--amber); border:1px solid rgba(255,196,110,.4);
+  border-radius:4px; padding:.25em .7em; vertical-align:middle; white-space:nowrap;
+}
+.eq-note{ margin-top:1rem; font-size:.88rem; color:var(--muted); border-top:1px dashed var(--line); padding-top:1rem; }
+.eq-note b{ color:var(--text); font-weight:600; }
+.frac{ display:inline-block; vertical-align:middle; text-align:center; font-size:.85em; line-height:1.25; }
+.frac .top{ display:block; border-bottom:1px solid currentColor; padding:0 .35em; }
+.frac .bot{ display:block; padding:0 .35em; }
+@media (max-width: 700px){
+  .eq .arrow{ display:inline-block; margin:.7em .2em; width:100%; text-align:center; }
+}
+
+.eq-panel .eq{ overflow-x:auto; }
+
+/* ---------- simulator ---------- */
+.sim-box{
+  border:1px solid var(--line); border-radius:10px; background:var(--panel);
+  overflow:hidden;
+}
+.sim-head{
+  display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;
+  padding:.9rem 1.3rem; border-bottom:1px solid var(--line);
+  font-family:var(--mono); font-size:.66rem; letter-spacing:.18em; text-transform:uppercase; color:var(--faint);
+}
+.sim-head .live{ color:var(--green); display:inline-flex; align-items:center; gap:.5rem; }
+.sim-head .live::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:blink 2s steps(2) infinite; }
+.sim-canvas-wrap{ position:relative; background:#060a11; border-bottom:1px solid var(--line); }
+#simCanvas{ display:block; width:100%; height:auto; }
+.sim-controls{
+  display:grid; grid-template-columns:1fr 1fr; gap:1.5rem 2rem; padding:1.4rem 1.5rem 1.5rem;
+}
+.ctrl label{
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--faint); display:flex; justify-content:space-between; margin-bottom:.6rem;
+}
+.ctrl label output{ color:var(--accent); }
+input[type=range]{
+  -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:2px;
+  background:linear-gradient(90deg, var(--accent) var(--fill,60%), rgba(126,168,214,.2) var(--fill,60%));
+  outline:none; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
+  background:#0a101b; border:2px solid var(--accent); box-shadow:0 0 12px rgba(59,224,255,.6); cursor:grab;
+}
+input[type=range]::-moz-range-thumb{
+  width:16px; height:16px; border-radius:50%; background:#0a101b;
+  border:2px solid var(--accent); box-shadow:0 0 12px rgba(59,224,255,.6); cursor:grab;
+}
+.state-readout{
+  grid-column:1 / -1; border-top:1px dashed var(--line); padding-top:1.2rem;
+  font-family:var(--mono); font-size:.9rem; color:#cfe6ff; text-align:center; letter-spacing:.02em;
+}
+.state-readout .a{ color:var(--accent); }
+.state-readout .b{ color:var(--amber); }
+.probs{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+.pbar label{
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.14em; color:var(--faint);
+  display:flex; justify-content:space-between; margin-bottom:.4rem;
+}
+.pbar label span{ color:var(--text); }
+.track{ height:6px; background:rgba(126,168,214,.14); border-radius:3px; overflow:hidden; }
+.track i{ display:block; height:100%; border-radius:3px; transition:width .25s ease; }
+.track.up i{ background:linear-gradient(90deg, var(--accent-dim), var(--accent)); box-shadow:0 0 10px rgba(59,224,255,.5); }
+.track.down i{ background:linear-gradient(90deg, #8a5a1e, var(--amber)); box-shadow:0 0 10px rgba(255,196,110,.5); }
+.sim-foot{
+  grid-column:1 / -1; font-family:var(--mono); font-size:.68rem; letter-spacing:.12em;
+  color:var(--faint); text-align:center; text-transform:uppercase;
+}
+.sim-foot b{ color:var(--green); font-weight:600; }
+
+/* ---------- comparison table ---------- */
+.table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+table{ border-collapse:collapse; width:100%; min-width:760px; font-size:.88rem; }
+thead th{
+  font-family:var(--mono); font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--faint); text-align:left; padding:1rem 1.1rem; border-bottom:1px solid var(--line-2);
+  background:rgba(126,168,214,.04);
+}
+tbody td{ padding:.95rem 1.1rem; border-bottom:1px solid rgba(126,168,214,.08); color:var(--muted); vertical-align:top; }
+tbody tr:last-child td{ border-bottom:none; }
+tbody td:first-child{ color:var(--text); font-weight:600; }
+tbody tr:hover td{ background:rgba(126,168,214,.04); }
+tr.mwi td{
+  background:linear-gradient(90deg, rgba(59,224,255,.09), rgba(59,224,255,.02));
+  box-shadow:inset 3px 0 0 var(--accent);
+  color:#c9e8f4;
+}
+tr.mwi td:first-child{ color:var(--accent); }
+.yes{ color:var(--red); font-family:var(--mono); font-size:.8rem; }
+.no{ color:var(--green); font-family:var(--mono); font-size:.8rem; }
+.mid{ color:var(--amber); font-family:var(--mono); font-size:.8rem; }
+
+/* ---------- figures ---------- */
+.cards.fig{ grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); }
+.fig-card{ display:flex; flex-direction:column; }
+.avatar{
+  width:52px; height:52px; border-radius:50%; display:grid; place-items:center;
+  font-family:var(--mono); font-size:.95rem; font-weight:700; letter-spacing:.05em;
+  color:var(--accent); margin-bottom:1rem;
+  background:radial-gradient(circle at 30% 25%, rgba(59,224,255,.16), rgba(59,224,255,.03));
+  border:1px solid rgba(59,224,255,.4);
+  box-shadow:0 0 0 4px rgba(59,224,255,.06);
+}
+.fig-card.crit .avatar{
+  color:var(--red); border-color:rgba(255,122,110,.4);
+  background:radial-gradient(circle at 30% 25%, rgba(255,122,110,.15), rgba(255,122,110,.03));
+  box-shadow:0 0 0 4px rgba(255,122,110,.06);
+}
+.fig-card.crit .tag::before{ background:var(--red); box-shadow:0 0 8px var(--red); }
+.fig-card.crit .tag{ color:var(--red); }
+.fig-meta{ font-family:var(--mono); font-size:.66rem; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; margin-bottom:.3rem; }
+.fig-card h3{ font-size:1.05rem; }
+
+/* ---------- timeline ---------- */
+.timeline{ position:relative; margin-left:.5rem; padding-left:2.2rem; max-width:820px; }
+.timeline::before{
+  content:""; position:absolute; left:8px; top:6px; bottom:6px; width:2px;
+  background:linear-gradient(180deg, var(--accent), rgba(59,224,255,.15) 70%, transparent);
+}
+.tl-item{ position:relative; padding-bottom:2.1rem; }
+.tl-item:last-child{ padding-bottom:0; }
+.tl-item::before{
+  content:""; position:absolute; left:-2.13rem; top:7px; width:10px; height:10px;
+  border-radius:50%; background:var(--bg); border:2px solid var(--accent);
+  box-shadow:0 0 10px rgba(59,224,255,.55);
+}
+.tl-item.major::before{ background:var(--accent); width:12px; height:12px; left:calc(-2.13rem - 1px); top:6px; }
+.tl-year{ font-family:var(--mono); font-size:.78rem; letter-spacing:.2em; color:var(--accent); }
+.tl-item.major .tl-year{ color:var(--amber); }
+.tl-item h3{ font-size:1.02rem; font-weight:650; margin:.25rem 0 .3rem; color:#eef5fd; }
+.tl-item p{ font-size:.92rem; color:var(--muted); max-width:640px; }
+
+/* ---------- controversy ---------- */
+.cards.prob{ grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); }
+.prob .tag{ color:var(--amber); }
+.prob .tag::before{ background:var(--amber); box-shadow:0 0 8px var(--amber); }
+.prob h3{ font-size:.98rem; }
+.prob p{ font-size:.9rem; }
+.prob .src{ display:block; margin-top:.8rem; font-family:var(--mono); font-size:.64rem; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; }
+
+/* ---------- references ---------- */
+.refs{ display:grid; gap:.6rem; }
+.ref{
+  display:grid; grid-template-columns:64px 1fr; gap:1rem; align-items:baseline;
+  padding:.85rem 1rem; border:1px solid transparent; border-bottom:1px solid rgba(126,168,214,.08);
+  border-radius:6px; transition:background .2s, border-color .2s;
+}
+.ref:hover{ background:rgba(126,168,214,.05); border-color:var(--line); }
+.ref .idx{ font-family:var(--mono); font-size:.68rem; letter-spacing:.16em; color:var(--faint); }
+.ref p{ font-size:.9rem; color:var(--muted); }
+.ref p b{ color:var(--text); font-weight:600; }
+.ref p i{ color:#bcd2e8; font-family:var(--serif); }
+
+/* ---------- footer ---------- */
+footer{ border-top:1px solid var(--line); background:var(--bg-2); }
+.foot-grid{
+  display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:2.5rem;
+  padding:3.5rem 0 2.5rem;
+}
+.foot-grid h4{
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--faint); margin-bottom:1.1rem;
+}
+.foot-brand p{ color:var(--muted); font-size:.9rem; max-width:340px; margin-top:1rem; }
+.foot-links{ list-style:none; }
+.foot-links li{ margin-bottom:.5rem; }
+.foot-links a{ font-family:var(--mono); font-size:.74rem; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
+.foot-links a:hover{ color:var(--accent); }
+.spec-list{ list-style:none; font-family:var(--mono); font-size:.72rem; color:var(--faint); letter-spacing:.08em; }
+.spec-list li{ margin-bottom:.55rem; display:flex; gap:.6rem; }
+.spec-list li::before{ content:"▸"; color:var(--accent); }
+.foot-bar{
+  border-top:1px solid var(--line); padding:1.1rem 0;
+  display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  font-family:var(--mono); font-size:.64rem; letter-spacing:.14em; color:var(--faint); text-transform:uppercase;
+}
+.foot-bar a{ color:var(--muted); }
+.foot-bar a:hover{ color:var(--accent); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px){
+  .ov-grid{ grid-template-columns:1fr; }
+  .hero-stats{ grid-template-columns:repeat(2,1fr); }
+  .stat:nth-child(2){ border-right:none; }
+  .stat:nth-child(-n+2){ border-bottom:1px solid var(--line); }
+  .sim-controls{ grid-template-columns:1fr; }
+  .foot-grid{ grid-template-columns:1fr; gap:2rem; }
+}
+@media (max-width: 860px){
+  .nav-toggle{ display:block; }
+  .nav-links{
+    display:none; position:absolute; top:100%; left:0; right:0;
+    flex-direction:column; align-items:stretch; gap:0;
+    background:rgba(6,9,15,.97); border-bottom:1px solid var(--line);
+    padding:.6rem 1rem 1rem;
+  }
+  .nav-links.open{ display:flex; }
+  .nav-links a{ padding:.8rem .6rem; border-bottom:1px solid rgba(126,168,214,.07); font-size:.78rem; }
+}
+@media (max-width: 560px){
+  .sec-index{ font-size:2rem; }
+  .eq{ font-size:1rem; line-height:2.3; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  .reveal{ opacity:1; transform:none; transition:none; }
+  .kicker .tick, .sim-head .live::before{ animation:none; }
+  *{ transition-duration:.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="site-nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Many-Worlds — back to top">
+      <span class="brand-mark">Ψ</span>
+      <span class="brand-text">MANY·WORLDS<span class="brand-sub">EVERETT TECHNICAL BRIEF · 1957</span></span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#postulates">Postulates</a>
+      <a href="#formalism">Formalism</a>
+      <a href="#simulator">Simulator</a>
+      <a href="#compare">Compare</a>
+      <a href="#figures">Figures</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#controversy">Open Problems</a>
+      <a href="#references">References</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </div>
+  <div class="nav-progress" id="navProgress"></div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero" aria-label="Introduction">
+  <canvas id="heroCanvas" aria-label="Animated diagram of quantum worldlines branching at decoherence events"></canvas>
+  <div class="wrap hero-content">
+    <p class="kicker"><span class="tick"></span>TECH BRIEF · QM·1957 · UNITARY ONLY</p>
+    <h1>The <span class="grad">Many-Worlds</span><br>Interpretation</h1>
+    <p class="lede">
+      Quantum mechanics does not choose. In the Everettian picture the universal wavefunction
+      evolves <b>strictly unitarily</b> — every possible outcome of every measurement is realized,
+      in its own decohered branch of the world. No collapse. No hidden variables.
+      <b>One equation, read literally.</b>
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#overview">Read the brief ↓</a>
+      <a class="btn btn-ghost" href="#simulator">Run the simulator</a>
+    </div>
+    <div class="hero-stats" role="list">
+      <div class="stat" role="listitem"><b>1957</b><span>Everett, “Relative State”</span></div>
+      <div class="stat" role="listitem"><b>0</b><span>Collapse postulates</span></div>
+      <div class="stat amber" role="listitem"><b>10⁻²⁰ s</b><span>Macroscopic decoherence</span></div>
+      <div class="stat" role="listitem"><b>∞</b><span>Branches, in practice</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 01 OVERVIEW ================= -->
+<section class="sec" id="overview" aria-labelledby="ov-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">01</span>
+      <div>
+        <h2 id="ov-h">The Core Idea</h2>
+        <p class="sec-sub">The measurement problem, solved by deletion — not by adding machinery, but by removing the one postulate the formalism never needed.</p>
+      </div>
+    </div>
+    <div class="ov-grid">
+      <div class="reveal">
+        <p>
+          For four decades after its birth, quantum mechanics was used with a <strong>double dynamics</strong>:
+          the smooth, deterministic Schrödinger evolution — von Neumann’s “Process 2” — and a second,
+          instantaneous, non-unitary “collapse” (Process 1) triggered whenever a measurement occurred.
+          But the theory never said what counts as a measurement, nor where the cut between the quantum
+          system and the classical apparatus belongs. That gap is the <span class="hl">measurement problem</span>.
+        </p>
+        <p>
+          Hugh Everett III’s 1957 move was radical in exactly one direction: he <strong>dropped collapse
+          entirely</strong>. Not as a preference — as a consequence. The Schrödinger equation is the only
+          dynamics the formalism contains, so it is applied to <em>everything</em>: system, apparatus,
+          observer, and environment, with no privileged cut. A “measurement” is then just an ordinary
+          entangling interaction, and the state after it is a superposition of <em>observer + outcome</em>
+          terms.
+        </p>
+        <p>
+          Each term contains a version of the observer who sees a definite result. Because these branches
+          decohere essentially instantaneously, they no longer interfere, and from the inside the theory
+          reproduces <strong>every prediction of standard quantum mechanics</strong> — while eliminating the
+          measurement problem at the root rather than relocating it.
+        </p>
+        <div class="codeblock" aria-label="Pseudocode of a measurement in the Everettian picture">
+<span class="c"># measurement = unitary entanglement, nothing more</span><br>
+|Ψ⟩ <span class="a">→</span> a·|↑⟩<span class="c">|</span>observer: “up”<span class="c">⟩</span>|E↑⟩<br>
+&nbsp;&nbsp;&nbsp;&nbsp; + b·|↓⟩<span class="c">|</span>observer: “down”<span class="c">⟩</span>|E↓⟩<br><br>
+<span class="c"># decoherence: ⟨E↑|E↓⟩ → 0, on a 10⁻²⁰ s timescale</span><br>
+<span class="b"># both terms are real. neither is noise. no collapse occurs.</span>
+        </div>
+      </div>
+      <aside class="spec reveal" style="--d:.15s" aria-label="Specification sheet">
+        <div class="spec-title"><span>SPEC SHEET</span><i>REV 1.0</i></div>
+        <dl>
+          <div class="row"><dt>Dynamics</dt><dd class="acc">Unitary (Schrödinger)</dd></div>
+          <div class="row"><dt>Collapse postulate</dt><dd class="no">Rejected</dd></div>
+          <div class="row"><dt>Hidden variables</dt><dd>None</dd></div>
+          <div class="row"><dt>Wavefunction status</dt><dd class="ok">Complete &amp; real</dd></div>
+          <div class="row"><dt>Observer</dt><dd>Ordinary matter</dd></div>
+          <div class="row"><dt>Measurement cut</dt><dd class="no">Not required</dd></div>
+          <div class="row"><dt>Probability rule</dt><dd class="acc">Born, |a|²</dd></div>
+          <div class="row"><dt>Empirical status</dt><dd>≡ Standard QM</dd></div>
+          <div class="row"><dt>Falsifiable deltas</dt><dd>None (by design)</dd></div>
+          <div class="row"><dt>Community standing</dt><dd class="ok">Leading candidate*</dd></div>
+        </dl>
+        <div class="spec-title" style="border-top:1px solid var(--line);"><span>*per recent field polls of working physicists</span><span class="mono" style="color:var(--faint);font-size:.6rem;">SEE §07</span></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 POSTULATES ================= -->
+<section class="sec alt" id="postulates" aria-labelledby="po-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">02</span>
+      <div>
+        <h2 id="po-h">Four Postulates</h2>
+        <p class="sec-sub">The entire ontology, compressed. Everything else in the theory — probability, identity, cosmology — is derived or debated from these.</p>
+      </div>
+    </div>
+    <div class="cards c4">
+      <div class="card reveal">
+        <span class="tag">P·01</span>
+        <h3>The universal wavefunction is real</h3>
+        <p>The quantum state of the entire universe is a physically real object in Hilbert space. There is no split between “system” and “observer” — every particle, field, and mind is a component of |Ψ⟩.</p>
+      </div>
+      <div class="card reveal" style="--d:.08s">
+        <span class="tag">P·02</span>
+        <h3>Unitary evolution only</h3>
+        <p>The state always obeys the Schrödinger equation. No collapse, no projection, no special role for measurement. What looks like a random outcome is, from outside the branch, just entanglement unfolding.</p>
+      </div>
+      <div class="card reveal" style="--d:.16s">
+        <span class="tag">P·03</span>
+        <h3>Branching by decoherence</h3>
+        <p>When a system entangles with uncontrolled degrees of freedom, interference between the resulting components is suppressed at rates of ~10²⁰ s⁻¹. The world effectively splits into non-interacting “branches.”</p>
+      </div>
+      <div class="card reveal" style="--d:.24s">
+        <span class="tag">P·04</span>
+        <h3>All branches are equally real</h3>
+        <p>Every term in the superposition exists. The Born weight |a|² is the rational degree of belief an observer should assign to finding themselves in a given branch after the next fork.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 FORMALISM ================= -->
+<section class="sec" id="formalism" aria-labelledby="fo-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">03</span>
+      <div>
+        <h2 id="fo-h">The Formalism</h2>
+        <p class="sec-sub">One equation does all the work. Here is the whole argument in three lines of mathematics.</p>
+      </div>
+    </div>
+    <div class="eq-stack">
+      <div class="eq-panel reveal">
+        <div class="eq-chip">Eq. 01 <span class="note">— the only law of motion in the theory</span></div>
+        <div class="eq">
+          iℏ <span class="frac"><span class="top">∂</span><span class="bot">∂t</span></span> |Ψ(t)⟩ <span class="op">=</span> Ĥ |Ψ(t)⟩
+        </div>
+        <p class="eq-note">
+          Standard quantum mechanics, as written in every textbook. Everett’s point is that this is
+          <b>complete</b>. The projection postulate of von Neumann’s formalism is not a second law —
+          it is an approximation that becomes exact inside a decohered branch, and nothing more.
+        </p>
+      </div>
+
+      <div class="eq-panel reveal" style="--d:.08s">
+        <div class="eq-chip">Eq. 02 <span class="note">— measurement as entanglement</span></div>
+        <div class="eq">
+          ( a<span class="ket">|↑⟩</span> + b<span class="ket">|↓⟩</span> ) <span class="ket">|A₀⟩</span> <span class="ket">|E₀⟩</span>
+          <span class="arrow">U — unitary</span>
+          a<span class="ket">|↑⟩</span><span class="ket">|A↑⟩</span><span class="ket">|E↑⟩</span> + b<span class="ket">|↓⟩</span><span class="ket">|A↓⟩</span><span class="ket">|E↓⟩</span>
+        </div>
+        <p class="eq-note">
+          A qubit in superposition meets a ready apparatus <span class="mono" style="font-size:.85em;">A₀</span>
+          in an environment <span class="mono" style="font-size:.85em;">E₀</span>. The total state evolves
+          linearly: amplitude <span class="mono" style="font-size:.85em;">a</span> flows into a branch where the
+          apparatus — and every observer who looks at it — records <span class="hl">↑</span>;
+          amplitude <span class="mono" style="font-size:.85em;">b</span> flows into a branch recording
+          <span style="color:var(--amber)">↓</span>. Both are present. Neither is “the dream of the other.”
+        </p>
+      </div>
+
+      <div class="eq-panel reveal" style="--d:.16s">
+        <div class="eq-chip">Eq. 03 <span class="note">— decoherence kills the interference, not the branches</span></div>
+        <div class="eq">
+          ρ<sub style="font-size:.6em">SA</sub> = |a|<span class="sup">2</span><span class="ket">|↑A↑⟩⟨↑A↑|</span>
+          + |b|<span class="sup">2</span><span class="ket">|↓A↓⟩⟨↓A↓|</span>
+          + ab* ⟨E↓|E↑⟩ <span class="ket">|↑A↑⟩⟨↓A↓|</span> + h.c.
+        </div>
+        <p class="eq-note">
+          Tracing out the environment, the off-diagonal terms are multiplied by
+          <span class="mono" style="font-size:.85em;">⟨E↓|E↑⟩</span>, which decays to zero as the
+          environment states orthogonalize. For a macroscopic pointer, this happens in
+          <b>~10⁻²⁰ seconds</b> (Joos–Zeh scale) — faster than any conceivable re-coherence.
+          Decoherence selects the <b>pointer basis</b> (the branches) but does not delete the other terms.
+          Everettianism holds that is not a bug: <b>no single outcome is ever selected, because none needs to be.</b>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 SIMULATOR ================= -->
+<section class="sec alt" id="simulator" aria-labelledby="si-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">04</span>
+      <div>
+        <h2 id="si-h">Branching Simulator</h2>
+        <p class="sec-sub">A two-stage measurement, drawn in real time. Drag the amplitude — the apparatus unitarily amplifies it, and every outcome coexists with its Born weight.</p>
+      </div>
+    </div>
+    <div class="sim-box reveal">
+      <div class="sim-head">
+        <span>SIM·04 — UNITARY MEASUREMENT CHAIN</span>
+        <span class="live">RUNNING · 0 COLLAPSE EVENTS</span>
+      </div>
+      <div class="sim-canvas-wrap">
+        <canvas id="simCanvas" width="900" height="470" aria-label="Diagram of a qubit undergoing two measurements, branching into four worlds"></canvas>
+      </div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <label for="ampSlider">Amplitude a — weight of |↑⟩ <output id="ampOut">0.600</output></label>
+          <input type="range" id="ampSlider" min="0" max="100" value="60" step="1" aria-label="Amplitude a of the up state">
+        </div>
+        <div class="probs">
+          <div class="pbar">
+            <label>P(↑) = |a|² <span id="valUp">36.0%</span></label>
+            <div class="track up"><i id="barUp" style="width:36%"></i></div>
+          </div>
+          <div class="pbar">
+            <label>P(↓) = |b|² <span id="valDown">64.0%</span></label>
+            <div class="track down"><i id="barDown" style="width:64%"></i></div>
+          </div>
+        </div>
+        <div class="state-readout" id="stateReadout">
+          |ψ⟩ = <span class="a">0.600</span>|↑⟩ + <span class="b">0.800</span>|↓⟩
+          &nbsp;·&nbsp; |a|² + |b|² = 1
+        </div>
+        <div class="sim-foot" id="simFoot">
+          4 BRANCHES REALIZED · ΣP = 1.000 · <b>NO COLLAPSE</b> — ZERO-WEIGHT BRANCHES ARE DRAWN DASHED (REAL, VACUOUS)
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 COMPARE ================= -->
+<section class="sec" id="compare" aria-labelledby="co-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">05</span>
+      <div>
+        <h2 id="co-h">Interpretations Compared</h2>
+        <p class="sec-sub">Every interpretation is a different way of making peace with the same experimental numbers. Here is where Everett sits in the landscape.</p>
+      </div>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>Interpretation</th>
+            <th>Collapse?</th>
+            <th>Ontology</th>
+            <th>Hidden variables</th>
+            <th>Probability</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Copenhagen</td>
+            <td><span class="yes">Yes — primitive</span></td>
+            <td>Operational; no claim about “what is real”</td>
+            <td><span class="no">No</span></td>
+            <td>Postulated (Born)</td>
+            <td>The pragmatic orthodoxy; the measurement problem is bracketed, not solved.</td>
+          </tr>
+          <tr class="mwi">
+            <td>Many-Worlds (Everett)</td>
+            <td><span class="no">No — unitary only</span></td>
+            <td>The universal wavefunction, literally</td>
+            <td><span class="no">No</span></td>
+            <td>Derived: Gleason, Deutsch–Wallace, envariance</td>
+            <td>Collapse replaced by branching. Empirically identical to standard QM; maximal parsimony of postulates.</td>
+          </tr>
+          <tr>
+            <td>Objective collapse (GRW/CSL)</td>
+            <td><span class="yes">Yes — physical &amp; stochastic</span></td>
+            <td>Wavefunction + spontaneous noise process</td>
+            <td><span class="no">No</span></td>
+            <td>Built into the dynamics</td>
+            <td>Makes new (tiny) predictions; actively tested in lab and cosmology.</td>
+          </tr>
+          <tr>
+            <td>de Broglie–Bohm</td>
+            <td><span class="mid">Effective only</span></td>
+            <td>Real particles + real pilot wave</td>
+            <td><span class="yes">Yes — particle positions</span></td>
+            <td>Quantum equilibrium |ψ|²</td>
+            <td>Deterministic, explicitly nonlocal. Passes Bell by abandoning locality, not realism.</td>
+          </tr>
+          <tr>
+            <td>QBism</td>
+            <td><span class="mid">Bayesian update</span></td>
+            <td>Agent’s expectations; no external ontology</td>
+            <td><span class="no">No</span></td>
+            <td>Personal degrees of belief</td>
+            <td>Anti-realist and instrumentalist; “collapse” is just learning.</td>
+          </tr>
+          <tr>
+            <td>Many-minds (Albert ’92)</td>
+            <td><span class="no">No — unitary only</span></td>
+            <td>One world; observer’s mind branches</td>
+            <td><span class="no">No</span></td>
+            <td>Measure over minds</td>
+            <td>Everett without many bodies — the cost is an ill-defined “mind” in the equations.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 FIGURES ================= -->
+<section class="sec alt" id="figures" aria-labelledby="fi-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">06</span>
+      <div>
+        <h2 id="fi-h">Key Figures</h2>
+        <p class="sec-sub">The people who made it, rejected it, and rebuilt it — plus the critic who keeps it honest.</p>
+      </div>
+    </div>
+    <div class="cards fig">
+      <div class="card fig-card reveal">
+        <div class="avatar">HE</div>
+        <span class="fig-meta">1930 – 1982</span>
+        <span class="tag">Originator</span>
+        <h3>Hugh Everett III</h3>
+        <p>Air Force officer who wrote “The Relative State Formulation of Quantum Mechanics” as a 1955 PhD thesis. The physics world rejected it for two decades; history mostly vindicated it.</p>
+      </div>
+      <div class="card fig-card reveal" style="--d:.07s">
+        <div class="avatar">JW</div>
+        <span class="fig-meta">1911 – 2008</span>
+        <span class="tag">Mentor</span>
+        <h3>John A. Wheeler</h3>
+        <p>Everett’s advisor. Called the theory “the theory of branching universes,” wrote the famous commentary, and kept the idea alive in the physics conversation for a generation.</p>
+      </div>
+      <div class="card fig-card reveal" style="--d:.14s">
+        <div class="avatar">DD</div>
+        <span class="fig-meta">1942 – 2002</span>
+        <span class="tag">Revivalist</span>
+        <h3>David Deutsch</h3>
+        <p>His 1985 quantum-computing paper made many-worlds a working tool for physicists, and his 1998 decision-theoretic argument became the standard internal derivation of the Born rule.</p>
+      </div>
+      <div class="card fig-card reveal" style="--d:.21s">
+        <div class="avatar">DW</div>
+        <span class="fig-meta">b. 1972</span>
+        <span class="tag">Systematizer</span>
+        <h3>David Wallace</h3>
+        <p><em>The Emergent Multiverse</em> (2012) is the rigorous reconstruction of Everettian ontology — branch counting, self-locating uncertainty, and decision theory, done properly.</p>
+      </div>
+      <div class="card fig-card reveal" style="--d:.28s">
+        <div class="avatar">LV</div>
+        <span class="fig-meta">b. 1952</span>
+        <span class="tag">Refiner</span>
+        <h3>Lev Vaidman</h3>
+        <p>Defends a “preferred branching structure” — worlds are the natural units of the theory. Also the author of the infamous “quantum suicide” thought experiment.</p>
+      </div>
+      <div class="card fig-card crit reveal" style="--d:.35s">
+        <div class="avatar">MT</div>
+        <span class="fig-meta">b. 1967</span>
+        <span class="tag">Principal critic</span>
+        <h3>Max Tegmark</h3>
+        <p>His 1998 Boltzmann-brain objection — that branch weights over the whole multiverse make predictions trivial or absurd — remains the sharpest standing attack on the view.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 TIMELINE ================= -->
+<section class="sec" id="timeline" aria-labelledby="ti-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">07</span>
+      <div>
+        <h2 id="ti-h">Timeline</h2>
+        <p class="sec-sub">From the birth of the measurement problem to the era when its cleanest solution started to look like the default.</p>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <span class="tl-year">1925 – 1926</span>
+        <h3>Quantum mechanics is born</h3>
+        <p>Matrix mechanics (Heisenberg, Born, Jordan) and wave mechanics (Schrödinger) are shown equivalent. Superposition is in the formalism from day one — and with it, the measurement problem.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">1932</span>
+        <h3>von Neumann’s double dynamics</h3>
+        <p><em>Mathematische Grundlagen</em> formalizes two distinct processes: unitary evolution, and the projection (collapse) postulate applied to measurement. The “Heisenberg cut” enters the literature.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">1935</span>
+        <h3>Schrödinger’s cat</h3>
+        <p>Wanted as a reductio of collapse — “a quite trivial stuff” becoming a live cat/dead-cat superposition. Everettians read it differently: the cat is a perfect model of a branch, and both states are real.</p>
+      </div>
+      <div class="tl-item major reveal">
+        <span class="tl-year">1957</span>
+        <h3>Everett’s “Relative State” paper</h3>
+        <p>PhD thesis under Wheeler, published in <em>Rev. Mod. Phys.</em> 29, 454. The community rejects it — Heisenberg reportedly calls it “the many-worlds of madness.” Wheeler’s reported advice: “If you can’t sleep with it, you can’t live with it.”</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">1970 – 1971</span>
+        <h3>A name, and an independent discovery</h3>
+        <p>David DeWitt coins the term “many-worlds” at a conference in Grenoble (1970). The same year, Hans Zeh independently introduces environment-induced entanglement — what will be called decoherence.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">1981 – 1982</span>
+        <h3>Zurek formalizes decoherence</h3>
+        <p>Pointer states, “einselection,” and quantitative decoherence rates. Decoherence becomes the physical mechanism that makes branching a viable story. In 1982, Hugh Everett dies of a heart attack at 51 — ten years before his revival.</p>
+      </div>
+      <div class="tl-item major reveal">
+        <span class="tl-year">1985</span>
+        <h3>Deutsch and quantum computation</h3>
+        <p>Deutsch’s universal quantum computer works most naturally on the Everettian picture, and the Born rule appears as a resource. Many-worlds stops being a philosophical curiosity and becomes a working framework.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">1998</span>
+        <h3>The Born rule, derived — and attacked</h3>
+        <p>Deutsch’s decision-theoretic argument (extended by Wallace) shows that a rational agent in a branching universe must act <em>as if</em> |a|² were a probability. The same year, Tegmark publishes his Boltzmann-brain critique.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">2012</span>
+        <h3>Wallace: <em>The Emergent Multiverse</em></h3>
+        <p>Everettian ontology is reconstructed with mathematical rigor: what a “world” is, how to count them, and why self-locating uncertainty is a coherent problem with a unique answer.</p>
+      </div>
+      <div class="tl-item reveal">
+        <span class="tl-year">2016 →</span>
+        <h3>Something deeply hidden</h3>
+        <p>Carroll’s popular treatment brings the interpretation to the wider physics community. In recent polls of working researchers, the Everettian interpretation consistently ranks at or near the top of the field’s own beliefs about which interpretation is true.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 OPEN PROBLEMS ================= -->
+<section class="sec alt" id="controversy" aria-labelledby="cp-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">08</span>
+      <div>
+        <h2 id="cp-h">Open Problems</h2>
+        <p class="sec-sub">The arguments the field still loses sleep over. A candidate for “the” interpretation must survive all six of these.</p>
+      </div>
+    </div>
+    <div class="cards prob">
+      <div class="card reveal">
+        <span class="tag">C·01</span>
+        <h3>The Born rule problem</h3>
+        <p>Why should squared amplitudes be probabilities? The standard answers are Gleason’s theorem (1957), the Deutsch–Wallace decision-theoretic derivation, and Zurek’s envariance. Critics call the circular; proponents reply that it is a derivation of rational belief, not of frequencies — and that no alternative interpretation does better.</p>
+        <span class="src">Gleason ’57 · Deutsch ’98 · Wallace ’12</span>
+      </div>
+      <div class="card reveal" style="--d:.07s">
+        <span class="tag">C·02</span>
+        <h3>Are branches even countable?</h3>
+        <p>“How many worlds are there?” may be ill-posed: branch number depends on how finely you carve the environment. Vaidman’s preferred branching structure and Wallace’s branch counting try to fix this; Tegmark argues the freedom makes the theory unpredicative once cosmological superpositions are included.</p>
+        <span class="src">Vaidman ’91 · Wallace ’12 · Tegmark ’98</span>
+      </div>
+      <div class="card reveal" style="--d:.14s">
+        <span class="tag">C·03</span>
+        <h3>Self-locating uncertainty</h3>
+        <p>Before I open the box, after branching, “I” am in every branch. Assigning the right credences to “which branch am I in?” is a new problem standard probability theory doesn’t directly address. Everettian decision theory answers it; whether the answer is unique is still debated.</p>
+        <span class="src">Wallace ’12 · Lewis ’46 (analogues)</span>
+      </div>
+      <div class="card reveal" style="--d:.21s">
+        <span class="tag">C·04</span>
+        <h3>Decoherence is not isolation</h3>
+        <p>Decoherence makes interference fantastically small, not strictly zero. In principle, a quantum eraser can re-cohere branches — so “worlds” are emergent, approximate structures, not fundamental entities. Defenders accept this; purists of a strict ontology do not.</p>
+        <span class="src">Zeh ’70 · Zurek ’03 (RMP)</span>
+      </div>
+      <div class="card reveal" style="--d:.28s">
+        <span class="tag">C·05</span>
+        <h3>Empirical equivalence</h3>
+        <p>MWI predicts exactly the same numbers as standard quantum mechanics. For Popperians this is fatal (unfalsifiable); for its advocates it is the point — collapse is an <em>extra</em> unfalsifiable postulate, and MWI is the reading with zero additions. Its status is the status of QM itself.</p>
+        <span class="src">Popper ’34 vs. Everett ’57</span>
+      </div>
+      <div class="card reveal" style="--d:.35s">
+        <span class="tag">C·06</span>
+        <h3>The price of realism</h3>
+        <p>A literal multiverse is a staggering ontological bill. The Occam counter: one set of equations, one state vector, no collapse, no cut, no hidden variables — and the “many worlds” are read off the mathematics, not added to it. The dispute is fundamentally about what parsimony counts.</p>
+        <span class="src">Wheeler ’57 · Tegmark ’98 · Carroll ’16</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 REFERENCES ================= -->
+<section class="sec" id="references" aria-labelledby="re-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-index">09</span>
+      <div>
+        <h2 id="re-h">Primary References</h2>
+        <p class="sec-sub">Read the sources, not the summaries. Ordered by the role each plays in the argument.</p>
+      </div>
+    </div>
+    <div class="refs">
+      <div class="ref reveal"><span class="idx">R·01</span><p><b>Everett, H. R. (1957).</b> <i>Relative State Formulation of Quantum Mechanics.</i> Reviews of Modern Physics 29(4), 454–462. — the original paper.</p></div>
+      <div class="ref reveal"><span class="idx">R·02</span><p><b>Wheeler, J. A. (1957).</b> <i>Commentary: The “Relative State” Formulation of Quantum Mechanics.</i> Reviews of Modern Physics 29(4), 463–464. — the advisor’s response.</p></div>
+      <div class="ref reveal"><span class="idx">R·03</span><p><b>von Neumann, J. (1932).</b> <i>Mathematische Grundlagen der Quantenmechanik.</i> Springer. — the double dynamics that Everett removed.</p></div>
+      <div class="ref reveal"><span class="idx">R·04</span><p><b>Schrödinger, E. (1935).</b> <i>Die gegenwärtige Situation in der Quantenmechanik.</i> Naturwissenschaften 23, 807–812. — the cat, as a warning label.</p></div>
+      <div class="ref reveal"><span class="idx">R·05</span><p><b>Zeh, H. D. (1970).</b> <i>On the Interpretation of Measurement in Quantum Theory in Terms of Quantum Entanglement.</i> Zeitschrift für Physik 257, 15. — decoherence, first proposed.</p></div>
+      <div class="ref reveal"><span class="idx">R·06</span><p><b>Zurek, W. H. (2003).</b> <i>Decoherence, Einselection, and the Quantum Origins of the Classical.</i> Reviews of Modern Physics 75, 715–775. — the definitive modern treatment.</p></div>
+      <div class="ref reveal"><span class="idx">R·07</span><p><b>DeWitt, B. S. &amp; Graham, R. H. (eds.) (1973).</b> <i>The Many-Worlds Interpretation of Quantum Mechanics.</i> Princeton University Press. — where the name took hold.</p></div>
+      <div class="ref reveal"><span class="idx">R·08</span><p><b>Deutsch, D. (1985).</b> <i>Quantum Theory, the Church–Turing Principle and the Universal Quantum Computer.</i> Proceedings of the Royal Society A 400, 97–117. — the revival.</p></div>
+      <div class="ref reveal"><span class="idx">R·09</span><p><b>Deutsch, D. (1998).</b> <i>Quantum Theory, Probability, and the Meaning of Probability.</i> Foundations of Science 3, 49–61. — the Born rule, derived.</p></div>
+      <div class="ref reveal"><span class="idx">R·10</span><p><b>Tegmark, M. (1998).</b> <i>Importance of Quantum Superpositions in Cosmic Evolution.</i> Physical Review Letters 80, 1852. — the standing critique.</p></div>
+      <div class="ref reveal"><span class="idx">R·11</span><p><b>Wallace, D. (2012).</b> <i>The Emergent Multiverse.</i> Oxford University Press. — the rigorous reconstruction.</p></div>
+      <div class="ref reveal"><span class="idx">R·12</span><p><b>Carroll, S. (2016).</b> <i>Something Deeply Hidden.</i> Henry Holt. — the modern popular account. See also: Vaidman, L. (2014), <i>Many-Worlds Interpretation of Quantum Mechanics,</i> Encyclopedia of Mathematical Physics, Elsevier.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top">
+          <span class="brand-mark">Ψ</span>
+          <span class="brand-text">MANY·WORLDS<span class="brand-sub">EVERETT TECHNICAL BRIEF</span></span>
+        </a>
+        <p>A self-contained technical overview of the Everettian interpretation of quantum mechanics — its postulates, mathematics, history, and open problems. No collapse. No cookies. No tracking.</p>
+      </div>
+      <div>
+        <h4>Sections</h4>
+        <ul class="foot-links">
+          <li><a href="#overview">01 · Overview</a></li>
+          <li><a href="#postulates">02 · Postulates</a></li>
+          <li><a href="#formalism">03 · Formalism</a></li>
+          <li><a href="#simulator">04 · Simulator</a></li>
+          <li><a href="#compare">05 · Compare</a></li>
+          <li><a href="#figures">06 · Figures</a></li>
+          <li><a href="#timeline">07 · Timeline</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Document spec</h4>
+        <ul class="spec-list">
+          <li>SINGLE FILE · ZERO DEPENDENCIES</li>
+          <li>NO EXTERNAL FONTS, LIBS OR CALLS</li>
+          <li>RENDERED WITH &lt;canvas&gt; + VANILLA JS</li>
+          <li>RESPONSIVE · REDUCED-MOTION AWARE</li>
+          <li>REV 1.0 · MODEL: REV MOD PHYS 29, 454 (1957)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span>© THE MULTIVERSE — ALL BRANCHES RESERVED</span>
+      <span>BUILD: SELF-CONTAINED · STATE: UNITARY</span>
+      <a href="#top">RETURN TO ORIGIN ▲</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function $(id){ return document.getElementById(id); }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function easeInOutCubic(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+/* ---------------- nav: progress + mobile menu + active link ---------------- */
+var navProgress = $('navProgress');
+function onScroll(){
+  var h = document.documentElement;
+  var max = h.scrollHeight - h.clientHeight;
+  navProgress.style.width = (max>0 ? (h.scrollTop||window.pageYOffset)/max*100 : 0) + '%';
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+window.addEventListener('resize', onScroll);
+onScroll();
+
+var navToggle = $('navToggle');
+var navLinks = $('navLinks');
+navToggle.addEventListener('click', function(){
+  var open = navLinks.classList.toggle('open');
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+navLinks.addEventListener('click', function(e){
+  if(e.target.tagName === 'A'){ navLinks.classList.remove('open'); navToggle.setAttribute('aria-expanded','false'); }
+});
+
+var linkEls = Array.prototype.slice.call(navLinks.querySelectorAll('a'));
+var linkMap = {};
+linkEls.forEach(function(l){ linkMap[l.getAttribute('href').slice(1)] = l; });
+var secObs = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){
+      linkEls.forEach(function(l){ l.classList.remove('active'); });
+      var l = linkMap[en.target.id];
+      if(l) l.classList.add('active');
+    }
+  });
+}, {rootMargin:'-40% 0px -55% 0px'});
+Array.prototype.slice.call(document.querySelectorAll('main section[id]')).forEach(function(s){ secObs.observe(s); });
+
+/* ---------------- reveal on scroll ---------------- */
+var revealObs = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){ en.target.classList.add('visible'); revealObs.unobserve(en.target); }
+  });
+}, {threshold:0.1, rootMargin:'0px 0px -5% 0px'});
+Array.prototype.slice.call(document.querySelectorAll('.reveal')).forEach(function(el){ revealObs.observe(el); });
+
+/* ================= HERO: branching worldlines ================= */
+(function(){
+  var canvas = $('heroCanvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W=0, H=0, DPR=1;
+  var segments=[], maxDist=1, dots=[];
+  var GROW=4200, HOLD=2600, FADE=900, CYCLE=GROW+HOLD+FADE;
+  var t0 = performance.now();
+  var heroVisible = true;
+
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  function build(){
+    segments = []; maxDist = 0;
+    var maxDepth = 5;
+    var L0 = Math.max(40, Math.min(H*0.30, W*0.09));
+    var spread = Math.min(0.52, Math.asin(clamp((H*0.42)/(L0*Math.pow(0.74, maxDepth)), 0, 1)));
+    var lo = Math.max(0.20, spread - rand(0.04, 0.10));
+    function branch(x, y, ang, len, depth, cum, hue){
+      if(depth > maxDepth) return;
+      var x2 = x + Math.cos(ang)*len;
+      var y2 = y + Math.sin(ang)*len;
+      var end = cum + len;
+      segments.push({x1:x, y1:y, x2:x2, y2:y2, depth:depth, cs:cum, len:len, hue:hue});
+      if(end > maxDist) maxDist = end;
+      if(depth < maxDepth){
+        var sp = rand(lo, spread);
+        branch(x2, y2, ang-sp, len*0.74, depth+1, end, hue);
+        branch(x2, y2, ang+sp, len*0.74, depth+1, end, 1-hue);
+      }
+    }
+    branch(W*0.09, H*0.52, -0.05, L0, 1, 0, 0);
+  }
+
+  function initDots(){
+    dots = [];
+    var n = clamp(Math.floor(W/18), 20, 60);
+    for(var i=0;i<n;i++){
+      dots.push({x:Math.random()*W, y:Math.random()*H, r:rand(0.5,1.7), v:rand(3,12), a:rand(0.05,0.20)});
+    }
+  }
+
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = Math.max(1, Math.floor(W*DPR));
+    canvas.height = Math.max(1, Math.floor(H*DPR));
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    build(); initDots();
+    if(prefersReduced) draw(performance.now());
+  }
+  var rt;
+  window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(resize, 180); });
+  new IntersectionObserver(function(e){ heroVisible = e[0].isIntersecting; }, {threshold:0}).observe(canvas);
+  resize();
+
+  var CYAN = 'rgba(59,224,255,', AMBER = 'rgba(255,196,110,';
+  function hueColor(h, a){ return (h ? AMBER : CYAN) + a + ')'; }
+
+  function draw(now){
+    var phase = prefersReduced ? GROW + HOLD : (now - t0) % CYCLE;
+    var p, alpha = 1;
+    if(prefersReduced){ p = maxDist; }
+    else if(phase < GROW){ p = easeInOutCubic(phase/GROW) * maxDist; }
+    else if(phase < GROW + HOLD){ p = maxDist; }
+    else { p = maxDist; alpha = 1 - (phase - GROW - HOLD)/FADE; }
+
+    ctx.clearRect(0,0,W,H);
+
+    /* faint engineering grid */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(126,168,214,0.05)';
+    var gs = 64, gx, gy;
+    for(gx = (W*0.09) % gs; gx < W; gx += gs){
+      ctx.beginPath(); ctx.moveTo(gx+0.5, 0); ctx.lineTo(gx+0.5, H); ctx.stroke();
+    }
+    for(gy = gs/2; gy < H; gy += gs){
+      ctx.beginPath(); ctx.moveTo(0, gy+0.5); ctx.lineTo(W, gy+0.5); ctx.stroke();
+    }
+
+    /* drifting background particles */
+    var i, d;
+    for(i=0;i<dots.length;i++){
+      d = dots[i];
+      if(!prefersReduced){ d.x += d.v*0.016; if(d.x > W+4){ d.x = -4; d.y = Math.random()*H; } }
+      ctx.globalAlpha = d.a * alpha;
+      ctx.fillStyle = '#9fd8ff';
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* worldlines */
+    for(var s=0; s<segments.length; s++){
+      var seg = segments[s];
+      if(p <= seg.cs) continue;
+      var f = Math.min(1, (p - seg.cs)/seg.len);
+      var x2 = lerp(seg.x1, seg.x2, f);
+      var y2 = lerp(seg.y1, seg.y2, f);
+      var depthFade = Math.max(0.28, 1 - (seg.depth-1)*0.15);
+      ctx.globalAlpha = alpha * depthFade * (0.35 + 0.65*f);
+      ctx.strokeStyle = hueColor(seg.hue, 0.95);
+      ctx.lineWidth = Math.max(1, 2.4 - seg.depth*0.3);
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(seg.x1, seg.y1); ctx.lineTo(x2, y2); ctx.stroke();
+
+      if(f < 1){
+        /* glowing growth tip */
+        ctx.save();
+        ctx.shadowColor = 'rgba(255,205,130,0.9)';
+        ctx.shadowBlur = 12;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#ffd9a0';
+        ctx.beginPath(); ctx.arc(x2, y2, 2.1, 0, 6.2832); ctx.fill();
+        ctx.restore();
+      } else if(seg.depth < 5){
+        /* decoherence fork node */
+        ctx.globalAlpha = alpha * 0.85;
+        ctx.fillStyle = hueColor(seg.hue, 1);
+        ctx.beginPath(); ctx.arc(x2, y2, 1.6, 0, 6.2832); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  if(prefersReduced){
+    draw(performance.now());
+  } else {
+    (function frame(now){
+      if(heroVisible) draw(now || performance.now());
+      requestAnimationFrame(frame);
+    })(performance.now());
+  }
+})();
+
+/* ================= SIMULATOR: two-stage measurement ================= */
+(function(){
+  var canvas = $('simCanvas');
+  if(!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var slider = $('ampSlider'), ampOut = $('ampOut');
+  var valUp = $('valUp'), valDown = $('valDown');
+  var barUp = $('barUp'), barDown = $('barDown');
+  var readout = $('stateReadout'), foot = $('simFoot');
+
+  var S = { a:0.6, b:Math.sqrt(0.64), pA:0.36, pB:0.64 };
+
+  var LW = 900, LH = 470;
+  var R = {x:85, y:235}, U = {x:430, y:100}, D = {x:430, y:370},
+      LU = {x:775, y:42}, LD = {x:775, y:158}, DU = {x:775, y:312}, DD = {x:775, y:428};
+
+  var edges = [
+    {f:R, t:U,  p:'pA', hue:0, lab:'M₁ → ↑'},
+    {f:R, t:D,  p:'pB', hue:1, lab:'M₁ → ↓'},
+    {f:U, t:LU, p:'pA', hue:0, lab:'M₂ → ↑'},
+    {f:U, t:LD, p:'pB', hue:1, lab:'M₂ → ↓'},
+    {f:D, t:DU, p:'pA', hue:0, lab:'M₂ → ↑'},
+    {f:D, t:DD, p:'pB', hue:1, lab:'M₂ → ↓'}
+  ];
+  var leaves = [
+    {n:LU, name:'w₁', p:function(){return S.pA*S.pA;}, hue:0},
+    {n:LD, name:'w₂', p:function(){return S.pA*S.pB;}, hue:-1},
+    {n:DU, name:'w₃', p:function(){return S.pB*S.pA;}, hue:-1},
+    {n:DD, name:'w₄', p:function(){return S.pB*S.pB;}, hue:1}
+  ];
+
+  var simVisible = true;
+  new IntersectionObserver(function(e){ simVisible = e[0].isIntersecting; }, {threshold:0}).observe(canvas);
+
+  function resize(){
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.parentElement.clientWidth;
+    var h = w * (LH/LW);
+    canvas.style.height = h + 'px';
+    canvas.width = Math.max(1, Math.floor(w*dpr));
+    canvas.height = Math.max(1, Math.floor(h*dpr));
+    ctx.setTransform(canvas.width/LW, 0, 0, canvas.height/LH, 0, 0);
+    if(prefersReduced) draw(0);
+  }
+  window.addEventListener('resize', resize);
+
+  function fmt3(x){ return x.toFixed(3); }
+  function fmtPct(x){ return (x*100).toFixed(1) + '%'; }
+
+  function updateUI(){
+    ampOut.textContent = fmt3(S.a);
+    valUp.textContent = fmtPct(S.pA);
+    valDown.textContent = fmtPct(S.pB);
+    barUp.style.width = (S.pA*100) + '%';
+    barDown.style.width = (S.pB*100) + '%';
+    slider.style.setProperty('--fill', (S.a*100) + '%');
+    readout.innerHTML = '|ψ⟩ = <span class="a">' + fmt3(S.a) + '</span>|↑⟩ + <span class="b">' + fmt3(S.b) + '</span>|↓⟩&nbsp;·&nbsp;|a|² + |b|² = 1';
+    var alive = 0;
+    leaves.forEach(function(l){ if(l.p() > 0.0005) alive++; });
+    foot.innerHTML = alive + ' BRANCHES WITH NON-ZERO WEIGHT · ΣP = 1.000 · <b>NO COLLAPSE</b> — ZERO-WEIGHT BRANCHES ARE DRAWN DASHED (REAL, VACUOUS)';
+  }
+
+  function onSlide(){
+    S.a = slider.value/100;
+    S.b = Math.sqrt(Math.max(0, 1 - S.a*S.a));
+    S.pA = S.a*S.a;
+    S.pB = 1 - S.pA;
+    updateUI();
+    if(prefersReduced) draw(0);
+  }
+  slider.addEventListener('input', onSlide);
+
+  var CYAN = 'rgba(59,224,255,', AMBER = 'rgba(255,196,110,';
+  function hueColor(h, a){ return (h ? AMBER : CYAN) + a + ')'; }
+
+  function draw(time){
+    ctx.clearRect(0,0,LW,LH);
+
+    /* grid */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(126,168,214,0.06)';
+    var gx, gy;
+    for(gx = 50; gx < LW; gx += 50){ ctx.beginPath(); ctx.moveTo(gx+0.5,0); ctx.lineTo(gx+0.5,LH); ctx.stroke(); }
+    for(gy = 50; gy < LH; gy += 50){ ctx.beginPath(); ctx.moveTo(0,gy+0.5); ctx.lineTo(LW,gy+0.5); ctx.stroke(); }
+
+    /* edges */
+    for(var i=0;i<edges.length;i++){
+      var e = edges[i];
+      var pv = S[e.p];
+      var mx = (e.f.x + e.t.x)/2, my = (e.f.y + e.t.y)/2;
+      var vacuous = pv < 0.0005;
+
+      ctx.save();
+      if(vacuous){
+        ctx.strokeStyle = 'rgba(126,168,214,0.28)';
+        ctx.setLineDash([4,6]);
+        ctx.lineWidth = 1.4;
+      } else {
+        ctx.strokeStyle = hueColor(e.hue, 0.85);
+        ctx.lineWidth = 2.2;
+      }
+      ctx.beginPath(); ctx.moveTo(e.f.x, e.f.y); ctx.lineTo(e.t.x, e.t.y); ctx.stroke();
+      ctx.restore();
+
+      /* traveling pulse */
+      if(!vacuous && !prefersReduced){
+        var ph = (time*0.00035 + i*0.17) % 1;
+        var px = lerp(e.f.x, e.t.x, ph);
+        var py = lerp(e.f.y, e.t.y, ph);
+        ctx.save();
+        ctx.shadowColor = hueColor(e.hue, 0.9);
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = hueColor(e.hue, 1);
+        ctx.beginPath(); ctx.arc(px, py, 2.4, 0, 6.2832); ctx.fill();
+        ctx.restore();
+      }
+
+      /* edge label */
+      var up = e.t.y < e.f.y;
+      ctx.font = '13px ' + 'ui-monospace, Menlo, Consolas, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillStyle = vacuous ? 'rgba(126,168,214,0.5)' : (e.hue ? 'rgba(255,196,110,0.9)' : 'rgba(59,224,255,0.9)');
+      var ly = up ? my - 12 : my + 22;
+      ctx.fillText(e.lab + '  P=' + (vacuous ? '0' : fmt3(pv)), mx - 4, ly);
+    }
+
+    /* nodes */
+    function node(pt, hue, label, labelDy){
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, 6.5, 0, 6.2832);
+      ctx.fillStyle = '#0a101b'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = hueColor(hue, 0.95); ctx.stroke();
+      if(label){
+        ctx.font = '12px ui-monospace, Menlo, Consolas, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(126,168,214,0.75)';
+        ctx.fillText(label, pt.x, pt.y + labelDy);
+      }
+    }
+    node(R, 0, '|ψ⟩ IN', 34);
+    node(U, 0, null, 0);
+    node(D, 1, null, 0);
+
+    /* leaves */
+    for(var k=0;k<leaves.length;k++){
+      var lf = leaves[k];
+      var pval = lf.p();
+      var vac = pval < 0.0005;
+      ctx.beginPath(); ctx.arc(lf.n.x, lf.n.y, 6, 0, 6.2832);
+      ctx.fillStyle = '#0a101b'; ctx.fill();
+      ctx.lineWidth = 2;
+      if(vac){
+        ctx.setLineDash([3,4]);
+        ctx.strokeStyle = 'rgba(126,168,214,0.35)';
+      } else {
+        ctx.strokeStyle = lf.hue >= 0 ? hueColor(lf.hue, 0.95) : 'rgba(219,230,243,0.9)';
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '13px ui-monospace, Menlo, Consolas, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = vac ? 'rgba(126,168,214,0.45)' : (lf.hue === 0 ? 'rgba(59,224,255,0.95)' : (lf.hue === 1 ? 'rgba(255,196,110,0.95)' : 'rgba(219,230,243,0.9)'));
+      ctx.fillText(lf.name + ' = ' + (vac ? '0 (vacuous)' : fmt3(pval)), lf.n.x + 16, lf.n.y + 4);
+    }
+
+    /* legend */
+    ctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(77,90,108,0.9)';
+    ctx.fillText('UNITARY ONLY · DECOHERED BRANCHES DO NOT INTERFERE · BRANCH WEIGHTS ARE BORN WEIGHTS |a|²', 24, LH - 20);
+  }
+
+  updateUI();
+  resize();
+
+  if(prefersReduced){
+    draw(0);
+  } else {
+    (function frame(t){
+      if(simVisible) draw(t || 0);
+      requestAnimationFrame(frame);
+    })(0);
+  }
+})();
+
+})();
+</script>
+</body>
+</html>

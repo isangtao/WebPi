@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A field guide to the statistical ideas that power artificial intelligence — probability, likelihood, inference, and decision theory, explained.">
+<title>Inference — The Statistics Inside AI</title>
+<style>
+/* ============================================================
+   INFERENCE — the statistics inside AI
+   Single-file · no external requests · dark by default
+   ============================================================ */
+
+/* ---------- 1. Tokens ---------- */
+:root{
+  --font-display:"Palatino Linotype","Iowan Old Style","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
+  --font-body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,"SF Mono","Cascadia Code","JetBrains Mono",Consolas,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0a0e13;
+  --bg2:#0e141b;
+  --panel:#10161e;
+  --ink:#ece7db;
+  --muted:#949ca7;
+  --faint:#5d6672;
+  --line:rgba(236,231,219,.10);
+  --line-strong:rgba(236,231,219,.20);
+  --grid-line:rgba(236,231,219,.035);
+  --p1:#d9a441;   /* foundations  — gold    */
+  --p2:#5fb3a1;   /* inference    — teal    */
+  --p3:#e2825f;   /* learning     — coral   */
+  --p4:#9f8ff2;   /* decision     — violet  */
+  --glow:rgba(217,164,65,.10);
+  --shadow:0 18px 44px -20px rgba(0,0,0,.65);
+  --noise-op:.05;
+  color-scheme:dark;
+}
+html[data-theme="light"]{
+  --bg:#f4f1ea;
+  --bg2:#efeae0;
+  --panel:#fbf9f4;
+  --ink:#1d232b;
+  --muted:#5b6470;
+  --faint:#8b93a0;
+  --line:rgba(29,35,43,.13);
+  --line-strong:rgba(29,35,43,.26);
+  --grid-line:rgba(29,35,43,.05);
+  --p1:#96660c;
+  --p2:#1d6e5c;
+  --p3:#b04a22;
+  --p4:#5746c2;
+  --glow:rgba(150,102,12,.10);
+  --shadow:0 18px 40px -22px rgba(29,35,43,.25);
+  --noise-op:.035;
+  color-scheme:light;
+}
+
+/* ---------- 2. Base ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background .35s ease,color .35s ease;
+}
+/* graph-paper backdrop */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+body::after{ /* top glow */
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(900px 480px at 78% -10%,var(--glow),transparent 70%);
+}
+.noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--noise-op);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+::selection{background:var(--p1);color:#0a0e13}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--p2);outline-offset:3px;border-radius:4px}
+.wrap{width:min(1120px,92%);margin:0 auto;position:relative;z-index:2}
+section{position:relative;z-index:2;scroll-margin-top:96px}
+h1,h2,h3,.display{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em}
+
+.kicker{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--p1);display:flex;align-items:center;gap:14px;
+}
+.kicker::before{content:"";width:34px;height:1px;background:var(--p1);opacity:.7}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:14px}
+.sec-head h2{font-size:clamp(1.9rem,3.6vw,2.9rem);line-height:1.12;margin-top:14px;max-width:22ch}
+.sec-head p{color:var(--muted);max-width:44ch;font-size:15.5px}
+
+/* ---------- 3. Progress + header ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--p1),var(--p2));
+}
+.site-head{
+  position:sticky;top:0;z-index:50;
+  background:color-mix(in oklab,var(--bg) 80%,transparent);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  transition:background .35s ease;
+}
+.head-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;height:64px}
+.brand{font-family:var(--font-display);font-size:21px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand .sigma{
+  color:var(--p1);font-size:24px;width:34px;height:34px;border:1px solid var(--line-strong);
+  border-radius:9px;display:grid;place-items:center;font-style:italic;flex:none;
+}
+.brand .brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand small{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+.nav{display:flex;gap:26px}
+.nav a{
+  font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  padding:6px 2px;position:relative;transition:color .25s;
+}
+.nav a::after{content:"";position:absolute;left:0;bottom:0;height:1.5px;width:0;background:var(--p1);transition:width .3s}
+.nav a:hover{color:var(--ink)}
+.nav a:hover::after{width:100%}
+
+.theme-toggle{
+  width:42px;height:42px;border:1px solid var(--line-strong);border-radius:12px;
+  display:grid;place-items:center;position:relative;overflow:hidden;
+  transition:border-color .25s,transform .25s;
+}
+.theme-toggle:hover{border-color:var(--p1);transform:translateY(-1px)}
+.theme-toggle svg{position:absolute;transition:transform .5s cubic-bezier(.3,1.4,.4,1),opacity .35s}
+html[data-theme="dark"] .icon-moon{opacity:0;transform:rotate(90deg) scale(.4)}
+html[data-theme="dark"] .icon-sun{opacity:1;transform:rotate(0) scale(1)}
+html[data-theme="light"] .icon-sun{opacity:0;transform:rotate(-90deg) scale(.4)}
+html[data-theme="light"] .icon-moon{opacity:1;transform:rotate(0) scale(1)}
+
+/* ---------- 4. Hero ---------- */
+.hero{padding:72px 0 30px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.5rem,5.6vw,4.2rem);line-height:1.06;margin:22px 0 20px}
+.hero h1 em{font-style:italic;color:var(--p1)}
+.hero .sub{color:var(--muted);font-size:17px;max-width:52ch}
+.hero .sub b{color:var(--ink);font-weight:600}
+.hero-cta{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;
+  padding:13px 22px;border-radius:11px;transition:transform .25s,box-shadow .25s,background .25s,border-color .25s;
+}
+.btn-primary{background:var(--p1);color:#0c0f14}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px -12px color-mix(in oklab,var(--p1) 70%,transparent)}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--p1);transform:translateY(-2px)}
+.hero-meta{margin-top:34px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);display:flex;gap:10px;align-items:center}
+.hero-meta i{font-style:normal;color:var(--p2)}
+
+/* hero instrument panels */
+.hero-panels{display:grid;gap:18px}
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:14px 16px 10px;box-shadow:var(--shadow);
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.panel-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:9px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--p2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in oklab,var(--p2) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+.replay{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:8px;padding:4px 10px;transition:all .25s;
+}
+.replay:hover{color:var(--p1);border-color:var(--p1)}
+.panel svg{width:100%;height:auto}
+.svg-ink{stroke:var(--faint)}
+.svg-label{font-family:var(--font-mono);font-size:10px;fill:var(--muted)}
+.svg-label-accent{font-family:var(--font-mono);font-size:11px;fill:var(--p2);font-weight:700}
+
+/* hero animation (driven by .play) */
+#heroCurve,#heroArea,#heroLine{opacity:0}
+#heroCurve{stroke-dasharray:1;stroke-dashoffset:1}
+#heroLine{stroke-dasharray:1;stroke-dashoffset:1}
+.play #heroCurve{animation:drawIn 1.6s .25s cubic-bezier(.4,0,.2,1) forwards}
+.play #heroArea{animation:fadeIn .8s 1.5s ease forwards}
+.play .hlab{animation:fadeIn .6s 2s ease both}
+.play .pt{animation:ptIn .5s both;animation-delay:calc(.15s + var(--i)*.09s)}
+.play #heroLine{animation:drawIn 1.1s 1.6s cubic-bezier(.4,0,.2,1) forwards}
+.play #r2lab{animation:fadeIn .5s 2.7s ease both}
+@keyframes drawIn{to{stroke-dashoffset:0;opacity:1}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes ptIn{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+.pt{transform-box:fill-box;transform-origin:center}
+
+/* ---------- 5. Stats strip ---------- */
+.stats-strip{
+  margin-top:56px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(4,1fr);
+}
+.stat{padding:26px 20px;text-align:center;border-left:1px solid var(--line)}
+.stat:first-child{border-left:none}
+.stat .num{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);color:var(--p1);line-height:1;font-variant-numeric:tabular-nums}
+.stat .lab{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+
+/* ---------- 6. Why ---------- */
+.why{padding:96px 0 40px}
+.why-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:56px;margin-top:34px;align-items:start}
+.why .lead{font-size:18.5px;line-height:1.75;color:color-mix(in oklab,var(--ink) 88%,var(--muted))}
+.why .lead::first-letter{
+  font-family:var(--font-display);float:left;font-size:4.6em;line-height:.82;
+  padding-right:.14em;color:var(--p1);
+}
+.thesis{margin-top:30px;display:grid;gap:0}
+.thesis li{
+  list-style:none;display:grid;grid-template-columns:44px 1fr;gap:16px;
+  padding:20px 0;border-top:1px solid var(--line);
+}
+.thesis .t-num{font-family:var(--font-display);font-size:24px;color:var(--p2);font-style:italic}
+.thesis b{display:block;font-family:var(--font-display);font-size:17.5px;margin-bottom:4px}
+.thesis span{color:var(--muted);font-size:14.5px}
+.under-hood{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;
+  box-shadow:var(--shadow);position:sticky;top:100px;
+}
+.under-hood .uh-k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--p3)}
+.under-hood p{font-family:var(--font-display);font-size:20px;line-height:1.5;margin-top:14px}
+.under-hood p em{font-style:italic;color:var(--p3)}
+.under-hood .uh-code{
+  margin-top:18px;font-family:var(--font-mono);font-size:12px;color:var(--muted);
+  background:color-mix(in oklab,var(--ink) 5%,transparent);border-left:3px solid var(--p3);
+  padding:12px 14px;border-radius:8px;line-height:1.8;
+}
+.under-hood .uh-code b{color:var(--ink)}
+
+/* ---------- 7. Concepts ---------- */
+.concepts{padding:64px 0}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:34px 0 8px}
+.tab{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;
+  border:1px solid var(--line-strong);border-radius:999px;padding:9px 16px;color:var(--muted);
+  transition:all .25s;
+}
+.tab .dot{width:8px;height:8px;border-radius:50%;background:var(--tc,var(--faint))}
+.tab:hover{color:var(--ink);border-color:var(--tc,var(--p1));transform:translateY(-1px)}
+.tab.active{background:color-mix(in oklab,var(--tc,var(--p1)) 14%,transparent);border-color:var(--tc,var(--p1));color:var(--ink)}
+.tab.active .dot{box-shadow:0 0 0 3px color-mix(in oklab,var(--tc) 25%,transparent)}
+.tab-count{font-size:12px;color:var(--faint);margin-bottom:22px;font-family:var(--font-mono);letter-spacing:.1em}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.p-foundations{--pc:var(--p1)} .p-inference{--pc:var(--p2)} .p-learning{--pc:var(--p3)} .p-decision{--pc:var(--p4)}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:15px;
+  padding:26px 26px 24px;position:relative;overflow:hidden;
+  transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s,box-shadow .35s;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--pc),transparent 75%);opacity:0;transition:opacity .35s;
+}
+.card:hover{
+  transform:translateY(-5px);
+  border-color:color-mix(in oklab,var(--pc) 40%,var(--line));
+  box-shadow:var(--shadow);
+}
+.card:hover::before{opacity:1}
+.card.is-hidden{display:none}
+.card.pop{animation:cardIn .5s cubic-bezier(.2,.7,.2,1) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px) scale(.985)}}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.card-num{font-family:var(--font-display);font-size:42px;line-height:1;color:var(--pc);opacity:.95;font-style:italic}
+.card-glyph{width:56px;height:44px;color:var(--faint);flex:none}
+.card-glyph .g2{color:var(--pc)}
+.pill{
+  display:inline-block;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--pc);background:color-mix(in oklab,var(--pc) 12%,transparent);
+  border:1px solid color-mix(in oklab,var(--pc) 35%,transparent);
+  padding:4px 11px;border-radius:999px;margin-bottom:12px;
+}
+.card h3{font-size:23px;line-height:1.2;margin-bottom:10px}
+.card .lead{font-size:14.5px;color:var(--muted);line-height:1.65}
+.formula{
+  margin:16px 0 14px;padding:11px 15px;border-radius:10px;
+  background:color-mix(in oklab,var(--ink) 5%,transparent);
+  border-left:3px solid var(--pc);
+  font-family:var(--font-display);font-style:italic;font-size:16.5px;letter-spacing:.015em;
+  transition:background .3s;
+}
+.card:hover .formula{background:color-mix(in oklab,var(--ink) 9%,transparent)}
+.formula sup,.formula sub{font-size:.62em}
+.apps{font-size:13px;color:var(--muted);line-height:1.75}
+.apps b{color:var(--ink);font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin-right:6px}
+.tag{
+  display:inline-block;font-family:var(--font-mono);font-size:10.5px;color:var(--muted);
+  border:1px solid var(--line);border-radius:6px;padding:1.5px 7px;margin:2px 3px 2px 0;
+  transition:all .25s;
+}
+.card:hover .tag{border-color:color-mix(in oklab,var(--pc) 40%,var(--line));color:color-mix(in oklab,var(--pc) 60%,var(--ink))}
+
+/* ---------- 8. Playground ---------- */
+.playground{padding:70px 0}
+.pg-box{
+  margin-top:30px;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:30px 30px 24px;box-shadow:var(--shadow);
+}
+.pg-readout{
+  display:flex;gap:34px;flex-wrap:wrap;font-family:var(--font-mono);font-size:13px;color:var(--muted);
+  margin-bottom:18px;
+}
+.pg-readout b{color:var(--p2);font-size:16px;font-variant-numeric:tabular-nums}
+.pg-sliders{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin:22px 0 6px}
+.pg-slider label{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pg-slider output{color:var(--p2);font-size:13px}
+input[type="range"]{
+  width:100%;height:4px;border-radius:99px;background:var(--line-strong);
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--p2);border:3px solid var(--panel);box-shadow:0 0 0 1px var(--line-strong),0 3px 10px rgba(0,0,0,.35);
+  transition:transform .2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+input[type="range"]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--p2);border:3px solid var(--panel);
+  box-shadow:0 0 0 1px var(--line-strong);
+}
+.pg-caption{font-size:13.5px;color:var(--faint);margin-top:14px;font-style:italic;font-family:var(--font-display)}
+
+/* ---------- 9. Pipeline ---------- */
+.pipeline{padding:70px 0}
+.stages{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:22px;margin-top:44px}
+.stages::before{
+  content:"";position:absolute;top:21px;left:5%;right:5%;height:1px;
+  background:linear-gradient(90deg,var(--p1),var(--p2) 45%,var(--p3) 75%,var(--p4));opacity:.5;
+}
+.stage{position:relative}
+.node{
+  width:42px;height:42px;border-radius:50%;background:var(--bg2);border:1px solid var(--line-strong);
+  display:grid;place-items:center;font-family:var(--font-display);font-size:17px;font-style:italic;
+  color:var(--nc);margin-bottom:18px;position:relative;z-index:1;
+  transition:transform .3s,box-shadow .3s;
+}
+.stage:hover .node{transform:translateY(-3px) scale(1.06);box-shadow:0 0 0 6px color-mix(in oklab,var(--nc) 14%,transparent)}
+.stage h3{font-size:18.5px;margin-bottom:8px;color:var(--nc)}
+.stage p{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+
+/* ---------- 10. Fields ---------- */
+.fields{padding:70px 0}
+.table-wrap{margin-top:34px;overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--panel);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--faint);text-align:left;padding:18px 24px 12px;border-bottom:1px solid var(--line-strong);
+}
+td{padding:19px 24px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .25s}
+tbody tr:hover{background:color-mix(in oklab,var(--ink) 4%,transparent)}
+td.field{font-family:var(--font-display);font-size:17.5px;white-space:nowrap;color:var(--ink)}
+td.field small{display:block;font-family:var(--font-body);font-size:12.5px;color:var(--faint);margin-top:3px}
+
+/* ---------- 11. Pitfalls ---------- */
+.pitfalls{padding:70px 0}
+.pit-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:34px}
+.pit{
+  background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:26px;
+  transition:transform .3s,border-color .3s;
+}
+.pit:hover{transform:translateY(-4px);border-color:color-mix(in oklab,var(--p3) 40%,var(--line))}
+.pit-top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:8px}
+.pit h3{font-size:20px}
+.pit-sev{font-family:var(--font-mono);font-size:11px;color:var(--p3);letter-spacing:.08em}
+.pit p{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.meter-lab{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:7px}
+.meter{height:6px;border-radius:99px;background:color-mix(in oklab,var(--ink) 8%,transparent);overflow:hidden}
+.meter-fill{
+  height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,color-mix(in oklab,var(--p3) 60%,var(--p1)),var(--p3));
+  transition:width 1.2s cubic-bezier(.2,.7,.2,1);
+}
+.in .meter-fill{width:var(--sev)}
+
+/* ---------- 12. Quote / footer ---------- */
+.quote{padding:110px 0 100px;text-align:center}
+.quote blockquote{font-family:var(--font-display);font-style:italic;font-size:clamp(1.7rem,3.6vw,2.7rem);line-height:1.3;max-width:22ch;margin:0 auto}
+.quote blockquote::before{content:"“";display:block;font-size:2.4em;color:var(--p1);line-height:.6;margin-bottom:18px}
+.quote cite{display:block;margin-top:26px;font-family:var(--font-mono);font-style:normal;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.quote cite b{color:var(--p1)}
+.quote .quote-sub{margin-top:22px;color:var(--faint);font-size:14.5px;max-width:52ch;margin-inline:auto;font-style:italic;font-family:var(--font-display)}
+
+footer{border-top:1px solid var(--line);padding:44px 0 50px;position:relative;z-index:2}
+.foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+.foot-brand{font-family:var(--font-display);font-size:20px;display:flex;gap:10px;align-items:center}
+.foot-brand .sigma{color:var(--p1);font-style:italic;font-size:22px}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap}
+.foot-links a{font-size:12.5px;color:var(--muted);letter-spacing:.06em;transition:color .25s}
+.foot-links a:hover{color:var(--p1)}
+.colophon{width:100%;margin-top:28px;padding-top:20px;border-top:1px solid var(--line);
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--faint);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.to-top{color:var(--p1)}
+
+/* ---------- 13. Reveal + motion prefs ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+  #heroCurve,#heroArea,#heroLine{opacity:1;stroke-dashoffset:0}
+  .in .meter-fill{width:var(--sev)}
+}
+
+/* ---------- 14. Responsive ---------- */
+@media (max-width:1020px){
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .why-grid{grid-template-columns:1fr}
+  .under-hood{position:static}
+  .stages{grid-template-columns:repeat(2,1fr);gap:34px 22px}
+  .stages::before{display:none}
+}
+@media (max-width:720px){
+  .nav{display:none}
+  .stats-strip{grid-template-columns:1fr 1fr}
+  .stat{border-left:none;border-top:1px solid var(--line)}
+  .stat:nth-child(odd){border-left:1px solid var(--line)}
+  .stat:nth-child(-n+2){border-top:none}
+  .pit-grid{grid-template-columns:1fr}
+  .pg-sliders{grid-template-columns:1fr}
+  .stages{grid-template-columns:1fr}
+  .hero{padding-top:44px}
+}
+</style>
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href="#top">
+      <span class="sigma">Σ</span>
+      <span class="brand-text">Inference<small>statistics · for · ai</small></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#why">Why</a>
+      <a href="#concepts">Concepts</a>
+      <a href="#playground">Playground</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#fields">Fields</a>
+      <a href="#pitfalls">Pitfalls</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-pressed="false" title="Switch to light theme">
+      <svg class="icon-sun" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2.1 2.1M17.4 17.4l2.1 2.1M19.5 4.5l-2.1 2.1M6.6 17.4l-2.1 2.1"/>
+      </svg>
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20.4 14.2A8.6 8.6 0 0 1 9.8 3.6 8.6 8.6 0 1 0 20.4 14.2z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">A field guide — statistics for machine intelligence</p>
+      <h1>AI is <em>statistics</em> with a lot more compute.</h1>
+      <p class="sub">From the first pixel to the last token, every prediction an AI makes is a <b>bet placed with probabilities, errors, and evidence</b>. No oracle, no answer key — just samples from a noisy world. Here are the twelve statistical ideas that quietly make artificial intelligence what it is.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#concepts">Explore the twelve concepts
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v16m0 0l-6-6m6 6l6-6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#pipeline">See the pipeline</a>
+      </div>
+      <p class="hero-meta">Single page <i>·</i> 12 concepts <i>·</i> 4 pillars <i>·</i> no jargon left unexplained</p>
+    </div>
+
+    <div class="hero-panels">
+      <div class="panel" id="heroPanelCurve">
+        <div class="panel-head">
+          <span class="panel-title"><span class="pulse"></span>Live · the normal curve</span>
+          <button class="replay" data-replay="heroCurveBox" aria-label="Replay normal curve animation">↻ Replay</button>
+        </div>
+        <svg id="heroCurveBox" viewBox="0 0 340 210" role="img" aria-label="Animated normal distribution curve showing that 68.27 percent of the mass lies within one standard deviation of the mean">
+          <line class="svg-ink" x1="24" y1="178" x2="316" y2="178" stroke-width="1"/>
+          <line class="svg-ink" x1="24" y1="178" x2="24" y2="18" stroke-width="1"/>
+          <path id="heroArea" style="fill:var(--p2)" fill-opacity="0.16"/>
+          <path id="heroCurve" fill="none" stroke="var(--p2)" stroke-width="2.5" stroke-linecap="round" pathLength="1"/>
+          <line class="svg-ink" x1="170" y1="178" x2="170" y2="38" stroke-dasharray="3 4" stroke-width="1"/>
+          <line class="svg-ink" x1="115" y1="178" x2="115" y2="86" stroke-dasharray="3 4" stroke-width="1"/>
+          <line class="svg-ink" x1="225" y1="178" x2="225" y2="86" stroke-dasharray="3 4" stroke-width="1"/>
+          <text class="svg-label hlab" x="170" y="196" text-anchor="middle">μ</text>
+          <text class="svg-label hlab" x="115" y="196" text-anchor="middle">μ−σ</text>
+          <text class="svg-label hlab" x="225" y="196" text-anchor="middle">μ+σ</text>
+          <text class="svg-label-accent hlab" x="170" y="98" text-anchor="middle">68.27%</text>
+        </svg>
+      </div>
+      <div class="panel" id="heroPanelReg">
+        <div class="panel-head">
+          <span class="panel-title"><span class="pulse" style="background:var(--p1)"></span>Live · least squares fit</span>
+          <button class="replay" data-replay="heroRegBox" aria-label="Replay regression fit animation">↻ Replay</button>
+        </div>
+        <svg id="heroRegBox" viewBox="0 0 340 210" role="img" aria-label="Scatter plot of data points with a least squares regression line being fitted through them">
+          <line class="svg-ink" x1="24" y1="182" x2="316" y2="182" stroke-width="1"/>
+          <line class="svg-ink" x1="24" y1="182" x2="24" y2="18" stroke-width="1"/>
+          <g id="heroPts"></g>
+          <path id="heroLine" fill="none" stroke="var(--p1)" stroke-width="2.5" stroke-linecap="round" pathLength="1" d="M36,178 L308,42"/>
+          <text class="svg-label" x="36" y="30" style="fill:var(--p1)">ŷ = a + b·x</text>
+          <text class="svg-label-accent" id="r2lab" x="304" y="30" text-anchor="end">R² = 0.93</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stats-strip reveal" data-stagger>
+      <div class="stat"><div class="num" data-count="12">0</div><div class="lab">Core concepts</div></div>
+      <div class="stat"><div class="num" data-count="4">0</div><div class="lab">Pillars</div></div>
+      <div class="stat"><div class="num" data-count="7">0</div><div class="lab">AI fields mapped</div></div>
+      <div class="stat"><div class="num" data-count="5">0</div><div class="lab">Pipeline stages</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHY ================= -->
+<section class="why" id="why">
+  <div class="wrap">
+    <p class="kicker reveal">01 — The premise</p>
+    <div class="sec-head">
+      <h2 class="reveal">Uncertainty is the problem AI solves.</h2>
+      <p class="reveal">Why a discipline born in the eighteenth century, in gambling halls and census bureaus, ended up as the native language of neural networks.</p>
+    </div>
+    <div class="why-grid">
+      <div>
+        <p class="lead reveal">An AI system is never handed the answer. It is handed <b>samples</b> — noisy, finite, biased snapshots of a world it will later have to act in. Every prediction is therefore a wager: a probability, an error term, an estimate of something unobservable. Statistics is the discipline that formalizes wagering under uncertainty, which is precisely why it is the foundation on which artificial intelligence stands. Compute and scale changed the size of the models; they did not change the mathematics beneath them.</p>
+        <ul class="thesis" data-stagger>
+          <li class="reveal"><span class="t-num">i.</span><div><b>The world is noisy, and data is a lossy sample of it.</b><span>Statistics tells us what we can legitimately conclude from finite evidence — the law of large numbers and the central limit theorem are the reason “more data” is a real strategy.</span></div></li>
+          <li class="reveal"><span class="t-num">ii.</span><div><b>Parameters are estimated, never assumed.</b><span>Training a model is a statistical procedure with a name and a guarantee: maximum likelihood estimation, which turns “fit these numbers” into an optimization problem.</span></div></li>
+          <li class="reveal"><span class="t-num">iii.</span><div><b>Decisions carry a cost.</b><span>A prediction only matters once someone acts on it. Decision theory closes the loop between evidence and action, pricing the consequences of being wrong.</span></div></li>
+        </ul>
+      </div>
+      <aside class="under-hood reveal">
+        <p class="uh-k">Under the hood</p>
+        <p>Every forward pass of a large language model ends in a <em>softmax</em> — a probability distribution over 100,000+ candidate tokens.</p>
+        <p>The next word is not <em>known</em>. It is <em>sampled</em>.</p>
+        <div class="uh-code">
+          <b>softmax</b>(z<sub>i</sub>) = e<sup>z<sub>i</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup><br>
+          <b>next&nbsp;token</b> ~ p(· | context)<br>
+          <b>loss</b> = −Σ p<sub>true</sub> log p<sub>model</sub>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONCEPTS ================= -->
+<section class="concepts" id="concepts">
+  <div class="wrap">
+    <p class="kicker reveal">02 — The canon</p>
+    <div class="sec-head">
+      <h2 class="reveal">Twelve concepts, four pillars.</h2>
+      <p class="reveal">Each idea below is load-bearing: remove it and modern AI stops working, or stops knowing when it is wrong. Filter by the pillar it belongs to.</p>
+    </div>
+
+    <div class="tabs reveal" role="tablist" aria-label="Filter concepts by pillar">
+      <button class="tab active" data-filter="all" role="tab" aria-selected="true" style="--tc:var(--ink)">All concepts</button>
+      <button class="tab" data-filter="foundations" role="tab" aria-selected="false" style="--tc:var(--p1)"><span class="dot"></span>Foundations</button>
+      <button class="tab" data-filter="inference" role="tab" aria-selected="false" style="--tc:var(--p2)"><span class="dot"></span>Inference</button>
+      <button class="tab" data-filter="learning" role="tab" aria-selected="false" style="--tc:var(--p3)"><span class="dot"></span>Learning</button>
+      <button class="tab" data-filter="decision" role="tab" aria-selected="false" style="--tc:var(--p4)"><span class="dot"></span>Decision</button>
+    </div>
+    <p class="tab-count" id="tabCount">Showing 12 of 12 concepts</p>
+
+    <div class="cards" id="cards">
+
+      <!-- 01 Probability -->
+      <article class="card reveal p-foundations" data-pillar="foundations">
+        <div class="card-top"><span class="card-num">01</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <rect x="14" y="5" width="36" height="36" rx="7" class="svg-ink" stroke="currentColor"/>
+            <circle class="g2" cx="24" cy="15" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="32" cy="23" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="40" cy="31" r="3" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="pill">Foundations</span>
+        <h3>Probability</h3>
+        <p class="lead">A number between 0 and 1 that quantifies how likely an outcome is. Probability converts the vague “maybe” into something measurable — and measurable into something computable. Nearly everything else on this page is a refinement of this one idea.</p>
+        <div class="formula">P(A|B) = P(A∩B) / P(B)</div>
+        <p class="apps"><b>In AI</b><span class="tag">Classifier outputs</span><span class="tag">Token sampling</span><span class="tag">Naive Bayes</span><span class="tag">Variational models</span> — every prediction, at the wire, is a probability.</p>
+      </article>
+
+      <!-- 02 Random variables & distributions -->
+      <article class="card reveal p-foundations" data-pillar="foundations">
+        <div class="card-top"><span class="card-num">02</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="6" y1="38" x2="58" y2="38" class="svg-ink" stroke="currentColor"/>
+            <path class="g2" d="M8,38 C20,38 22,8 32,8 C42,8 44,38 56,38" stroke="currentColor"/>
+          </svg>
+        </div>
+        <span class="pill">Foundations</span>
+        <h3>Random Variables &amp; Distributions</h3>
+        <p class="lead">A random variable is a quantity whose value is not yet known. Its <em>distribution</em> is the complete map of what could happen and how likely each outcome is — normal, Bernoulli, Poisson, mixture. Distributions are the vocabulary models use to describe data instead of describing a single case.</p>
+        <div class="formula">E[X] = ∫ x · f(x) dx</div>
+        <p class="apps"><b>In AI</b><span class="tag">Latent variables (VAEs)</span><span class="tag">GAN noise</span><span class="tag">Dropout</span><span class="tag">Mixture models</span></p>
+      </article>
+
+      <!-- 03 Expectation & variance -->
+      <article class="card reveal p-foundations" data-pillar="foundations">
+        <div class="card-top"><span class="card-num">03</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" aria-hidden="true">
+            <line x1="6" y1="24" x2="58" y2="24" class="svg-ink" stroke="currentColor" stroke-dasharray="3 4"/>
+            <circle class="g2" cx="14" cy="31" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="22" cy="13" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="30" cy="35" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="38" cy="11" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="46" cy="29" r="3" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="54" cy="19" r="3" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="pill">Foundations</span>
+        <h3>Expectation &amp; Variance</h3>
+        <p class="lead">The <em>expectation</em> is the long-run average of a quantity; the <em>variance</em> is how far its realizations scatter around that average. Together they summarize a distribution in two numbers — and they are the raw material of loss functions. Most of a training run is the minimization of an expected error.</p>
+        <div class="formula">Var(X) = E[(X − μ)²]</div>
+        <p class="apps"><b>In AI</b><span class="tag">MSE loss</span><span class="tag">BatchNorm statistics</span><span class="tag">Whitening</span><span class="tag">Gradient noise</span></p>
+      </article>
+
+      <!-- 04 Sampling & LLN -->
+      <article class="card reveal p-inference" data-pillar="inference">
+        <div class="card-top"><span class="card-num">04</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="6" y1="23" x2="58" y2="23" class="svg-ink" stroke="currentColor" stroke-dasharray="3 4"/>
+            <path class="g2" d="M6,10 L14,32 L22,12 L30,29 L38,16 L46,26 L54,22 L58,22" stroke="currentColor"/>
+          </svg>
+        </div>
+        <span class="pill">Inference</span>
+        <h3>Sampling &amp; the Law of Large Numbers</h3>
+        <p class="lead">Models never see the data-generating process — only samples of it. The law of large numbers guarantees that as the sample grows, sample statistics settle down to the true quantities. This is why “more data reliably helps,” and why it is safe to optimize with the statistics of a single minibatch.</p>
+        <div class="formula">x̄<sub>n</sub> → μ&nbsp;&nbsp;as&nbsp;&nbsp;n → ∞</div>
+        <p class="apps"><b>In AI</b><span class="tag">Minibatch SGD</span><span class="tag">Monte Carlo methods</span><span class="tag">Dataset curation</span><span class="tag">RL rollouts</span></p>
+      </article>
+
+      <!-- 05 Central limit theorem -->
+      <article class="card reveal p-inference" data-pillar="inference">
+        <div class="card-top"><span class="card-num">05</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+            <line x1="4" y1="38" x2="60" y2="38" class="svg-ink" stroke="currentColor" stroke-width="2"/>
+            <rect class="g2" x="10" y="32" width="5" height="6" fill="currentColor"/>
+            <rect class="g2" x="17" y="27" width="5" height="11" fill="currentColor"/>
+            <rect class="g2" x="24" y="21" width="5" height="17" fill="currentColor"/>
+            <rect class="g2" x="31" y="18" width="5" height="20" fill="currentColor"/>
+            <rect class="g2" x="38" y="21" width="5" height="17" fill="currentColor"/>
+            <rect class="g2" x="45" y="27" width="5" height="11" fill="currentColor"/>
+            <rect class="g2" x="52" y="32" width="5" height="6" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="pill">Inference</span>
+        <h3>The Central Limit Theorem</h3>
+        <p class="lead">No matter the shape of the underlying data, the average of many independent observations is approximately normal. The CLT is the reason the bell curve appears everywhere in AI — in sums of weights, in errors, in benchmark scores — and why normal approximations are safe, workhorse tools.</p>
+        <div class="formula">√n · (x̄ − μ) → N(0, σ²)</div>
+        <p class="apps"><b>In AI</b><span class="tag">Confidence intervals</span><span class="tag">Error bars on benchmarks</span><span class="tag">Optimizer statistics</span></p>
+      </article>
+
+      <!-- 06 Hypothesis testing -->
+      <article class="card reveal p-inference" data-pillar="inference">
+        <div class="card-top"><span class="card-num">06</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="38" x2="60" y2="38" class="svg-ink" stroke="currentColor"/>
+            <path d="M10,38 C20,38 20,10 32,10 C44,10 44,38 54,38" class="svg-ink" stroke="currentColor" fill="none"/>
+            <path class="g2" d="M10,38 C15,38 16.5,34 18.5,27 L18.5,38 Z" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="pill">Inference</span>
+        <h3>Hypothesis Testing &amp; p-values</h3>
+        <p class="lead">A formal way to ask “is this effect real, or noise?” Assume the null (no effect), measure how surprising the observed result would be under it, and reject the null only if the result is surprising enough. In AI it is how you verify that a model actually beats its baseline, or that an ablation actually matters.</p>
+        <div class="formula">p = P(test statistic as extreme | H₀)</div>
+        <p class="apps"><b>In AI</b><span class="tag">A/B tests</span><span class="tag">Paired model comparisons</span><span class="tag">Ablation studies</span></p>
+      </article>
+
+      <!-- 07 Confidence intervals -->
+      <article class="card reveal p-inference" data-pillar="inference">
+        <div class="card-top"><span class="card-num">07</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" aria-hidden="true">
+            <line x1="8" y1="22" x2="56" y2="22" class="svg-ink" stroke="currentColor" stroke-dasharray="2 3"/>
+            <rect class="g2" x="20" y="12" width="24" height="20" fill="currentColor" opacity="0.22" stroke="none"/>
+            <line x1="20" y1="10" x2="20" y2="34" class="g2" stroke="currentColor"/>
+            <line x1="44" y1="10" x2="44" y2="34" class="g2" stroke="currentColor"/>
+            <circle cx="32" cy="22" r="3.4" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="pill">Inference</span>
+        <h3>Confidence Intervals &amp; Estimation</h3>
+        <p class="lead">A point estimate is one number; an interval says “the true value lies here, 95 times out of 100.” Intervals turn results into honest ranges — indispensable when a single evaluation run is merely one draw from a distribution of possible runs.</p>
+        <div class="formula">x̄ ± z<sub>0.025</sub> · s/√n</div>
+        <p class="apps"><b>In AI</b><span class="tag">Uncertainty quantification</span><span class="tag">Bayesian posteriors</span><span class="tag">Robust model selection</span></p>
+      </article>
+
+      <!-- 08 MLE -->
+      <article class="card reveal p-learning" data-pillar="learning">
+        <div class="card-top"><span class="card-num">08</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="14" cy="30" r="3" fill="currentColor" stroke="none" class="svg-ink"/>
+            <circle cx="26" cy="16" r="3" fill="currentColor" stroke="none" class="svg-ink"/>
+            <circle cx="40" cy="26" r="3" fill="currentColor" stroke="none" class="svg-ink"/>
+            <circle cx="52" cy="12" r="3" fill="currentColor" stroke="none" class="svg-ink"/>
+            <path class="g2" d="M6,34 C18,32 20,14 32,20 C42,25 48,20 58,10" stroke="currentColor"/>
+          </svg>
+        </div>
+        <span class="pill">Learning</span>
+        <h3>Maximum Likelihood Estimation</h3>
+        <p class="lead">The workhorse of model fitting: choose the parameters θ that make the observed data most probable. Maximizing the likelihood is how nearly every AI model is trained — cross-entropy loss is just the negative log-likelihood, up to a constant. Training and MLE are the same act wearing different clothes.</p>
+        <div class="formula">θ̂ = argmax<sub>θ</sub> ∏<sub>i</sub> P(x<sub>i</sub> | θ)</div>
+        <p class="apps"><b>In AI</b><span class="tag">Neural network training</span><span class="tag">Language models</span><span class="tag">Logistic regression</span><span class="tag">Any loss function</span></p>
+      </article>
+
+      <!-- 09 Bayesian inference -->
+      <article class="card reveal p-learning" data-pillar="learning">
+        <div class="card-top"><span class="card-num">09</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" aria-hidden="true">
+            <circle cx="24" cy="22" r="13" class="svg-ink" stroke="currentColor"/>
+            <circle cx="40" cy="22" r="13" class="g2" stroke="currentColor"/>
+            <path d="M24,22 Q32,14 40,22" class="g2" stroke="currentColor" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="pill">Learning</span>
+        <h3>Bayesian Inference &amp; Priors</h3>
+        <p class="lead">Bayes’ theorem updates beliefs: a prior over parameters is multiplied by the evidence to produce a posterior. Bayesian AI treats parameters as <em>distributions</em> rather than points, so a model can say “I’m uncertain” instead of blushing with false precision.</p>
+        <div class="formula">P(θ | D) = P(D | θ) · P(θ) / P(D)</div>
+        <p class="apps"><b>In AI</b><span class="tag">Bayesian neural nets</span><span class="tag">VAE ELBO</span><span class="tag">Thompson sampling</span><span class="tag">LLM priors</span></p>
+      </article>
+
+      <!-- 10 Bias-variance -->
+      <article class="card reveal p-learning" data-pillar="learning">
+        <div class="card-top"><span class="card-num">10</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path class="g2" d="M8,10 C16,42 40,42 56,10" stroke="currentColor"/>
+            <circle cx="32" cy="30.5" r="3.6" fill="currentColor" stroke="none"/>
+            <line x1="32" y1="2" x2="32" y2="24" class="svg-ink" stroke="currentColor" stroke-dasharray="2 3"/>
+          </svg>
+        </div>
+        <span class="pill">Learning</span>
+        <h3>Bias–Variance &amp; Regularization</h3>
+        <p class="lead">A model’s error decomposes into <em>bias</em> (systematic mis-aiming), <em>variance</em> (oversensitivity to the particular sample), and irreducible noise. Small models underfit; huge models memorize. Regularization — L1, L2, dropout, early stopping — is the dial that keeps the two in balance.</p>
+        <div class="formula">E[(y − ŷ)²] = Bias²(ŷ) + Var(ŷ) + σ²</div>
+        <p class="apps"><b>In AI</b><span class="tag">Weight decay</span><span class="tag">Dropout</span><span class="tag">Early stopping</span><span class="tag">Model selection</span></p>
+      </article>
+
+      <!-- 11 Information theory -->
+      <article class="card reveal p-learning" data-pillar="learning">
+        <div class="card-top"><span class="card-num">11</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" aria-hidden="true">
+            <line x1="6" y1="38" x2="58" y2="38" class="svg-ink" stroke="currentColor" stroke-width="2"/>
+            <rect class="g2" x="10" y="26" width="8" height="12" fill="currentColor"/>
+            <rect class="g2" x="23" y="16" width="8" height="22" fill="currentColor"/>
+            <rect class="g2" x="36" y="22" width="8" height="16" fill="currentColor"/>
+            <rect class="g2" x="49" y="10" width="8" height="28" fill="currentColor"/>
+          </svg>
+        </div>
+        <span class="pill">Learning</span>
+        <h3>Information Theory &amp; Entropy</h3>
+        <p class="lead">Entropy measures the average surprise in a distribution. <em>Cross-entropy</em> measures how wrong a model’s predictions are relative to reality; <em>KL divergence</em> measures the distance between two distributions. Information theory gave AI its losses, its regularization terms, and its favorite metrics.</p>
+        <div class="formula">H(X) = −Σ p<sub>i</sub> · log₂ p<sub>i</sub></div>
+        <p class="apps"><b>In AI</b><span class="tag">Cross-entropy loss</span><span class="tag">KL penalty (VAEs, RLHF)</span><span class="tag">Perplexity</span><span class="tag">Mutual information</span></p>
+      </article>
+
+      <!-- 12 Decision theory -->
+      <article class="card reveal p-decision" data-pillar="decision">
+        <div class="card-top"><span class="card-num">12</span>
+          <svg class="card-glyph" viewBox="0 0 64 44" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="10" y1="22" x2="32" y2="22" class="svg-ink" stroke="currentColor"/>
+            <path class="g2" d="M32,22 L52,11 M32,22 L52,33" stroke="currentColor"/>
+            <circle class="g2" cx="53" cy="10.5" r="3.2" fill="currentColor" stroke="none"/>
+            <circle class="g2" cx="53" cy="33.5" r="3.2" fill="currentColor" stroke="none"/>
+            <circle cx="10" cy="22" r="3.2" fill="currentColor" stroke="none" class="svg-ink"/>
+          </svg>
+        </div>
+        <span class="pill">Decision</span>
+        <h3>Decision Theory &amp; Expected Utility</h3>
+        <p class="lead">Statistics ends in decisions. Decision theory says: act on the action with the highest expected utility, given your beliefs and the asymmetric cost of being wrong. Thresholds, risk, and the economics of errors live here — and so does every question that arises the moment a model meets the real world.</p>
+        <div class="formula">a* = argmax<sub>a</sub> E[U | a, D]</div>
+        <p class="apps"><b>In AI</b><span class="tag">Medical AI thresholds</span><span class="tag">Cost-sensitive learning</span><span class="tag">Risk-aware RL</span><span class="tag">Calibration</span></p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= PLAYGROUND ================= -->
+<section class="playground" id="playground">
+  <div class="wrap">
+    <p class="kicker reveal">03 — Interlude</p>
+    <div class="sec-head">
+      <h2 class="reveal">Hold a distribution in your hands.</h2>
+      <p class="reveal">The normal distribution is the single most quoted object in AI literature. Drag the sliders and watch what “N(μ, σ²)” actually means.</p>
+    </div>
+    <div class="pg-box reveal">
+      <div class="pg-readout">
+        <span>μ = <b id="pgMuVal">5.0</b></span>
+        <span>σ = <b id="pgSigmaVal">1.60</b></span>
+        <span>peak f(μ) = <b id="pgPeakVal">0.249</b></span>
+        <span style="color:var(--faint)">68.27% of mass within μ ± σ</span>
+      </div>
+      <svg id="pgSvg" viewBox="0 0 640 240" role="img" aria-label="Interactive normal distribution curve controlled by mean and standard deviation sliders">
+        <line x1="40" y1="210" x2="620" y2="210" class="svg-ink" stroke="var(--line-strong)" stroke-width="1"/>
+        <line x1="40" y1="210" x2="40" y2="14" class="svg-ink" stroke="var(--line-strong)" stroke-width="1"/>
+        <rect id="pgBand" x="0" y="14" width="0" height="196" style="fill:var(--p2)" fill-opacity="0.10"/>
+        <line id="pgBandL" y1="14" y2="210" style="stroke:var(--p2)" stroke-dasharray="4 4" stroke-width="1.2" opacity="0.55"/>
+        <line id="pgBandR" y1="14" y2="210" style="stroke:var(--p2)" stroke-dasharray="4 4" stroke-width="1.2" opacity="0.55"/>
+        <path id="pgArea" style="fill:var(--p2)" fill-opacity="0.15"/>
+        <path id="pgCurve" fill="none" style="stroke:var(--p2)" stroke-width="2.6" stroke-linecap="round"/>
+        <line id="pgMean" y1="20" y2="210" style="stroke:var(--p1)" stroke-dasharray="5 4" stroke-width="1.4"/>
+        <text id="pgMeanLabel" y="228" text-anchor="middle" class="svg-label" style="fill:var(--p1)">μ</text>
+        <text x="620" y="228" text-anchor="end" class="svg-label">x</text>
+      </svg>
+      <div class="pg-sliders">
+        <div class="pg-slider">
+          <label for="muRange">Mean · μ <output id="muOut">5.0</output></label>
+          <input type="range" id="muRange" min="1" max="9" step="0.1" value="5" aria-label="Mean of the distribution">
+        </div>
+        <div class="pg-slider">
+          <label for="sigmaRange">Std dev · σ <output id="sigmaOut">1.60</output></label>
+          <input type="range" id="sigmaRange" min="0.4" max="3.5" step="0.05" value="1.6" aria-label="Standard deviation of the distribution">
+        </div>
+      </div>
+      <p class="pg-caption">Shrink σ and the model is overconfident; widen it and predictions blur. This one slider is the difference between a calibrated model and an unhelpful one.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PIPELINE ================= -->
+<section class="pipeline" id="pipeline">
+  <div class="wrap">
+    <p class="kicker reveal">04 — The pipeline</p>
+    <div class="sec-head">
+      <h2 class="reveal">Where each idea earns its keep.</h2>
+      <p class="reveal">Follow a single AI project from raw world to deployed decision — every stage is dominated by one statistical discipline.</p>
+    </div>
+    <div class="stages" data-stagger>
+      <div class="stage reveal" style="--nc:var(--p1)">
+        <div class="node">1</div>
+        <h3>Sampling</h3>
+        <p>Design data that represents the world: what to collect, how much, and how to keep it from leaking or biasing the rest.</p>
+        <p><span class="tag">LLN</span><span class="tag">Sampling design</span></p>
+      </div>
+      <div class="stage reveal" style="--nc:var(--p2)">
+        <div class="node">2</div>
+        <h3>Representation</h3>
+        <p>Pick distributions, features, and latent spaces in which the regularities of the data are actually expressible.</p>
+        <p><span class="tag">Distributions</span><span class="tag">Information theory</span></p>
+      </div>
+      <div class="stage reveal" style="--nc:var(--p3)">
+        <div class="node">3</div>
+        <h3>Estimation</h3>
+        <p>Fit parameters to the sample — by likelihood, by optimization — while regularization holds the variance in check.</p>
+        <p><span class="tag">MLE</span><span class="tag">Bias–variance</span></p>
+      </div>
+      <div class="stage reveal" style="--nc:var(--p4)">
+        <div class="node">4</div>
+        <h3>Inference</h3>
+        <p>Quantify what can be concluded: uncertainty, intervals, posteriors — not just a point prediction, but its honesty.</p>
+        <p><span class="tag">Bayes</span><span class="tag">Confidence intervals</span></p>
+      </div>
+      <div class="stage reveal" style="--nc:var(--p1)">
+        <div class="node">5</div>
+        <h3>Decision</h3>
+        <p>Act: choose thresholds and actions that maximize expected utility under the real, asymmetric costs of being wrong.</p>
+        <p><span class="tag">Decision theory</span><span class="tag">Hypothesis testing</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FIELDS ================= -->
+<section class="fields" id="fields">
+  <div class="wrap">
+    <p class="kicker reveal">05 — In the wild</p>
+    <div class="sec-head">
+      <h2 class="reveal">The same twelve, dressed for the job.</h2>
+      <p class="reveal">Different fields lean on different subsets of the canon. Here is which statistics each one reaches for first.</p>
+    </div>
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Statistical tools it leans on</th><th>The core statistical question</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="field">NLP &amp; LLMs<small>language, code, agents</small></td>
+            <td><span class="tag">Likelihood &amp; softmax</span><span class="tag">Cross-entropy</span><span class="tag">Sampling</span><span class="tag">Perplexity</span><span class="tag">KL (RLHF)</span></td>
+            <td style="color:var(--muted);font-size:14px">What is the probability of the next token, given everything before it?</td>
+          </tr>
+          <tr>
+            <td class="field">Computer Vision<small>images, video, detection</small></td>
+            <td><span class="tag">Latent variables</span><span class="tag">Regularization</span><span class="tag">Uncertainty</span><span class="tag">Mixture models</span></td>
+            <td style="color:var(--muted);font-size:14px">Which explanation of these pixels is most probable?</td>
+          </tr>
+          <tr>
+            <td class="field">Recommender Systems<small>feeds, ads, matching</small></td>
+            <td><span class="tag">A/B testing</span><span class="tag">Bandits</span><span class="tag">Thompson sampling</span><span class="tag">CTR as probability</span></td>
+            <td style="color:var(--muted);font-size:14px">Which item should we show, balancing exploration against exploitation?</td>
+          </tr>
+          <tr>
+            <td class="field">Healthcare AI<small>diagnosis, triage, trials</small></td>
+            <td><span class="tag">Hypothesis testing</span><span class="tag">Decision theory</span><span class="tag">Calibration</span><span class="tag">Intervals</span></td>
+            <td style="color:var(--muted);font-size:14px">What is the cost of a false negative here — and what threshold is it worth?</td>
+          </tr>
+          <tr>
+            <td class="field">Robotics &amp; Autonomy<small>navigation, control, manipulation</small></td>
+            <td><span class="tag">Bayesian filtering</span><span class="tag">Sequential estimation</span><span class="tag">Reinforcement learning</span></td>
+            <td style="color:var(--muted);font-size:14px">Where am I, and what action maximizes expected return under uncertainty?</td>
+          </tr>
+          <tr>
+            <td class="field">Finance &amp; Risk<small>pricing, fraud, portfolios</small></td>
+            <td><span class="tag">CLT</span><span class="tag">Tail risk</span><span class="tag">Decision under risk</span><span class="tag">Time series</span></td>
+            <td style="color:var(--muted);font-size:14px">How far into the tail can a loss go, and can we price it?</td>
+          </tr>
+          <tr>
+            <td class="field">Speech &amp; Audio<small>ASR, TTS, music</small></td>
+            <td><span class="tag">HMMs &amp; likelihood</span><span class="tag">Information theory</span><span class="tag">Distributional noise</span></td>
+            <td style="color:var(--muted);font-size:14px">Which sequence of sounds best explains this waveform?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PITFALLS ================= -->
+<section class="pitfalls" id="pitfalls">
+  <div class="wrap">
+    <p class="kicker reveal">06 — The other side of the ledger</p>
+    <div class="sec-head">
+      <h2 class="reveal">The cost of skipping statistics.</h2>
+      <p class="reveal">Every failure mode below is a statistical idea ignored. The meter shows how often it shows up in deployed systems.</p>
+    </div>
+    <div class="pit-grid" data-stagger>
+      <article class="pit reveal" style="--sev:95%">
+        <div class="pit-top"><h3>Data Leakage</h3><span class="pit-sev">SEVERITY 95 / 100</span></div>
+        <p>Test data sneaking into training inflates every benchmark. The model isn’t clever — it memorized the answer key. Sampling discipline (stratification, temporal splits, deduplication) is the only defense.</p>
+        <div><div class="meter-lab"><span>Risk to deployments</span><span>95%</span></div><div class="meter"><div class="meter-fill"></div></div></div>
+      </article>
+      <article class="pit reveal" style="--sev:85%">
+        <div class="pit-top"><h3>Overfitting</h3><span class="pit-sev">SEVERITY 85 / 100</span></div>
+        <p>Training accuracy climbs to 100% while generalization quietly collapses — the variance term winning the bias–variance trade. Without regularization and held-out evaluation, scale just memorizes faster.</p>
+        <div><div class="meter-lab"><span>Risk to deployments</span><span>85%</span></div><div class="meter"><div class="meter-fill"></div></div></div>
+      </article>
+      <article class="pit reveal" style="--sev:78%">
+        <div class="pit-top"><h3>Spurious Correlation</h3><span class="pit-sev">SEVERITY 78 / 100</span></div>
+        <p>The model learns correlation without causation — the classic “penguins predict ship traffic” — and works beautifully in the lab, catastrophically in the field, the moment the world shifts.</p>
+        <div><div class="meter-lab"><span>Risk to deployments</span><span>78%</span></div><div class="meter"><div class="meter-fill"></div></div></div>
+      </article>
+      <article class="pit reveal" style="--sev:62%">
+        <div class="pit-top"><h3>Variance Blindness</h3><span class="pit-sev">SEVERITY 62 / 100</span></div>
+        <p>Comparing models on a single evaluation run reads noise as signal. Seed variance in LLM benchmarks can exceed the claimed gap between “SOTA” systems. Report intervals, never means alone.</p>
+        <div><div class="meter-lab"><span>Risk to deployments</span><span>62%</span></div><div class="meter"><div class="meter-fill"></div></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUOTE ================= -->
+<section class="quote">
+  <div class="wrap">
+    <blockquote class="reveal">All models are wrong, but some are useful.</blockquote>
+    <cite class="reveal">— <b>G. E. P. Box</b>, statistician</cite>
+    <p class="quote-sub reveal">AI inherited the statistician’s humility: the goal was never certainty, but calibrated, quantifiable uncertainty — and the discipline to say exactly how much you don’t know.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><span class="sigma">Σ</span> Inference</div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="#why">Why</a>
+        <a href="#concepts">Concepts</a>
+        <a href="#playground">Playground</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#fields">Fields</a>
+        <a href="#pitfalls">Pitfalls</a>
+      </nav>
+    </div>
+    <div class="colophon">
+      <span>A field guide to statistics for machine intelligence</span>
+      <span>Single HTML file · no external requests · theme saved locally · press <b style="color:var(--p1)">T</b> to switch theme · <a class="to-top" href="#top">back to top ↑</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s,c){ return (c||document).querySelector(s); };
+  var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Theme (default dark, persisted) ---------- */
+  var root = document.documentElement;
+  var toggle = $("#themeToggle");
+  var stored = null;
+  try { stored = localStorage.getItem("inference-theme"); } catch(e){}
+  if (stored === "light" || stored === "dark") root.dataset.theme = stored;
+  function syncToggle(){
+    var isDark = root.dataset.theme !== "light";
+    toggle.setAttribute("aria-pressed", String(!isDark));
+    toggle.title = isDark ? "Switch to light theme" : "Switch to dark theme";
+  }
+  syncToggle();
+  toggle.addEventListener("click", function(){
+    root.dataset.theme = (root.dataset.theme === "light") ? "dark" : "light";
+    try { localStorage.setItem("inference-theme", root.dataset.theme); } catch(e){}
+    syncToggle();
+  });
+  document.addEventListener("keydown", function(e){
+    if ((e.key === "t" || e.key === "T") && !/input|textarea|select/i.test(document.activeElement.tagName)) {
+      toggle.click();
+    }
+  });
+
+  /* ---------- Scroll progress ---------- */
+  var bar = $("#progress");
+  var ticking = false;
+  function onScroll(){
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){
+      var h = document.documentElement;
+      var max = h.scrollHeight - window.innerHeight;
+      bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%";
+      ticking = false;
+    });
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+
+  /* ---------- Stagger delays ---------- */
+  $$("[data-stagger]").forEach(function(parent){
+    $$(".reveal", parent).forEach(function(el,i){
+      el.style.transitionDelay = Math.min(i*70, 420) + "ms";
+    });
+  });
+
+  /* ---------- Reveal on scroll ---------- */
+  if ("IntersectionObserver" in window && !reduced){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target); }
+      });
+    }, {threshold:.12, rootMargin:"0px 0px -6% 0px"});
+    $$(".reveal").forEach(function(el){ io.observe(el); });
+  } else {
+    $$(".reveal").forEach(function(el){ el.classList.add("in"); });
+  }
+
+  /* ---------- Count-up numbers ---------- */
+  function countUp(el){
+    var target = parseInt(el.dataset.count, 10) || 0;
+    if (reduced){ el.textContent = target; return; }
+    var t0 = null, dur = 1100;
+    function step(ts){
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var counted = new WeakSet();
+  var cio = ("IntersectionObserver" in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting && !counted.has(en.target)){
+        counted.add(en.target); countUp(en.target); cio.unobserve(en.target);
+      }
+    });
+  }, {threshold:.5}) : null;
+  $$("[data-count]").forEach(function(el){
+    if (cio) cio.observe(el); else countUp(el);
+  });
+
+  /* ---------- Tabs / filter ---------- */
+  var tabs = $$(".tab");
+  var cards = $$("#cards .card");
+  var countEl = $("#tabCount");
+  function applyFilter(filter){
+    var shown = 0;
+    cards.forEach(function(card){
+      var match = (filter === "all") || (card.dataset.pillar === filter);
+      card.classList.toggle("is-hidden", !match);
+      card.classList.remove("pop");
+      if (match){
+        shown++;
+        if (!reduced){ void card.offsetWidth; card.classList.add("pop"); }
+      }
+    });
+    countEl.textContent = "Showing " + shown + " of 12 concepts";
+  }
+  tabs.forEach(function(tab, idx){
+    tab.addEventListener("click", function(){
+      tabs.forEach(function(t){ t.classList.remove("active"); t.setAttribute("aria-selected","false"); });
+      tab.classList.add("active"); tab.setAttribute("aria-selected","true");
+      applyFilter(tab.dataset.filter);
+    });
+    tab.addEventListener("keydown", function(e){
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft"){
+        e.preventDefault();
+        var next = (idx + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length;
+        tabs[next].focus(); tabs[next].click();
+      }
+    });
+  });
+
+  /* ---------- Gaussian path helper ---------- */
+  function gaussPath(cx, base, amp, sigma, x0, x1, steps){
+    var d = "";
+    for (var i = 0; i <= steps; i++){
+      var x = x0 + (x1 - x0) * i / steps;
+      var z = (x - cx) / sigma;
+      var y = base - amp * Math.exp(-z * z / 2);
+      d += (i ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1);
+    }
+    return d;
+  }
+
+  /* ---------- Hero: normal curve ---------- */
+  var CX = 170, BASE = 178, AMP = 140, SIG = 55, X0 = 24, X1 = 316;
+  $("#heroCurve").setAttribute("d", gaussPath(CX, BASE, AMP, SIG, X0, X1, 60));
+  $("#heroArea").setAttribute("d",
+    gaussPath(CX, BASE, AMP, SIG, CX - SIG, CX + SIG, 26) +
+    "L" + (CX + SIG) + "," + BASE + " L" + (CX - SIG) + "," + BASE + " Z"
+  );
+
+  /* ---------- Hero: regression points ---------- */
+  var pts = [
+    [44,170],[64,152],[82,160],[98,136],[116,144],[134,122],
+    [152,126],[170,106],[188,112],[206,92],[224,96],[242,76],
+    [262,82],[282,60],[300,48]
+  ];
+  var g = $("#heroPts");
+  pts.forEach(function(p, i){
+    var c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r","3.6");
+    c.style.fill = "var(--muted)";
+    c.setAttribute("class","pt");
+    c.style.setProperty("--i", i);
+    g.appendChild(c);
+  });
+
+  /* ---------- Hero play / replay ---------- */
+  function play(boxId){
+    var box = $("#" + boxId);
+    if (!box) return;
+    if (reduced) return;
+    box.classList.remove("play");
+    void box.offsetWidth;
+    box.classList.add("play");
+  }
+  $$(".replay").forEach(function(btn){
+    btn.addEventListener("click", function(){ play(btn.dataset.replay); });
+  });
+  window.addEventListener("load", function(){
+    setTimeout(function(){ play("heroCurveBox"); play("heroRegBox"); }, 150);
+  });
+
+  /* ---------- Playground ---------- */
+  var mu = $("#muRange"), sig = $("#sigmaRange");
+  var PX0 = 40, PX1 = 620, PB = 210, SCALE = 172; // f(x) * SCALE = px height
+  function px(x){ return PX0 + (x / 10) * (PX1 - PX0); }
+  function updatePG(){
+    var m = parseFloat(mu.value), s = parseFloat(sig.value);
+    var d = "";
+    var steps = 90;
+    for (var i = 0; i <= steps; i++){
+      var x = 10 * i / steps;
+      var z = (x - m) / s;
+      var f = Math.exp(-z * z / 2) / (s * Math.sqrt(2 * Math.PI));
+      var X = px(x), Y = PB - f * SCALE;
+      d += (i ? "L" : "M") + X.toFixed(1) + "," + Math.max(Y, 10).toFixed(1);
+    }
+    $("#pgCurve").setAttribute("d", d);
+    $("#pgArea").setAttribute("d", d + " L" + PX1 + "," + PB + " L" + PX0 + "," + PB + " Z");
+    $("#pgMean").setAttribute("x1", px(m));
+    $("#pgMean").setAttribute("x2", px(m));
+    $("#pgMeanLabel").setAttribute("x", px(m));
+    var bl = px(Math.max(m - s, 0)), br = px(Math.min(m + s, 10));
+    $("#pgBand").setAttribute("x", bl);
+    $("#pgBand").setAttribute("width", Math.max(br - bl, 0));
+    $("#pgBandL").setAttribute("x1", bl); $("#pgBandL").setAttribute("x2", bl);
+    $("#pgBandR").setAttribute("x1", br); $("#pgBandR").setAttribute("x2", br);
+    $("#pgMuVal").textContent = m.toFixed(1);
+    $("#pgSigmaVal").textContent = s.toFixed(2);
+    $("#pgPeakVal").textContent = (1 / (s * Math.sqrt(2 * Math.PI))).toFixed(3);
+    $("#muOut").textContent = m.toFixed(1);
+    $("#sigmaOut").textContent = s.toFixed(2);
+  }
+  mu.addEventListener("input", updatePG);
+  sig.addEventListener("input", updatePG);
+  updatePG();
+})();
+</script>
+</body>
+</html>

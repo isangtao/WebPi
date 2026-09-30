@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="Quantum — a self-contained interactive tour of the eight experiments that built quantum mechanics, from Planck's blackbody to Aspect's entangled photons."/>
+<meta name="color-scheme" content="dark light"/>
+<title>Quantum — The Experiments That Built It</title>
+<style>
+/* ============================ THEME TOKENS ============================ */
+:root{
+  --bg:#05070d;
+  --bg-2:#0a0f1c;
+  --surface:rgba(13,20,36,.62);
+  --surface-2:#0d1424;
+  --text:#e8eefb;
+  --muted:#93a4c3;
+  --faint:#5b6b8c;
+  --accent:#5eead4;
+  --accent-2:#8b9dff;
+  --accent-3:#f0abfc;
+  --line:rgba(148,163,199,.15);
+  --line-strong:rgba(148,163,199,.34);
+  --glow:rgba(94,234,212,.16);
+  --glow-1:rgba(94,234,212,.09);
+  --glow-2:rgba(139,157,255,.08);
+  --sim-bg:#04070e;
+  --soft:rgba(148,163,184,.09);
+  --shadow:0 22px 60px rgba(0,0,0,.5);
+  --danger:#fb7185;
+  --warn:#fbbf24;
+  --good:#34d399;
+  --btn-ink:#04121a;
+  --header-bg:rgba(5,7,13,.72);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+}
+[data-theme="light"]{
+  --bg:#f3f6fc;
+  --bg-2:#e9eef8;
+  --surface:rgba(255,255,255,.82);
+  --surface-2:#ffffff;
+  --text:#0e1626;
+  --muted:#44536f;
+  --faint:#7b89a6;
+  --accent:#0d9488;
+  --accent-2:#5b5bd6;
+  --accent-3:#c026d3;
+  --line:rgba(20,35,70,.13);
+  --line-strong:rgba(20,35,70,.3);
+  --glow:rgba(13,148,136,.12);
+  --glow-1:rgba(13,148,136,.10);
+  --glow-2:rgba(91,91,214,.09);
+  --sim-bg:#ffffff;
+  --soft:rgba(15,30,60,.06);
+  --shadow:0 20px 48px rgba(30,50,90,.14);
+  --danger:#e11d48;
+  --warn:#d97706;
+  --good:#059669;
+  --btn-ink:#ffffff;
+  --header-bg:rgba(243,246,252,.78);
+}
+
+/* ============================ BASE ============================ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);line-height:1.6;font-size:15.5px;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  transition:background .35s,color .35s;
+}
+::selection{background:var(--accent);color:var(--btn-ink)}
+a{color:inherit}
+.bg{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(1100px 780px at 88% -12%, var(--glow-1), transparent 62%),
+    radial-gradient(950px 720px at -8% 34%, var(--glow-2), transparent 58%),
+    radial-gradient(760px 560px at 55% 118%, var(--glow-1), transparent 60%),
+    var(--bg);
+}
+#progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+section{scroll-margin-top:72px}
+
+/* ============================ HEADER ============================ */
+header{
+  position:sticky;top:0;z-index:100;
+  background:var(--header-bg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:0 18px;height:58px}
+.brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;flex:0 0 auto}
+.brand-mark{
+  font-family:var(--serif);font-size:22px;font-weight:700;color:var(--accent);
+  width:34px;height:34px;display:grid;place-items:center;border-radius:10px;
+  border:1px solid var(--line-strong);background:var(--surface);align-self:center;
+  box-shadow:0 0 18px var(--glow);
+}
+.brand-name{font-family:var(--serif);font-size:19px;font-weight:600;letter-spacing:.01em}
+.brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+nav.nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;padding:4px 2px}
+nav.nav::-webkit-scrollbar{display:none}
+nav.nav a{
+  font-size:12.5px;color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:8px;
+  white-space:nowrap;transition:color .2s,background .2s;font-weight:500;
+}
+nav.nav a:hover{color:var(--text);background:var(--soft)}
+nav.nav a.active{color:var(--accent);background:var(--soft)}
+.theme-btn{
+  flex:0 0 auto;width:38px;height:38px;border-radius:12px;cursor:pointer;
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--text);
+  font-size:16px;line-height:1;display:grid;place-items:center;transition:.2s;
+}
+.theme-btn:hover{border-color:var(--accent);box-shadow:0 0 16px var(--glow)}
+
+/* ============================ HERO ============================ */
+.hero{min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-veil{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 42%, transparent 0%, var(--bg) 100%);}
+.hero-content{position:relative;z-index:2;text-align:center;padding:56px 22px 40px;max-width:860px}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+h1{
+  font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:.95;
+  font-size:clamp(64px,12vw,132px);
+  background:linear-gradient(118deg,var(--text) 28%,var(--accent) 72%,var(--accent-2) 96%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{margin:24px auto 30px;max-width:660px;color:var(--muted);font-size:clamp(15px,1.9vw,18px)}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.formulae{margin-top:38px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.formulae code{
+  font-family:var(--mono);font-size:11.5px;color:var(--faint);
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);
+}
+.scroll-hint{
+  position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);
+  display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;
+}
+.scroll-hint span{width:1px;height:34px;background:linear-gradient(180deg,var(--accent),transparent);animation:drip 1.8s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ============================ BUTTONS / CHIPS ============================ */
+.btn{
+  display:inline-block;padding:11px 22px;border-radius:999px;font-size:14px;font-weight:600;
+  text-decoration:none;border:1px solid transparent;cursor:pointer;transition:.2s;font-family:var(--sans);
+}
+.btn.primary{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:var(--btn-ink);box-shadow:0 8px 28px var(--glow)}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 12px 34px var(--glow)}
+.btn.ghost{border-color:var(--line-strong);color:var(--text);background:var(--surface)}
+.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.chipbtn{
+  font-family:var(--mono);font-size:12.5px;padding:8px 13px;border-radius:9px;cursor:pointer;transition:.15s;
+  border:1px solid var(--line-strong);background:var(--surface-2);color:var(--text);
+}
+.chipbtn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 14px var(--glow)}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 10px;border-radius:999px;
+  border:1px solid var(--line-strong);color:var(--muted);background:var(--surface);white-space:nowrap;
+}
+.chip.year{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+
+/* ============================ TIMELINE ============================ */
+.timeline-section{padding:74px 0 66px;border-top:1px solid var(--line)}
+.sec-kicker{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+h3.sec-title{font-family:var(--serif);font-size:clamp(26px,3.6vw,38px);font-weight:600;margin-bottom:10px}
+.sec-lede{color:var(--muted);max-width:640px;margin-bottom:30px}
+.timeline{display:flex;gap:14px;overflow-x:auto;padding:8px 2px 16px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.tl-card{
+  min-width:206px;max-width:230px;scroll-snap-align:start;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:transform .25s,border-color .25s;
+}
+.tl-card:hover{transform:translateY(-4px);border-color:var(--line-strong)}
+.tl-year{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.tl-name{font-family:var(--serif);font-size:16px;font-weight:600;margin:6px 0 5px}
+.tl-card p{font-size:12.5px;color:var(--muted);line-height:1.5}
+
+/* ============================ EXPERIMENTS ============================ */
+.exp{padding:86px 0;border-top:1px solid var(--line)}
+.exp-head{display:flex;gap:22px;align-items:flex-start;margin-bottom:34px}
+.exp-index{
+  font-family:var(--serif);font-size:clamp(52px,8vw,88px);line-height:.9;font-weight:700;
+  color:transparent;-webkit-text-stroke:1.4px var(--line-strong);flex:0 0 auto;
+}
+.exp-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.exp h2{font-family:var(--serif);font-size:clamp(27px,4vw,42px);font-weight:600;line-height:1.12;letter-spacing:-.01em}
+.lede{color:var(--muted);font-size:clamp(14.5px,1.6vw,16.5px);max-width:760px;margin-top:12px}
+.exp-grid{display:grid;grid-template-columns:1fr 1.18fr;gap:26px;align-items:start}
+.exp.flip .prose{order:2}
+.prose{display:flex;flex-direction:column;gap:16px}
+.prose-block{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.prose-block h4{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:7px;font-weight:600;
+}
+.prose-block p{font-size:14px;color:var(--muted)}
+.prose-block p b{color:var(--text);font-weight:600}
+.eq{
+  margin-top:2px;border:1px dashed var(--line-strong);border-radius:12px;padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.eq-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.eq code{font-family:var(--mono);font-size:15px;color:var(--accent)}
+
+/* ============================ SIM CARD ============================ */
+.simcard{
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;
+  box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.simcard-head{
+  display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:12px;
+}
+.simcard-head .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 9px var(--good);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.sim-hint{margin-left:auto;letter-spacing:.04em;text-transform:none}
+canvas.sim{
+  width:100%;height:clamp(300px,44vw,420px);display:block;border-radius:12px;
+  background:var(--sim-bg);border:1px solid var(--line);
+}
+canvas.sim.tall{height:clamp(330px,47vw,470px)}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px 18px;margin-top:16px}
+.ctl{display:flex;flex-direction:column;gap:8px}
+.ctl-label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12.5px;color:var(--muted);font-weight:600}
+.ctl-label output{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500}
+.sw-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.range-wrap{position:relative;padding-top:2px}
+.tick{
+  position:absolute;top:50%;width:3px;height:16px;background:var(--danger);
+  transform:translate(-50%,-50%);border-radius:2px;pointer-events:none;box-shadow:0 0 8px var(--danger);
+}
+input[type="range"]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+  background:var(--line-strong);outline:none;cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border:2px solid var(--bg);box-shadow:0 0 0 3px var(--glow),0 2px 6px rgba(0,0,0,.4);cursor:pointer;
+}
+input[type="range"]::-moz-range-thumb{
+  width:14px;height:14px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border:2px solid var(--bg);box-shadow:0 0 0 3px var(--glow);cursor:pointer;
+}
+select{
+  background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong);
+  border-radius:9px;padding:9px 10px;font-family:var(--sans);font-size:13px;cursor:pointer;width:100%;
+}
+.switch{position:relative;width:42px;height:22px;display:inline-block;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;background:var(--line-strong);border-radius:999px;transition:.25s;cursor:pointer}
+.switch span::after{
+  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:#fff;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.switch input:checked + span{background:linear-gradient(120deg,var(--accent),var(--accent-2))}
+.switch input:checked + span::after{transform:translateX(20px)}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.stat{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+  padding:8px 12px;font-size:11.5px;color:var(--muted);line-height:1.3;min-width:96px;
+}
+.stat b{display:block;font-family:var(--mono);font-size:14px;color:var(--text);font-weight:600;margin-top:1px}
+.meter-wrap{margin-top:14px}
+.meter-wrap label{font-size:12px;color:var(--muted);font-weight:600;display:flex;justify-content:space-between}
+.meter{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:7px}
+.meter i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .35s}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+
+/* ============================ OUTRO / FOOTER ============================ */
+.outro{padding:96px 0;border-top:1px solid var(--line);text-align:center}
+.outro .quote{
+  font-family:var(--serif);font-size:clamp(24px,3.6vw,38px);font-weight:500;line-height:1.35;
+  max-width:760px;margin:18px auto 14px;
+  background:linear-gradient(110deg,var(--text),var(--accent));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.outro p.body{color:var(--muted);max-width:720px;margin:0 auto 40px}
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;max-width:920px;margin:0 auto;text-align:left}
+.pillar{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.pillar .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.18em}
+.pillar h5{font-family:var(--serif);font-size:18px;font-weight:600;margin:8px 0 6px}
+.pillar p{font-size:13px;color:var(--muted)}
+footer{
+  border-top:1px solid var(--line);padding:34px 22px 44px;text-align:center;
+  color:var(--faint);font-size:12.5px;line-height:1.9;
+}
+footer .fbrand{font-family:var(--serif);font-size:17px;color:var(--muted);margin-bottom:6px}
+footer code{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+/* ============================ REVEAL / RESPONSIVE ============================ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media (max-width:960px){
+  .exp-grid{grid-template-columns:1fr}
+  .exp.flip .prose{order:0}
+  .exp{padding:64px 0}
+  .exp-head{gap:14px}
+  .brand-sub{display:none}
+}
+@media (max-width:560px){
+  nav.nav a{font-size:11.5px;padding:5px 8px}
+  .stats .stat{min-width:calc(50% - 12px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div id="progress"></div>
+
+<!-- ============================ HEADER ============================ -->
+<header>
+  <div class="nav-inner">
+    <a class="brand" href="#hero">
+      <span class="brand-mark">Q</span>
+      <span class="brand-name">Quantum</span>
+      <span class="brand-sub">experiments</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Experiments">
+      <a href="#blackbody">Blackbody</a>
+      <a href="#photoelectric">Photoelectric</a>
+      <a href="#compton">Compton</a>
+      <a href="#stern">Stern–Gerlach</a>
+      <a href="#davisson">Diffraction</a>
+      <a href="#slits">Double Slit</a>
+      <a href="#hydrogen">Hydrogen</a>
+      <a href="#bell">Bell</a>
+    </nav>
+    <button id="themeBtn" class="theme-btn" aria-label="Switch to light theme" title="Switch theme">☀</button>
+  </div>
+</header>
+
+<!-- ============================ HERO ============================ -->
+<section class="hero" id="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-veil"></div>
+  <div class="hero-content">
+    <p class="kicker">1900 — 1982 · An interactive reconstruction</p>
+    <h1>Quantum</h1>
+    <p class="sub">Eight experiments, one revolution. Operate each apparatus yourself — from Planck's
+    glowing cavity to Aspect's entangled photons — and watch the classical world fail, one result at a time.</p>
+    <div class="hero-ctas">
+      <a href="#blackbody" class="btn primary">Begin the tour</a>
+      <a href="#timeline" class="btn ghost">The timeline</a>
+    </div>
+    <div class="formulae">
+      <code>E = hν</code><code>K<sub>max</sub> = hν − φ</code><code>Δλ = (h/mc)(1−cosθ)</code>
+      <code>S<sub>z</sub> = ± ħ/2</code><code>nλ = 2d sinθ</code><code>E<sub>n</sub> = −13.6 eV / n²</code><code>|S| ≤ 2 ?</code>
+    </div>
+  </div>
+  <div class="scroll-hint"><span></span>scroll</div>
+</section>
+
+<!-- ============================ TIMELINE ============================ -->
+<section class="timeline-section" id="timeline">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="sec-kicker">The road to quantum</p>
+      <h3 class="sec-title">A century of stubborn experiments</h3>
+      <p class="sec-lede">No one planned to invent quantum mechanics. It was extracted, year by year, from
+      measurements that refused to make classical sense. Drag the timeline, then dive into the apparatuses below.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-card"><div class="tl-year">1885</div><div class="tl-name">Balmer</div><p>An empirical formula for hydrogen's visible lines — no theory, just a pattern.</p></div>
+      <div class="tl-card"><div class="tl-year">1900</div><div class="tl-name">Planck</div><p>Energy comes in packets. The quantum is born in a patent office.</p></div>
+      <div class="tl-card"><div class="tl-year">1905</div><div class="tl-name">Einstein</div><p>Light itself is quantized: the photon explains the photoelectric effect.</p></div>
+      <div class="tl-card"><div class="tl-year">1913</div><div class="tl-name">Bohr</div><p>Quantized orbits explain the atomic line spectra.</p></div>
+      <div class="tl-card"><div class="tl-year">1922</div><div class="tl-name">Stern &amp; Gerlach</div><p>A beam of atoms splits into two — spin is discovered.</p></div>
+      <div class="tl-card"><div class="tl-year">1923</div><div class="tl-name">Compton</div><p>X-rays scatter like particles: photons carry momentum.</p></div>
+      <div class="tl-card"><div class="tl-year">1925–26</div><div class="tl-name">Heisenberg &amp; Schrödinger</div><p>Matrix mechanics and wave mechanics: the theory arrives.</p></div>
+      <div class="tl-card"><div class="tl-year">1927</div><div class="tl-name">Davisson &amp; Germer</div><p>Electrons diffract off nickel. Matter waves are real.</p></div>
+      <div class="tl-card"><div class="tl-year">1935</div><div class="tl-name">Einstein, Podolsky &amp; Rosen</div><p>"Spooky action at a distance" — the completeness challenge.</p></div>
+      <div class="tl-card"><div class="tl-year">1964</div><div class="tl-name">Bell</div><p>An inequality no local hidden-variable theory can beat.</p></div>
+      <div class="tl-card"><div class="tl-year">1982</div><div class="tl-name">Aspect</div><p>Entangled photons violate the bound. Local realism is overruled.</p></div>
+    </div>
+  </div>
+</section>
+
+<main>
+<!-- ============================ 01 BLACKBODY ============================ -->
+<section class="exp" id="blackbody">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">01</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1900</span><span class="chip">Max Planck</span><span class="chip">Berlin</span></div>
+        <h2>Blackbody Radiation &amp; the Birth of the Quantum</h2>
+        <p class="lede">Every object glows. The color and brightness of that glow obeyed no known law —
+        until a clerk at the Berlin Patent Office made a desperate, brilliant guess.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>A hollow cavity heated to temperature <b>T</b> emits "blackbody" radiation through a tiny hole.
+          Classical physics — the Rayleigh–Jeans law — says each electromagnetic mode should carry <b>kT</b> of
+          energy, and the modes pile up without bound toward the ultraviolet. The prediction: an infinitely hot
+          sky. This was the <b>ultraviolet catastrophe</b>.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>The real spectrum climbs, peaks, and falls off. Planck's fit worked only if the cavity's oscillators
+          could exchange energy in discrete packets <b>E = nhν</b>. He called it "an act of desperation". It was
+          the birth of the quantum.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>A single constant, <b>h = 6.626×10⁻³⁴ J·s</b>, entered physics. Raise the temperature and the peak
+          slides exactly as Wien's law demands; the dashed classical curve meanwhile races off toward the
+          ultraviolet — the catastrophe, on display.</p></div>
+        <div class="eq"><span class="eq-label">Key relations</span><code>E = hν</code><code>B(λ,T) = 2hc²/λ⁵ · 1/(e^(hc/λkT) − 1)</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">heated cavity + spectrum</span></div>
+        <canvas id="cBlackbody" class="sim"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="bbTemp">Cavity temperature <output id="bbTempOut">5800 K</output></label>
+            <input type="range" id="bbTemp" min="300" max="12000" step="25" value="5800"/>
+          </div>
+          <div class="ctl">
+            <div class="sw-row">
+              <span class="ctl-label">Classical prediction (Rayleigh–Jeans)</span>
+              <label class="switch"><input type="checkbox" id="bbRJ" checked/><span></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Temperature <b id="bbStatT">5800 K</b></div>
+          <div class="stat">Wien peak λmax <b id="bbStatL">500 nm</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 02 PHOTOELECTRIC ============================ -->
+<section class="exp flip" id="photoelectric">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">02</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1905</span><span class="chip">Albert Einstein</span><span class="chip">Zürich / Berlin</span></div>
+        <h2>The Photoelectric Effect &amp; the Photon</h2>
+        <p class="lede">Shine light on a clean metal plate and electrons pop off. The classical wave story made
+        one prediction that simply did not happen.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>If light is a wave, its energy comes from intensity: dim light should eventually eject electrons and
+          no threshold should exist. But below a cutoff frequency <b>ν₀</b>, <b>no</b> light of any brightness frees
+          an electron — and above it, electrons leave instantly with energies that are independent of brightness.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>Einstein's 1905 move: light arrives in quanta — <b>photons</b> — each carrying energy <b>hν</b>. A
+          photon gives its whole energy to a single electron: <b>K<sub>max</sub> = hν − φ</b>. Intensity changes
+          only how many photons arrive, so it scales the current, never the energy per electron.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>The photon was real. This effect runs every photodiode, solar cell and light sensor you own.
+          Push the frequency below the red tick (ν₀) and the current dies — crank the intensity to maximum and
+          it stays dead. That single fact killed wave-only light.</p></div>
+        <div class="eq"><span class="eq-label">Key relation</span><code>K<sub>max</sub> = hν − φ</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">lamp → cathode</span></div>
+        <canvas id="cPhoto" class="sim"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="peF">Frequency ν <output id="peFOut">550 THz</output></label>
+            <div class="range-wrap">
+              <input type="range" id="peF" min="100" max="1500" step="5" value="550"/>
+              <span class="tick" id="peTick"></span>
+            </div>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="peI">Intensity <output id="peIOut">60 %</output></label>
+            <input type="range" id="peI" min="0" max="100" step="1" value="60"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="peMetal">Cathode metal</label>
+            <select id="peMetal">
+              <option value="0">Cesium — φ = 2.14 eV</option>
+              <option value="1">Sodium — φ = 2.28 eV</option>
+              <option value="2">Zinc — φ = 4.31 eV</option>
+              <option value="3">Platinum — φ = 6.35 eV</option>
+            </select>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Photon energy hν <b id="peE">2.28 eV</b></div>
+          <div class="stat">Work function φ <b id="pePhi">2.14 eV</b></div>
+          <div class="stat">K<sub>max</sub> <b id="peK">0.14 eV</b></div>
+          <div class="stat">Stopping voltage <b id="peV">0.14 V</b></div>
+        </div>
+        <div class="meter-wrap">
+          <label>Photoelectric current <output id="peCur">—</output></label>
+          <div class="meter"><i id="peMeter"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 03 COMPTON ============================ -->
+<section class="exp" id="compton">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">03</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1923</span><span class="chip">Arthur Compton</span><span class="chip">Washington University</span></div>
+        <h2>Compton Scattering: Photons With Momentum</h2>
+        <p class="lede">If photons carry energy, they must carry momentum too. Compton found a collision that
+        proved it — head-on, in plain sight.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>X-rays scatter off the loose electrons in graphite. A classical wave should emerge with essentially
+          the <b>same wavelength</b>. Yet the scattered X-rays were measurably <b>longer</b>, and the shift
+          depended only on the scattering angle — no classical model predicted such a clean relation.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>The shift obeys <b>Δλ = (h/mc)(1 − cosθ)</b> — exactly the bookkeeping of a particle collision: a
+          photon with momentum <b>h/λ</b> trades energy and momentum with a free electron. Rotate the detector
+          and the shift follows the formula to four significant figures.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>Compton's 1923 result settled the debate: light is quantized in its <b>momentum</b>, not just its
+          energy. It underpins X-ray and neutron diffraction, and it is the cleanest single demonstration that
+          "particle" and "wave" are not mutually exclusive.</p></div>
+        <div class="eq"><span class="eq-label">Key relation</span><code>Δλ = (h/mc)(1 − cosθ) = 2.426 pm · (1 − cosθ)</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">photon → free electron</span></div>
+        <canvas id="cCompton" class="sim"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="cmLi">Incident wavelength <output id="cmLiOut">0.150 nm</output></label>
+            <input type="range" id="cmLi" min="0.05" max="0.5" step="0.005" value="0.15"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="cmTh">Scattering angle θ <output id="cmThOut">90°</output></label>
+            <input type="range" id="cmTh" min="0" max="180" step="1" value="90"/>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">λ in <b id="cmIn">0.150 nm</b></div>
+          <div class="stat">λ out <b id="cmOut">0.153 nm</b></div>
+          <div class="stat">Shift Δλ <b id="cmDL">2.4 pm</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 04 STERN–GERLACH ============================ -->
+<section class="exp flip" id="stern">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">04</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1922</span><span class="chip">Otto Stern · Walther Gerlach</span><span class="chip">Frankfurt</span></div>
+        <h2>Stern–Gerlach: The Beam That Split in Two</h2>
+        <p class="lede">Point a beam of silver atoms through an uneven magnetic field. Classical physics predicts
+        a smear. Nature writes two dots.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>Silver atoms carry one unpaired electron and thus a magnetic moment. Classically that moment can point
+          in <b>any</b> direction, so passing through a gradient field should fan the beam into a
+          <b>continuous</b> band on the detector screen.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>In 1922 Stern and Gerlach saw exactly <b>two spots</b>: spin-up, spin-down. Angular momentum is
+          quantized — measured along any axis it only ever returns <b>±ħ/2</b>. Send the beam through a second
+          analyzer rotated 90° and the two spots split <b>again</b>, 50/50, as if the first measurement were
+          forgotten.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>Spin-½ is the single most important two-level system in physics: the <b>qubit</b>, MRI, electron
+          spin resonance, atomic clocks. Toggle the second analyzer below to see the surprise that keeps quantum
+          information honest.</p></div>
+        <div class="eq"><span class="eq-label">Key result</span><code>S<sub>z</sub> = ± ½ħ</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">atomic beam → inhomogeneous field</span></div>
+        <canvas id="cStern" class="sim"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="sgRate">Beam rate <output id="sgRateOut">4 /s</output></label>
+            <input type="range" id="sgRate" min="1" max="10" step="1" value="4"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="sgG">Field gradient <output id="sgGOut">60 %</output></label>
+            <input type="range" id="sgG" min="15" max="100" step="5" value="60"/>
+          </div>
+          <div class="ctl">
+            <div class="sw-row">
+              <span class="ctl-label">Second analyzer (axis x)</span>
+              <label class="switch"><input type="checkbox" id="sgS2"/><span></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Spot ↑ <b id="sgUp">0</b></div>
+          <div class="stat">Spot ↓ <b id="sgDown">0</b></div>
+          <div class="stat">Ratio ↑ : ↓ <b id="sgRatio">— : —</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 05 DAVISSON–GERMER ============================ -->
+<section class="exp" id="davisson">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">05</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1927</span><span class="chip">C. Davisson · L. Germer</span><span class="chip">Bell Labs</span></div>
+        <h2>Electron Diffraction: Matter Waves Confirmed</h2>
+        <p class="lede">Louis de Broglie bet the physics community that electrons have wavelengths. Two years
+        later a lab accident in New Jersey proved him right.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>de Broglie (1924): every particle with momentum <b>p</b> has a wavelength <b>λ = h/p</b>. An electron
+          accelerated through voltage V has <b>λ = h/√(2meV)</b>, so a beam of electrons should diffract off a
+          crystal exactly like X-rays, satisfying Bragg's law <b>nλ = 2d sinθ</b>.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>Davisson and Germer fired electrons at a nickel target — an oxygen-baked accident had grown a giant
+          single crystal. At just the right voltage a <b>sharp peak</b> appeared at the Bragg angle, and as the
+          voltage rose the peak slid exactly where the matter-wave formula demanded. (G. P. Thomson got the same
+          result the same year, through thin films.)</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>Matter is a wave. Electron microscopes, low-energy electron diffraction and half of condensed-matter
+          physics rest on it. Sweep the voltage and watch the diffraction peak hunt its angle.</p></div>
+        <div class="eq"><span class="eq-label">Key relations</span><code>nλ = 2d sinθ</code><code>λ = h/√(2meV) = 1.226/√V nm</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">electron gun → Ni crystal → detector arc</span></div>
+        <canvas id="cDavis" class="sim"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="dvV">Accelerating voltage <output id="dvVOut">54 V</output></label>
+            <input type="range" id="dvV" min="10" max="100" step="1" value="54"/>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">de Broglie λ <b id="dvL">0.167 nm</b></div>
+          <div class="stat">Bragg angle θB <b id="dvTB">22.3°</b></div>
+          <div class="stat">Lattice spacing d <b>0.215 nm</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 06 DOUBLE SLIT ============================ -->
+<section class="exp flip" id="slits">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">06</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1989</span><span class="chip">Tonomura, Tonomura group &amp; predecessors</span><span class="chip">Hitachi, Japan</span></div>
+        <h2>The Double Slit: Dots That Add to a Wave</h2>
+        <p class="lede">The entire content of quantum mechanics in one image: dots, that add up to a wave.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>Fire electrons, <b>one at a time</b>, through two slits. Each lands as a single dot — a particle.
+          But the dots accumulate into bright and dark <b>interference fringes</b> — a wave. How does one dot
+          "know" about the other slit?</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>Tonomura's 1989 version made it vivid: the fringe pattern builds up dot by dot, from single-particle
+          impacts. Now turn on a <b>which-path detector</b>: the fringes collapse into two plain bands, exactly
+          classical. Measurement does not merely observe the quantum world — it reshapes it.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>This is the measurement problem in its purest form, and the reason "wavefunction" and "collapse" are
+          still debated a century later. Let the pattern build for a minute — it is the most beautiful image in
+          physics.</p></div>
+        <div class="eq"><span class="eq-label">Interference</span><code>I(x) ∝ cos²(πdx/λL) · sinc²(πax/λL)</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">single-electron buildup</span></div>
+        <canvas id="cSlits" class="sim tall"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="slRate">Emission rate <output id="slRateOut">90 /s</output></label>
+            <input type="range" id="slRate" min="5" max="300" step="5" value="90"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="slSep">Slit separation <output id="slSepOut">1.00 ×</output></label>
+            <input type="range" id="slSep" min="0.5" max="2" step="0.05" value="1"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="slWid">Slit width <output id="slWidOut">1.00 ×</output></label>
+            <input type="range" id="slWid" min="0.5" max="2" step="0.05" value="1"/>
+          </div>
+          <div class="ctl">
+            <div class="sw-row">
+              <span class="ctl-label">Which-path detector</span>
+              <label class="switch"><input type="checkbox" id="slWP"/><span></span></label>
+            </div>
+          </div>
+          <div class="ctl">
+            <div class="sw-row">
+              <span class="ctl-label">Density profile</span>
+              <label class="switch"><input type="checkbox" id="slProf" checked/><span></span></label>
+            </div>
+          </div>
+          <div class="ctl">
+            <div class="sw-row" style="align-items:flex-end">
+              <span class="ctl-label" style="opacity:.7">Pattern</span>
+              <button class="chipbtn" id="slClear">Clear screen</button>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Particles landed <b id="slN">0</b></div>
+          <div class="stat">Emergent pattern <b id="slState">interference fringes</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 07 HYDROGEN ============================ -->
+<section class="exp" id="hydrogen">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">07</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1885 → 1913</span><span class="chip">Balmer · N. Bohr</span><span class="chip">Copenhagen</span></div>
+        <h2>The Hydrogen Spectrum: Orbits Become Levels</h2>
+        <p class="lede">The simplest atom in the universe emits only certain colors of light. No one could
+        explain why — until orbits became energy levels.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>Hydrogen's spectrum is a set of razor-sharp lines (Balmer series: 410, 434, 486, 656 nm) that fit
+          Balmer's 1885 formula with <b>no theory</b> behind it. Why those wavelengths and no others?</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>Bohr's 1913 atom: electrons live only in quantized levels <b>E<sub>n</sub> = −13.6 eV/n²</b>. When an
+          electron falls between levels it emits a photon of <b>exactly</b> that energy difference — every line in
+          the spectrum is a transition. Excite the atom and watch the Balmer lines build on the right: the same
+          pattern etched into every nebula photograph.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>Bohr's circular orbits were soon replaced by Schrödinger's orbitals, but the level structure
+          survived. Atomic clocks, lasers and all of spectroscopy run on quantized transitions like these.</p></div>
+        <div class="eq"><span class="eq-label">Key relations</span><code>E<sub>n</sub> = −13.6 eV / n²</code><code>hν = E<sub>i</sub> − E<sub>f</sub></code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">click an orbit or excite with a button</span></div>
+        <canvas id="cHyd" class="sim tall"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <span class="ctl-label">Excite electron to</span>
+            <div class="btnrow">
+              <button class="chipbtn" id="hb2">n = 2</button>
+              <button class="chipbtn" id="hb3">n = 3</button>
+              <button class="chipbtn" id="hb4">n = 4</button>
+              <button class="chipbtn" id="hb5">n = 5</button>
+              <button class="chipbtn" id="hb6">n = 6</button>
+            </div>
+          </div>
+          <div class="ctl">
+            <div class="sw-row">
+              <span class="ctl-label">Automatic decay</span>
+              <label class="switch"><input type="checkbox" id="hAuto" checked/><span></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Current level <b id="hN">n = 4</b></div>
+          <div class="stat">Last emission <b id="hLine" style="font-size:12px">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 08 BELL ============================ -->
+<section class="exp flip" id="bell">
+  <div class="wrap">
+    <div class="exp-head reveal">
+      <span class="exp-index">08</span>
+      <div>
+        <div class="exp-meta"><span class="chip year">1935 → 1982</span><span class="chip">EPR · Bell · Aspect</span><span class="chip">Paris</span></div>
+        <h2>Bell's Theorem: Spooky Action, Measured</h2>
+        <p class="lede">Einstein called it "spooky action at a distance". Bell turned the complaint into an
+        inequality — and experiments broke the inequality.</p>
+      </div>
+    </div>
+    <div class="exp-grid">
+      <article class="prose reveal">
+        <div class="prose-block"><h4>The puzzle</h4>
+          <p>Two entangled photons fly to Alice and Bob, who measure polarization at freely chosen angles. The
+          EPR camp argued: the results must be decided in advance by hidden variables, and nothing influences a
+          distant lab. Bell (1964) showed any such <b>local</b> theory must obey <b>|S| ≤ 2</b> for a clever
+          combination of four correlation settings.</p></div>
+        <div class="prose-block"><h4>What was observed</h4>
+          <p>Quantum mechanics predicts the singlet correlation <b>E = −cos 2(a−b)</b>, which reaches
+          <b>|S| = 2√2 ≈ 2.83</b> at the optimal settings. Aspect's 1982 experiment — and every loophole-hardened
+          experiment since — measured the quantum value. Local realism is not just incomplete; it is <b>false</b>.</p></div>
+        <div class="prose-block"><h4>Why it matters</h4>
+          <p>Entanglement is now an engineering resource: quantum key distribution, teleportation and quantum
+          computers. Drag the analyzer angles to feel the correlation curve, then run the CHSH protocol and watch
+          the classical bound get broken.</p></div>
+        <div class="eq"><span class="eq-label">The test</span><code>|S| ≤ 2 (local)</code><code>|S| = 2√2 (Q.M.)</code></div>
+      </article>
+      <div class="simcard reveal">
+        <div class="simcard-head"><span class="dot"></span>Interactive apparatus<span class="sim-hint">entangled pair → two polarizers</span></div>
+        <canvas id="cBell" class="sim tall"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <label class="ctl-label" for="blA">Alice's angle a <output id="blAOut">0°</output></label>
+            <input type="range" id="blA" min="0" max="180" step="1" value="0"/>
+          </div>
+          <div class="ctl">
+            <label class="ctl-label" for="blB">Bob's angle b <output id="blBOut">45°</output></label>
+            <input type="range" id="blB" min="0" max="180" step="1" value="45"/>
+          </div>
+          <div class="ctl">
+            <div class="sw-row" style="align-items:flex-end">
+              <span class="ctl-label" style="opacity:.7">Protocol</span>
+              <button class="chipbtn" id="blChsh">Run CHSH test</button>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">Trials <b id="blN">0</b></div>
+          <div class="stat">E (measured) <b id="blElive">0.00</b></div>
+          <div class="stat">E (theory) <b id="blEth">−1.00</b></div>
+          <div class="stat">CHSH |S| <b id="blS">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============================ OUTRO ============================ -->
+<section class="outro" id="outro">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="sec-kicker">What remains</p>
+      <div class="quote">"The quantum is not small. It is the smallest thing we can measure — and the
+      smallest thing we can measure turned out to be the whole universe."</div>
+      <p class="body">From a glowing cavity in Berlin to entangled photons in Paris, the thread is one:
+      nature is <b>quantized</b>, <b>probabilistic</b> and <b>entangled</b>. The technology in your pocket —
+      LEDs, transistors, lasers, photodiodes, MRI machines, atomic clocks — is nothing but this physics,
+      industrialized.</p>
+    </div>
+    <div class="pillars reveal">
+      <div class="pillar"><span class="num">I</span><h5>Quantization</h5><p>Energy, angular momentum and charge arrive in discrete packets: hν, ±ħ/2, e. Experiments 01–05.</p></div>
+      <div class="pillar"><span class="num">II</span><h5>Superposition</h5><p>Amplitudes add and interfere; a single electron passes both slits at once until something asks which way it went. Experiment 06.</p></div>
+      <div class="pillar"><span class="num">III</span><h5>Nonlocality</h5><p>Entangled systems share outcomes that no local story can explain — and we can use them. Experiment 08.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fbrand">Quantum</div>
+  <p>A self-contained, single-file interactive study of the experiments behind quantum mechanics.<br/>
+  Simulations are stylized pedagogical approximations, not exact numerical solutions.<br/>
+  <code>Quantum.html</code> — built with vanilla HTML, CSS &amp; JavaScript. No dependencies, no network, one file.</p>
+</footer>
+
+<script>
+'use strict';
+/* ================================================================
+   UTILITIES
+================================================================ */
+const $  = (s, el=document)=>el.querySelector(s);
+const $$ = (s, el=document)=>Array.from(el.querySelectorAll(s));
+const TAU = Math.PI*2, PI = Math.PI;
+const MONO = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
+const rand  = (a=1,b)=> b===undefined ? Math.random()*a : a+Math.random()*(b-a);
+const randn = ()=> (Math.random()+Math.random()+Math.random()+Math.random()-2)*0.5;
+const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
+const lerp  = (a,b,t)=> a+(b-a)*t;
+const fmt   = (v,d=2)=> Number(v).toFixed(d);
+const rad   = d=> d*PI/180;
+
+function wavelengthToRGB(nm){
+  let r=0,g=0,b=0;
+  if(nm>=380&&nm<440){r=-(nm-440)/60;b=1;}
+  else if(nm<490){g=(nm-440)/50;b=1;}
+  else if(nm<510){g=1;b=-(nm-510)/20;}
+  else if(nm<580){r=(nm-510)/70;g=1;}
+  else if(nm<645){r=1;g=-(nm-645)/65;}
+  else if(nm<=780){r=1;}
+  if(nm<380||nm>780) return null;
+  let f=1;
+  if(nm>700) f=0.35+0.65*(780-nm)/80;
+  else if(nm<420) f=0.35+0.65*(nm-380)/40;
+  const g2=x=>Math.round(255*Math.pow(Math.max(0,x)*f,0.8));
+  return [g2(r),g2(g),g2(b)];
+}
+const rgbStr = c=> c ? `rgb(${c[0]},${c[1]},${c[2]})` : '#888';
+function photonColor(nm){
+  if(nm<380)  return {c:'#c084fc', tag:'UV'};
+  if(nm>780)  return {c:'#9a3412', tag:'IR'};
+  return {c:rgbStr(wavelengthToRGB(nm)), tag:''};
+}
+function blackbodyColor(T){
+  const t=T/100; let r,g,b;
+  if(t<=66){r=255;g=99.4704*Math.log(t)-161.12;}
+  else{r=329.698727*Math.pow(t-60,-0.1332047592);g=288.122169*Math.pow(t-60,-0.0755148492);}
+  if(t>=66)b=255; else if(t<=19)b=0; else b=138.517731*Math.log(t-10)-305.044793;
+  return [clamp(Math.round(r),0,255),clamp(Math.round(g),0,255),clamp(Math.round(b),0,255)];
+}
+function mixHex(a,b,t){
+  const pa=parseInt(a.slice(1),16), pb=parseInt(b.slice(1),16);
+  const r=Math.round(lerp((pa>>16)&255,(pb>>16)&255,t));
+  const g=Math.round(lerp((pa>>8)&255,(pb>>8)&255,t));
+  const bl=Math.round(lerp(pa&255,pb&255,t));
+  return `rgb(${r},${g},${bl})`;
+}
+function roundRect(ctx,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function drawWiggle(ctx,x,y,ang,len,wl,amp,color,alpha=1,dash=false){
+  ctx.save();
+  ctx.translate(x,y); ctx.rotate(ang);
+  ctx.globalAlpha=alpha; ctx.strokeStyle=color; ctx.lineWidth=1.7;
+  if(dash) ctx.setLineDash([5,4]);
+  ctx.beginPath();
+  for(let s=0;s<=len;s+=2) ctx.lineTo(s, Math.sin(s*TAU/Math.max(3,wl))*amp);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(len,0); ctx.lineTo(len-5,-3.5);
+  ctx.moveTo(len,0); ctx.lineTo(len-5,3.5);
+  ctx.stroke();
+  ctx.restore();
+}
+function arrow(ctx,x1,y1,x2,y2,color,w=1){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-6*Math.cos(a-0.42), y2-6*Math.sin(a-0.42));
+  ctx.lineTo(x2-6*Math.cos(a+0.42), y2-6*Math.sin(a+0.42));
+  ctx.closePath(); ctx.fill();
+}
+
+/* ================================================================
+   THEME + PALETTE
+================================================================ */
+const rootEl=document.documentElement, themeBtn=$('#themeBtn');
+const PAL={};
+function refreshPalette(){
+  const cs=getComputedStyle(rootEl);
+  const g=n=>cs.getPropertyValue(n).trim();
+  PAL.text=g('--text'); PAL.muted=g('--muted'); PAL.faint=g('--faint');
+  PAL.accent=g('--accent'); PAL.accent2=g('--accent-2');
+  PAL.line=g('--line'); PAL.lineStrong=g('--line-strong');
+  PAL.simBg=g('--sim-bg'); PAL.soft=g('--soft');
+  PAL.danger=g('--danger'); PAL.warn=g('--warn'); PAL.good=g('--good');
+}
+function paintThemeBtn(){
+  const dark=rootEl.dataset.theme==='dark';
+  themeBtn.textContent=dark?'☀':'☾';
+  themeBtn.setAttribute('aria-label', dark?'Switch to light theme':'Switch to dark theme');
+}
+(function initTheme(){
+  let saved=null;
+  try{saved=localStorage.getItem('quantum-theme');}catch(e){}
+  if(saved) rootEl.dataset.theme=saved;
+  refreshPalette(); paintThemeBtn();
+})();
+themeBtn.addEventListener('click',()=>{
+  rootEl.dataset.theme = rootEl.dataset.theme==='dark'?'light':'dark';
+  try{localStorage.setItem('quantum-theme',rootEl.dataset.theme);}catch(e){}
+  refreshPalette(); paintThemeBtn();
+});
+
+/* ================================================================
+   SIM ENGINE (single rAF loop, viewport-gated)
+================================================================ */
+const sims=[];
+function addSim(sim){
+  sims.push(sim); sim.active=false;
+  const io=new IntersectionObserver(es=>{sim.active=es.some(e=>e.isIntersecting);},{rootMargin:'140px'});
+  io.observe(sim.canvas);
+}
+function fit(c){
+  const dpr=clamp(window.devicePixelRatio||1,1,2);
+  const w=c.clientWidth, h=c.clientHeight;
+  const W=Math.max(1,Math.round(w*dpr)), H=Math.max(1,Math.round(h*dpr));
+  if(c.width!==W||c.height!==H){c.width=W;c.height=H;}
+  const ctx=c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w,h};
+}
+let lastT=performance.now();
+function loop(now){
+  const dt=clamp((now-lastT)/1000,0,0.05); lastT=now;
+  for(const s of sims) if(s.active) s.tick(dt, now/1000);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ================================================================
+   GLOBAL UI: progress, reveal, nav highlight
+================================================================ */
+const prog=$('#progress');
+addEventListener('scroll',()=>{
+  const d=document.documentElement;
+  const p=d.scrollTop/((d.scrollHeight-d.clientHeight)||1);
+  prog.style.width=(p*100)+'%';
+},{passive:true});
+
+const revIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in'); revIO.unobserve(e.target);}
+}),{threshold:.1});
+$$('.reveal').forEach(el=>revIO.observe(el));
+
+const navIO=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      $$('#nav a').forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id));
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+$$('main section.exp').forEach(s=>navIO.observe(s));
+
+function bindRange(id,outId,unit,fn,dec=0){
+  const el=$('#'+id), out=$('#'+outId);
+  const apply=()=>{const v=+el.value; out.textContent=fmt(v,dec)+unit; if(fn) fn(v);};
+  el.addEventListener('input',apply); apply();
+}
+
+/* ================================================================
+   0 · HERO BACKGROUND
+================================================================ */
+(function(){
+  const c=$('#heroCanvas');
+  const N=64, P=[];
+  for(let i=0;i<N;i++) P.push({x:Math.random(),y:Math.random(),vx:rand(-.018,.018),vy:rand(-.014,.014),r:rand(.8,2)});
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    ctx.save();
+    ctx.globalAlpha=.09; ctx.strokeStyle=PAL.accent; ctx.lineWidth=1;
+    for(let k=0;k<3;k++){
+      ctx.beginPath();
+      for(let x=0;x<=w;x+=8){
+        const y=h*(.3+.22*k)+Math.sin(x*.004+t*.55+k*2.1)*26;
+        x?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+    for(const p of P){p.x=(p.x+p.vx*dt+1)%1; p.y=(p.y+p.vy*dt+1)%1;}
+    const pts=P.map(p=>[p.x*w,p.y*h]);
+    ctx.lineWidth=1; ctx.strokeStyle=PAL.accent;
+    for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+      const dx=pts[i][0]-pts[j][0], dy=pts[i][1]-pts[j][1], d2=dx*dx+dy*dy;
+      if(d2<12100){
+        ctx.globalAlpha=(1-Math.sqrt(d2)/110)*.16;
+        ctx.beginPath(); ctx.moveTo(pts[i][0],pts[i][1]); ctx.lineTo(pts[j][0],pts[j][1]); ctx.stroke();
+      }
+    }
+    ctx.fillStyle=PAL.accent;
+    for(let i=0;i<N;i++){
+      ctx.globalAlpha=.5;
+      ctx.beginPath(); ctx.arc(pts[i][0],pts[i][1],P[i].r,0,TAU); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   1 · BLACKBODY RADIATION (Planck 1900)
+================================================================ */
+(function(){
+  const c=$('#cBlackbody');
+  const S={T:5800,Td:5800,rj:true,ph:[],acc:0,st:0};
+  bindRange('bbTemp','bbTempOut',' K',v=>{S.T=v;},0);
+  $('#bbRJ').addEventListener('change',e=>{S.rj=e.target.checked;});
+  const hC=6.626e-34,cC=3e8,kC=1.381e-23;
+  const planck=(lm,T)=>{
+    const x=hC*cC/(lm*kC*T);
+    if(x>60) return 0;
+    return (2*hC*cC*cC)/(lm*lm*lm*lm*lm)/Math.expm1(x);
+  };
+  const sim={canvas:c,active:false,tick(dt,t){
+    S.Td=lerp(S.Td,S.T,Math.min(1,dt*2.5));
+    const T=S.Td;
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    /* ---- cavity ---- */
+    const cw=Math.min(150,w*0.21), cx0=14, cy0=h*0.14, chh=h*0.58;
+    roundRect(ctx,cx0,cy0,cw,chh,10);
+    ctx.fillStyle=PAL.soft; ctx.fill();
+    ctx.strokeStyle=PAL.lineStrong; ctx.lineWidth=1.4; ctx.stroke(); ctx.lineWidth=1;
+    ctx.strokeStyle=PAL.warn; ctx.globalAlpha=.65; ctx.beginPath();
+    const nseg=9;
+    for(let i=0;i<=nseg;i++){
+      const x=cx0+12+i*(cw-24)/nseg, y=cy0+chh-10-(i%2?7:0);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.stroke(); ctx.globalAlpha=1;
+    const apX=cx0+cw, apY=cy0+chh/2;
+    const bc=blackbodyColor(T), bcStr=`rgb(${bc[0]},${bc[1]},${bc[2]})`;
+    const gr=26+T/220;
+    const glow=ctx.createRadialGradient(apX,apY,2,apX,apY,gr);
+    glow.addColorStop(0,bcStr); glow.addColorStop(1,'transparent');
+    ctx.globalAlpha=.85; ctx.fillStyle=glow;
+    ctx.beginPath(); ctx.arc(apX,apY,gr,0,TAU); ctx.fill(); ctx.globalAlpha=1;
+    ctx.fillStyle=bcStr; ctx.beginPath(); ctx.arc(apX,apY,7,0,TAU); ctx.fill();
+    S.acc+=dt*(1.2+Math.pow(T/4000,2)*7);
+    while(S.acc>1){S.acc-=1;S.ph.push({x:apX+8,y:apY+randn()*10,vx:rand(50,120),vy:rand(-25,25),l:1});}
+    for(const p of S.ph){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt*.45;}
+    S.ph=S.ph.filter(p=>p.l>0&&p.x<w);
+    for(const p of S.ph){ctx.globalAlpha=p.l*.8;ctx.fillStyle=bcStr;ctx.beginPath();ctx.arc(p.x,p.y,1.6,0,TAU);ctx.fill();}
+    ctx.globalAlpha=1;
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('cavity @ '+Math.round(T)+' K', cx0+cw/2, cy0+chh+20);
+    /* ---- spectrum plot ---- */
+    const px0=Math.max(190,w*0.33), px1=w-18, py0=28, py1=h-44;
+    const Lmin=20, Lmax=1000, N=150;
+    const vals=new Float64Array(N), rjv=new Float64Array(N);
+    let mx=0;
+    for(let i=0;i<N;i++){
+      const lm=(Lmin+(Lmax-Lmin)*i/(N-1))*1e-9;
+      const v=planck(lm,T);
+      vals[i]=v; if(v>mx) mx=v;
+      rjv[i]=(2*cC*kC*T)/(lm*lm*lm*lm);
+    }
+    if(mx>0) for(let i=0;i<N;i++){vals[i]/=mx; rjv[i]/=mx;}
+    const X=i=>px0+(px1-px0)*i/(N-1);
+    const Y=v=>py1-clamp(v,0,1.25)*(py1-py0);
+    ctx.font='10px '+MONO;
+    for(let L=100;L<=1000;L+=100){
+      const x=px0+(px1-px0)*(L-Lmin)/(Lmax-Lmin);
+      ctx.strokeStyle=PAL.line; ctx.globalAlpha=.55;
+      ctx.beginPath(); ctx.moveTo(x,py0); ctx.lineTo(x,py1); ctx.stroke(); ctx.globalAlpha=1;
+      ctx.fillStyle=PAL.faint; ctx.textAlign='center';
+      if(L%200===0) ctx.fillText(L,x,py1+15);
+    }
+    ctx.textAlign='left'; ctx.fillStyle=PAL.faint;
+    ctx.fillText('λ (nm)', px0, py1+30);
+    ctx.fillText('relative intensity', px0+4, py0-8);
+    /* planck curve */
+    ctx.beginPath();
+    for(let i=0;i<N;i++) i?ctx.lineTo(X(i),Y(vals[i])):ctx.moveTo(X(i),Y(vals[i]));
+    ctx.strokeStyle=PAL.accent; ctx.lineWidth=2; ctx.stroke(); ctx.lineWidth=1;
+    const grd=ctx.createLinearGradient(0,py0,0,py1);
+    grd.addColorStop(0,PAL.accent); grd.addColorStop(1,'transparent');
+    ctx.beginPath();
+    for(let i=0;i<N;i++) i?ctx.lineTo(X(i),Y(vals[i])):ctx.moveTo(X(i),Y(vals[i]));
+    ctx.lineTo(X(N-1),py1); ctx.lineTo(X(0),py1); ctx.closePath();
+    ctx.globalAlpha=.16; ctx.fillStyle=grd; ctx.fill(); ctx.globalAlpha=1;
+    /* rayleigh–jeans */
+    if(S.rj){
+      ctx.save();
+      ctx.beginPath(); ctx.rect(px0,py0-6,px1-px0,py1-py0+6); ctx.clip();
+      ctx.setLineDash([5,4]); ctx.strokeStyle=PAL.danger; ctx.lineWidth=1.5;
+      ctx.beginPath();
+      for(let i=0;i<N;i++) i?ctx.lineTo(X(i),Y(rjv[i])):ctx.moveTo(X(i),Y(rjv[i]));
+      ctx.stroke();
+      ctx.setLineDash([]); ctx.lineWidth=1;
+      ctx.restore();
+      ctx.fillStyle=PAL.danger; ctx.font='10px '+MONO; ctx.textAlign='left';
+      ctx.fillText('Rayleigh–Jeans (classical)', px0+4, py0+12);
+    }
+    /* Wien peak */
+    const lmax=2.898e6/T;
+    if(lmax>=Lmin&&lmax<=Lmax){
+      const x=px0+(px1-px0)*(lmax-Lmin)/(Lmax-Lmin);
+      ctx.setLineDash([3,4]); ctx.strokeStyle=PAL.accent2;
+      ctx.beginPath(); ctx.moveTo(x,py0); ctx.lineTo(x,py1); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=PAL.accent2; ctx.font='10px '+MONO; ctx.textAlign='left';
+      ctx.fillText('λmax = '+Math.round(lmax)+' nm', x+5, py0+26);
+    }
+    S.st+=dt;
+    if(S.st>0.25){S.st=0;
+      $('#bbStatT').textContent=Math.round(T)+' K';
+      $('#bbStatL').textContent = lmax<1000 ? Math.round(lmax)+' nm' : (lmax/1000).toFixed(2)+' µm';
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   2 · PHOTOELECTRIC EFFECT (Einstein 1905)
+================================================================ */
+(function(){
+  const c=$('#cPhoto');
+  const METALS=[{n:'Cesium',phi:2.14},{n:'Sodium',phi:2.28},{n:'Zinc',phi:4.31},{n:'Platinum',phi:6.35}];
+  const H=0.0041357; // eV per THz
+  const S={f:550,int:60,mi:0,photons:[],electrons:[],flashes:[],acc:0,st:0};
+  bindRange('peF','peFOut',' THz',v=>{S.f=v;},0);
+  bindRange('peI','peIOut',' %',v=>{S.int=v;},0);
+  const placeTick=()=>{
+    const t=clamp((METALS[S.mi].phi/H-100)/1400,0,.999);
+    $('#peTick').style.left=(t*100)+'%';
+  };
+  $('#peMetal').addEventListener('change',e=>{S.mi=+e.target.value; placeTick();});
+  placeTick();
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const lampX=52, lampY=h*0.5;
+    const plateX=w-64, plateTop=h*0.14, plateBot=h*0.86;
+    const E=H*S.f, phi=METALS[S.mi].phi, above=E>phi;
+    const λnm=299794/S.f;
+    const pc=photonColor(λnm);
+    /* lamp */
+    roundRect(ctx,lampX-32,lampY-28,64,56,10);
+    ctx.fillStyle=PAL.soft; ctx.fill();
+    ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+    ctx.globalAlpha=.9; ctx.fillStyle=pc.c;
+    ctx.beginPath(); ctx.arc(lampX+8,lampY,12,0,TAU); ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText(Math.round(S.f)+' THz · '+Math.round(λnm)+' nm', lampX-6, lampY+42);
+    if(pc.tag){ctx.fillStyle=pc.c; ctx.fillText(pc.tag+' light', lampX-6, lampY-36);}
+    /* plate */
+    const grad=ctx.createLinearGradient(plateX,0,plateX+18,0);
+    grad.addColorStop(0,'rgba(148,163,184,.9)'); grad.addColorStop(1,'rgba(71,85,105,.9)');
+    ctx.fillStyle=grad; ctx.fillRect(plateX,plateTop,18,plateBot-plateTop);
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='left';
+    ctx.fillText(METALS[S.mi].n+' (cathode)', plateX-96, plateTop-8);
+    /* spawn photons */
+    S.acc+=dt*(S.int/100*11);
+    while(S.acc>1){S.acc-=1; S.photons.push({x:lampX+28, y:rand(plateTop+10,plateBot-10)});}
+    const wlpx=clamp(9000/S.f,5,60);
+    for(const p of S.photons) p.x+=250*dt;
+    for(const p of S.photons)
+      if(p.x<plateX) drawWiggle(ctx,p.x,p.y,0,26,wlpx,3,pc.c,.95,pc.tag==='UV');
+    /* collisions */
+    for(let i=S.photons.length-1;i>=0;i--){
+      const p=S.photons[i];
+      if(p.x>=plateX){
+        S.photons.splice(i,1);
+        if(above){
+          const K=E-phi;
+          S.electrons.push({x:plateX-2,y:p.y,vx:-(90+150*Math.sqrt(K/4)),vy:rand(-55,55)});
+        } else S.flashes.push({x:plateX-2,y:p.y,r:2,l:1});
+      }
+    }
+    /* electrons */
+    for(const e of S.electrons){e.x+=e.vx*dt; e.y+=e.vy*dt;}
+    S.electrons=S.electrons.filter(e=>e.x>-10&&e.y>-10&&e.y<h+10);
+    for(const e of S.electrons){
+      ctx.strokeStyle='rgba(96,165,250,.5)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.lineTo(e.x-e.vx*.05,e.y-e.vy*.05); ctx.stroke();
+      ctx.fillStyle='#60a5fa'; ctx.beginPath(); ctx.arc(e.x,e.y,2.4,0,TAU); ctx.fill();
+    }
+    ctx.lineWidth=1;
+    /* absorption flashes */
+    for(const f of S.flashes){f.l-=dt*2.2; f.r+=dt*30;}
+    S.flashes=S.flashes.filter(f=>f.l>0);
+    for(const f of S.flashes){
+      ctx.globalAlpha=f.l*.5; ctx.strokeStyle=PAL.danger;
+      ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,TAU); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+    if(!above){
+      ctx.fillStyle=PAL.danger; ctx.font='11px '+MONO; ctx.textAlign='center';
+      ctx.fillText('ν < ν₀ — no emission, at any intensity', w*0.5, h-14);
+    }
+    S.st+=dt;
+    if(S.st>0.15){S.st=0;
+      $('#peE').textContent=fmt(E)+' eV';
+      $('#pePhi').textContent=fmt(phi)+' eV';
+      $('#peK').textContent=fmt(Math.max(0,E-phi))+' eV';
+      $('#peV').textContent=fmt(Math.max(0,E-phi))+' V';
+      $('#peMeter').style.width=(above?S.int:0)+'%';
+      $('#peCur').textContent=above? S.int+' % of max' : '0 (below ν₀)';
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   3 · COMPTON SCATTERING (Compton 1923)
+================================================================ */
+(function(){
+  const c=$('#cCompton');
+  const S={li:0.15,th:90,ph:0,tt:0,d:0,ex:0,ey:0,evx:0,evy:0,st:0};
+  bindRange('cmLi','cmLiOut',' nm',v=>{S.li=v;},3);
+  bindRange('cmTh','cmThOut','°',v=>{S.th=v;},0);
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const ex=w*0.52, ey=h*0.60;
+    const th=rad(S.th);
+    const dl=0.0024266*(1-Math.cos(th));
+    const lo=S.li+dl;
+    const ci='#a78bfa';
+    const co=mixHex('#a78bfa','#f87171',clamp(dl/(S.li*2),0,1));
+    /* guides */
+    ctx.setLineDash([4,5]); ctx.strokeStyle=PAL.faint;
+    ctx.beginPath(); ctx.moveTo(ex-170,ey); ctx.lineTo(ex,ey); ctx.stroke();
+    if(S.th>1){ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex+Math.cos(th)*160,ey-Math.sin(th)*160); ctx.stroke();}
+    ctx.setLineDash([]);
+    if(S.th>3){
+      ctx.strokeStyle=PAL.accent; ctx.lineWidth=1.3;
+      ctx.beginPath(); ctx.arc(ex,ey,36,-th,0); ctx.stroke(); ctx.lineWidth=1;
+      ctx.fillStyle=PAL.accent; ctx.font='11px '+MONO; ctx.textAlign='left';
+      ctx.fillText('θ = '+S.th+'°', ex+44, ey-12*Math.sin(th));
+    }
+    ctx.fillStyle=ci; ctx.font='11px '+MONO; ctx.textAlign='center';
+    ctx.fillText('λ = '+S.li.toFixed(3)+' nm', ex-95, ey-14);
+    if(S.th>15){
+      ctx.fillStyle=co;
+      ctx.fillText('λ′ = '+lo.toFixed(3)+' nm', ex+Math.cos(th)*105, ey-Math.sin(th)*105-12);
+    }
+    /* state machine */
+    const sp=175;
+    if(S.ph===0){
+      S.tt+=dt; S.d=0;
+      if(S.tt>0.6) S.ph=1;
+    } else if(S.ph===1){
+      S.d+=sp*dt;
+      if(S.d>=170){
+        S.ph=2; S.d=0; S.ex=ex; S.ey=ey;
+        // recoil direction from p_ph_in − p_ph_out (in units of 1/nm, screen y down)
+        const pexx=1/S.li-Math.cos(th)/lo;
+        const peyy=0+Math.sin(th)/lo;
+        const m=Math.hypot(pexx,peyy)||1;
+        const v=clamp(m*10,20,230);
+        S.evx=pexx/m*v; S.evy=peyy/m*v;
+      }
+    } else {
+      S.d+=sp*dt;
+      S.ex+=S.evx*dt; S.ey+=S.evy*dt;
+      if(S.d>w+40||S.ey<-40||S.ey>h+40){S.ph=0; S.tt=0;}
+    }
+    if(S.ph===2){
+      ctx.strokeStyle='rgba(96,165,250,.35)'; ctx.setLineDash([3,4]);
+      ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(S.ex,S.ey); ctx.stroke(); ctx.setLineDash([]);
+    }
+    /* electron */
+    const epos=S.ph===2?[S.ex,S.ey]:[ex,ey];
+    const eg=ctx.createRadialGradient(epos[0],epos[1],1,epos[0],epos[1],12);
+    eg.addColorStop(0,'rgba(96,165,250,.9)'); eg.addColorStop(1,'transparent');
+    ctx.fillStyle=eg; ctx.beginPath(); ctx.arc(epos[0],epos[1],12,0,TAU); ctx.fill();
+    ctx.fillStyle='#93c5fd'; ctx.beginPath(); ctx.arc(epos[0],epos[1],4.5,0,TAU); ctx.fill();
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='left';
+    ctx.fillText('e⁻ (free)', epos[0]+10, epos[1]+15);
+    /* photons */
+    if(S.ph===1) drawWiggle(ctx, ex-170+S.d, ey, 0, 30, 26+S.li*70, 3.2, ci);
+    if(S.ph===2){
+      const pxx=ex+Math.cos(th)*S.d, pyy=ey-Math.sin(th)*S.d;
+      drawWiggle(ctx, pxx, pyy, -th, 30, 26+lo*70, 3.2, co);
+    }
+    if(S.th===0){
+      ctx.fillStyle=PAL.faint; ctx.font='11px '+MONO; ctx.textAlign='center';
+      ctx.fillText('no shift at θ = 0° — rotate the detector', w*0.5, h-16);
+    }
+    S.st+=dt;
+    if(S.st>0.25){S.st=0;
+      $('#cmIn').textContent=S.li.toFixed(3)+' nm';
+      $('#cmOut').textContent=lo.toFixed(3)+' nm';
+      $('#cmDL').textContent=(dl*1000).toFixed(1)+' pm';
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   4 · STERN–GERLACH (Stern & Gerlach 1922)
+================================================================ */
+(function(){
+  const c=$('#cStern');
+  const S={rate:4,g:60,s2:false,atoms:[],hits:[],up:0,down:0,acc:0,st:0};
+  bindRange('sgRate','sgRateOut',' /s',v=>{S.rate=v;},0);
+  bindRange('sgG','sgGOut',' %',v=>{S.g=v;},0);
+  $('#sgS2').addEventListener('change',e=>{S.s2=e.target.checked;});
+  function magnet(ctx,x,y0,mw,lN,lS,prime){
+    const colN=prime?'rgba(192,38,211,.28)':'rgba(244,63,94,.28)';
+    const colS=prime?'rgba(139,92,246,.28)':'rgba(59,130,246,.28)';
+    const strN=prime?'#c026d3':'#f43f5e', strS=prime?'#8b5cf6':'#3b82f6';
+    roundRect(ctx,x-5,y0-96,mw+10,32,5); ctx.fillStyle=colN; ctx.fill(); ctx.strokeStyle=strN; ctx.stroke();
+    roundRect(ctx,x-5,y0+64,mw+10,32,5); ctx.fillStyle=colS; ctx.fill(); ctx.strokeStyle=strS; ctx.stroke();
+    ctx.font='11px '+MONO; ctx.textAlign='center';
+    ctx.fillStyle=strN; ctx.fillText(lN,x+mw/2,y0-75);
+    ctx.fillStyle=strS; ctx.fillText(lS,x+mw/2,y0+86);
+    ctx.globalAlpha=.45;
+    for(let i=0;i<3;i++) arrow(ctx,x+mw*0.25+i*mw*0.25,y0-56,x+mw*0.25+i*mw*0.25,y0+56,PAL.faint,1);
+    ctx.globalAlpha=1;
+  }
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const y0=h*0.5, mw=44, x1=w*0.38, x2=w*0.70, sx=w-34;
+    /* tube */
+    ctx.strokeStyle=PAL.line;
+    ctx.beginPath(); ctx.moveTo(10,y0-88); ctx.lineTo(sx-4,y0-88); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(10,y0+88); ctx.lineTo(sx-4,y0+88); ctx.stroke();
+    /* source funnel */
+    ctx.strokeStyle=PAL.faint;
+    ctx.beginPath(); ctx.moveTo(8,y0-30); ctx.lineTo(24,y0-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8,y0+30); ctx.lineTo(24,y0+8); ctx.stroke();
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='left';
+    ctx.fillText('Ag atoms', 6, y0-40);
+    /* magnets */
+    magnet(ctx,x1,y0,mw,'N','S',false);
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('∇B (z)', x1+mw/2, y0+106);
+    if(S.s2){
+      magnet(ctx,x2,y0,mw,'N′','S′',true);
+      ctx.fillStyle=PAL.faint; ctx.fillText('∇B (x)', x2+mw/2, y0+106);
+    }
+    /* spawn */
+    S.acc+=dt*S.rate;
+    while(S.acc>1){
+      S.acc-=1;
+      S.atoms.push({x:14,y:y0+randn()*4,vx:150,vy:0,sp:Math.random()<.5?1:-1,m2:false,done:false});
+    }
+    /* update */
+    const G=(S.g/100)*60;
+    for(const a of S.atoms){
+      a.x+=a.vx*dt;
+      const inM1=a.x>x1&&a.x<x1+mw;
+      const inM2=S.s2&&a.x>x2&&a.x<x2+mw;
+      if(inM2&&!a.m2){a.m2=true; a.sp=Math.random()<.5?1:-1; a.vy=0;}
+      if(inM1||inM2) a.vy=lerp(a.vy,a.sp*G,Math.min(1,dt*8));
+      a.y+=a.vy*dt;
+      if(a.x>=sx-8&&!a.done){
+        a.done=true;
+        if(a.y<y0) S.up++; else S.down++;
+        S.hits.push({x:sx-9,y:a.y});
+        if(S.hits.length>900) S.hits.splice(0,250);
+      }
+    }
+    S.atoms=S.atoms.filter(a=>!a.done&&a.y>y0-92&&a.y<y0+92);
+    /* atoms */
+    for(const a of S.atoms){
+      ctx.globalAlpha=.9; ctx.fillStyle=PAL.text;
+      ctx.beginPath(); ctx.arc(a.x,a.y,2,0,TAU); ctx.fill();
+      ctx.globalAlpha=.25;
+      ctx.beginPath(); ctx.arc(a.x-a.vx*.03,a.y-a.vy*.03,1.4,0,TAU); ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    /* screen + hits */
+    ctx.fillStyle=PAL.faint; ctx.globalAlpha=.13;
+    ctx.fillRect(sx-9,y0-90,9,180);
+    ctx.globalAlpha=1;
+    ctx.strokeStyle=PAL.lineStrong;
+    ctx.strokeRect(sx-9,y0-90,9,180);
+    ctx.fillStyle=PAL.accent;
+    for(const hi of S.hits){ctx.globalAlpha=.7;ctx.fillRect(hi.x,hi.y,2.4,2.4);}
+    ctx.globalAlpha=1;
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('screen', sx-4, y0-98);
+    S.st+=dt;
+    if(S.st>0.25){S.st=0;
+      const tot=S.up+S.down;
+      $('#sgUp').textContent=S.up;
+      $('#sgDown').textContent=S.down;
+      $('#sgRatio').textContent = tot ? (100*S.up/tot).toFixed(0)+'% : '+(100*S.down/tot).toFixed(0)+'%' : '— : —';
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   5 · DAVISSON–GERMER (1927)
+================================================================ */
+(function(){
+  const c=$('#cDavis');
+  const S={V:54,elec:[],scat:[],acc:0,st:0};
+  const D=0.215; // nm
+  bindRange('dvV','dvVOut',' V',v=>{S.V=v;},0);
+  function crystal(ctx,cx,gy){
+    const cw=52, ch=84;
+    roundRect(ctx,cx-cw/2,gy-ch/2,cw,ch,6);
+    ctx.fillStyle=PAL.soft; ctx.fill();
+    ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+    ctx.fillStyle=PAL.accent2;
+    const dy=13, dx=11;
+    for(let r2=0;r2<6;r2++)for(let q=0;q<5;q++){
+      const x=cx-cw/2+9+q*dx+(r2%2?dx/2:0);
+      const y=gy-ch/2+10+r2*dy;
+      ctx.globalAlpha=.7;
+      ctx.beginPath(); ctx.arc(x,y,1.6,0,TAU); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('Ni crystal · d = 0.215 nm', cx, gy+ch/2+14);
+  }
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const gy=h*0.32, cx=w*0.52, gx=54;
+    const λ=1.226/Math.sqrt(S.V);
+    const thB=Math.asin(λ/(2*D))*180/PI;
+    const R=Math.min(w*0.32,150);
+    /* gun */
+    roundRect(ctx,gx-28,gy-15,46,30,8);
+    ctx.fillStyle=PAL.soft; ctx.fill();
+    ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('e⁻ gun · '+Math.round(S.V)+' V', gx-5, gy+32);
+    /* beam guide */
+    ctx.setLineDash([3,4]); ctx.strokeStyle=PAL.faint;
+    ctx.beginPath(); ctx.moveTo(gx+18,gy); ctx.lineTo(cx-24,gy); ctx.stroke(); ctx.setLineDash([]);
+    crystal(ctx,cx,gy);
+    /* detector arc */
+    for(let a=10;a<=80;a+=10){
+      const x1=cx+Math.cos(rad(a))*(R-8), y1=gy-Math.sin(rad(a))*(R-8);
+      const x2=cx+Math.cos(rad(a))*(R+6), y2=gy-Math.sin(rad(a))*(R+6);
+      ctx.strokeStyle=PAL.lineStrong;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      if(a%20===0){
+        ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='center';
+        ctx.fillText(a+'°', cx+Math.cos(rad(a))*(R+20), gy-Math.sin(rad(a))*(R+20)+3);
+      }
+    }
+    /* coherent Bragg beam */
+    const bx=cx+Math.cos(rad(thB))*R, by=gy-Math.sin(rad(thB))*R;
+    ctx.strokeStyle=PAL.accent; ctx.lineWidth=2.5;
+    ctx.setLineDash([8,6]); ctx.lineDashOffset=-t*60;
+    ctx.beginPath(); ctx.moveTo(cx,gy); ctx.lineTo(bx,by); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset=0; ctx.lineWidth=1;
+    ctx.fillStyle=PAL.accent;
+    ctx.beginPath(); ctx.arc(bx,by,4+Math.sin(t*6)*1.5,0,TAU); ctx.fill();
+    ctx.strokeStyle=PAL.accent2; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(cx,gy,44,0,-rad(thB),true); ctx.stroke(); ctx.lineWidth=1;
+    ctx.fillStyle=PAL.accent2; ctx.font='11px '+MONO; ctx.textAlign='left';
+    ctx.fillText('θB', cx+52, gy-12);
+    /* electrons + scattering */
+    S.acc+=dt*7;
+    while(S.acc>1){S.acc-=1; S.elec.push({x:gx+20,y:gy});}
+    for(const e of S.elec) e.x+=230*dt;
+    for(const e of S.elec){
+      if(e.x>=cx-26){
+        for(let k=0;k<3;k++){
+          const a2=rand(PI*0.3,PI*1.7);
+          S.scat.push({x:cx-20,y:gy,vx:-Math.cos(a2)*rand(30,80),vy:-Math.sin(a2)*rand(30,80),l:rand(.25,.5)});
+        }
+        e.dead=true;
+      }
+    }
+    S.elec=S.elec.filter(e=>!e.dead);
+    ctx.fillStyle='#60a5fa';
+    for(const e of S.elec){ctx.beginPath();ctx.arc(e.x,e.y,1.8,0,TAU);ctx.fill();}
+    for(const s of S.scat){s.x+=s.vx*dt; s.y+=s.vy*dt; s.l-=dt;}
+    S.scat=S.scat.filter(s=>s.l>0);
+    ctx.fillStyle=PAL.faint;
+    for(const s of S.scat){ctx.globalAlpha=s.l*1.6;ctx.beginPath();ctx.arc(s.x,s.y,1.4,0,TAU);ctx.fill();}
+    ctx.globalAlpha=1;
+    /* count-vs-angle plot */
+    const px0=44, px1=w-18, py0=h*0.60, py1=h-26, yMax=115;
+    ctx.strokeStyle=PAL.line;
+    ctx.beginPath(); ctx.moveTo(px0,py0); ctx.lineTo(px0,py1); ctx.lineTo(px1,py1); ctx.stroke();
+    const pts=[];
+    for(let a=0;a<=90;a+=1.5){
+      let I=8+95*Math.exp(-Math.pow((a-thB)/5,2));
+      I+=1.6*Math.sin(a*1.7+t*3)*(1+a/90);
+      pts.push([px0+(px1-px0)*a/90, py1-clamp(I/yMax,0,1)*(py1-py0-8)]);
+    }
+    ctx.beginPath();
+    pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
+    ctx.strokeStyle=PAL.accent; ctx.lineWidth=1.8; ctx.stroke(); ctx.lineWidth=1;
+    ctx.lineTo(px1,py1); ctx.lineTo(px0,py1); ctx.closePath();
+    ctx.globalAlpha=.12; ctx.fillStyle=PAL.accent; ctx.fill(); ctx.globalAlpha=1;
+    const xm=px0+(px1-px0)*thB/90;
+    ctx.setLineDash([3,4]); ctx.strokeStyle=PAL.accent2;
+    ctx.beginPath(); ctx.moveTo(xm,py0); ctx.lineTo(xm,py1); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('detector count vs angle', (px0+px1)/2, h-8);
+    ctx.textAlign='left'; ctx.fillText('peak at θB = '+thB.toFixed(1)+'°', px0+6, py0+12);
+    S.st+=dt;
+    if(S.st>0.2){S.st=0;
+      $('#dvL').textContent=λ.toFixed(3)+' nm';
+      $('#dvTB').textContent=thB.toFixed(1)+'°';
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   6 · DOUBLE SLIT (Tonomura 1989)
+================================================================ */
+(function(){
+  const c=$('#cSlits');
+  const S={rate:90,sep:1,wid:1,wp:false,prof:true,N:0,parts:[],dots:[],histo:new Float32Array(160),histMax:0,acc:0,pulse:null,st:0};
+  bindRange('slRate','slRateOut',' /s',v=>{S.rate=v;},0);
+  bindRange('slSep','slSepOut',' ×',v=>{S.sep=v;},2);
+  bindRange('slWid','slWidOut',' ×',v=>{S.wid=v;},2);
+  $('#slWP').addEventListener('change',e=>{
+    S.wp=e.target.checked;
+    $('#slState').textContent=e.target.checked?'two bands (no interference)':'interference fringes';
+  });
+  $('#slProf').addEventListener('change',e=>{S.prof=e.target.checked;});
+  $('#slClear').addEventListener('click',()=>{S.dots.length=0;S.histo.fill(0);S.histMax=0;S.N=0;$('#slN').textContent='0';});
+  function sampleX(cc,h){
+    const Hh=h*0.44;
+    if(S.wp){
+      // the electron passed through the slit at offset cc — land in its own band
+      return clamp(cc+randn()*8,-Hh,Hh);
+    }
+    const dx=26/S.sep, zero=140/S.wid, k=TAU/dx, n=170;
+    const P=new Float32Array(n); let tot=0;
+    for(let i=0;i<n;i++){
+      const x=-Hh+2*Hh*i/n;
+      const c2=Math.cos(k*x);
+      const u=PI*x/zero;
+      const s=u===0?1:Math.sin(u)/u;
+      const v=c2*c2*s*s;
+      P[i]=v; tot+=v;
+    }
+    let r=Math.random()*tot, a2=0;
+    for(let i=0;i<n;i++){a2+=P[i]; if(a2>=r) return -Hh+2*Hh*i/n;}
+    return 0;
+  }
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const y0=h/2, sx0=26, bx=w*0.5, scrX=w-30;
+    const d=44*S.sep, ah=9*S.wid;
+    /* source */
+    ctx.beginPath(); ctx.arc(sx0,y0,4,0,TAU); ctx.fillStyle=PAL.text; ctx.fill();
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='left';
+    ctx.fillText('source', sx0-12, y0+24);
+    /* wavefronts (right-hand side of the barrier only) */
+    if(!S.wp){
+      for(const sy of [y0-d/2,y0+d/2]){
+        for(let i=0;i<5;i++){
+          const r=(t*80+i*24)%120;
+          ctx.globalAlpha=(1-r/120)*.14;
+          ctx.strokeStyle=PAL.accent;
+          ctx.beginPath(); ctx.arc(bx,sy,r,-PI/2,PI/2); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha=1;
+    }
+    /* barrier: top wall · middle wall · bottom wall, two open slits */
+    const s1t=y0-d/2-ah, s1b=y0-d/2+ah;
+    const s2t=y0+d/2-ah, s2b=y0+d/2+ah;
+    ctx.fillStyle=PAL.lineStrong;
+    ctx.fillRect(bx-3,14,6,Math.max(0,s1t-14));
+    ctx.fillRect(bx-3,s1b,6,Math.max(0,s2t-s1b));
+    ctx.fillRect(bx-3,s2b,6,Math.max(0,h-14-s2b));
+    if(S.wp){
+      ctx.fillStyle=PAL.danger;
+      for(const sy of [y0-d/2,y0+d/2]){ctx.beginPath();ctx.arc(bx,sy,4,0,TAU);ctx.fill();}
+      ctx.font='10px '+MONO; ctx.textAlign='center';
+      ctx.fillText('which-path detector ON', bx, 10);
+    }
+    /* particles */
+    S.acc+=dt*S.rate;
+    while(S.acc>1&&S.parts.length<240){
+      S.acc-=1;
+      const sy=Math.random()<.5?y0-d/2:y0+d/2;
+      S.parts.push({x:sx0,y:y0,ph:1,tx:bx,ty:sy});
+    }
+    if(S.acc>3) S.acc=3;
+    for(const p of S.parts){
+      const dx2=p.tx-p.x, dy2=p.ty-p.y, dist=Math.hypot(dx2,dy2);
+      const mv=280*dt;
+      if(dist<=mv){
+        if(p.ph===1){
+          const slitY=p.ty; // y of the slit this particle actually flew through
+          p.ph=2; p.tx=scrX-6; p.ty=y0+sampleX(slitY-y0,h);
+          if(S.wp) S.pulse={x:bx,y:slitY,l:1};
+        } else {
+          p.done=true; S.N++;
+          S.dots.push({y:p.ty});
+          if(S.dots.length>3200) S.dots.splice(0,500);
+          const bi=clamp(Math.floor((p.ty-h*0.04)/(h*0.92)*160),0,159);
+          S.histo[bi]++; if(S.histo[bi]>S.histMax) S.histMax=S.histo[bi];
+        }
+      } else {p.x+=dx2/dist*mv; p.y+=dy2/dist*mv;}
+    }
+    S.parts=S.parts.filter(p=>!p.done);
+    ctx.fillStyle='#60a5fa';
+    for(const p of S.parts){ctx.beginPath();ctx.arc(p.x,p.y,1.7,0,TAU);ctx.fill();}
+    /* detector pulse */
+    if(S.pulse){
+      S.pulse.l-=dt*2;
+      ctx.globalAlpha=Math.max(0,S.pulse.l);
+      ctx.strokeStyle=PAL.danger; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(S.pulse.x,S.pulse.y,4+(1-S.pulse.l)*14,0,TAU); ctx.stroke();
+      ctx.globalAlpha=1; ctx.lineWidth=1;
+      if(S.pulse.l<=0) S.pulse=null;
+    }
+    /* screen */
+    ctx.fillStyle=PAL.faint; ctx.globalAlpha=.14;
+    ctx.fillRect(scrX-6,y0-h*0.46,8,h*0.92);
+    ctx.globalAlpha=1;
+    ctx.fillStyle=S.wp?PAL.text:PAL.accent;
+    for(const dd of S.dots){ctx.globalAlpha=.75;ctx.fillRect(scrX-5,dd.y,2.4,1.6);}
+    ctx.globalAlpha=1;
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='right';
+    ctx.fillText('screen', scrX-4, y0-h*0.46-8);
+    /* live cumulative density profile hugging the screen */
+    if(S.prof&&S.histMax>3){
+      const NB=160, yTop=h*0.04, yBot=h*0.96, per=(yBot-yTop)/NB, maxW=52, base=scrX-9;
+      const sm=new Float32Array(NB); let mx=1;
+      for(let i=0;i<NB;i++){
+        const v=(S.histo[i-1]||0)+2*S.histo[i]+(S.histo[i+1]||0);
+        sm[i]=v*0.25; if(sm[i]>mx) mx=sm[i];
+      }
+      const col=S.wp?PAL.warn:PAL.accent;
+      ctx.beginPath(); ctx.moveTo(base,yTop);
+      for(let i=0;i<NB;i++) ctx.lineTo(base-(sm[i]/mx)*maxW, yTop+(i+0.5)*per);
+      ctx.lineTo(base,yBot); ctx.closePath();
+      ctx.globalAlpha=.12; ctx.fillStyle=col; ctx.fill();
+      ctx.beginPath();
+      for(let i=0;i<NB;i++){
+        const x=base-(sm[i]/mx)*maxW, y=yTop+(i+0.5)*per;
+        i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+      }
+      ctx.globalAlpha=.8; ctx.strokeStyle=col; ctx.lineWidth=1.6; ctx.stroke();
+      ctx.globalAlpha=1; ctx.lineWidth=1;
+      ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='right';
+      ctx.fillText('density profile', base, yBot+12);
+    }
+    S.st+=dt;
+    if(S.st>0.2){S.st=0; $('#slN').textContent=S.N;}
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   7 · HYDROGEN SPECTRUM (Balmer → Bohr)
+================================================================ */
+(function(){
+  const c=$('#cHyd');
+  const S={n:4,nVis:4,ang:rand(TAU),ph:[],bumps:new Float32Array(401),last:null,dt:0.8,auto:true,st:0,uv:null,ir:null};
+  function orbitR(n2,w,h){const rMax=Math.min(w*0.31,h*0.42)-10; return 14+(rMax-14)*(n2/6);}
+  function colorName(nm){return nm<450?'violet':nm<495?'blue':nm<570?'green':nm<590?'yellow':nm<630?'orange':'red';}
+  function updateLastLine(){
+    if(!S.last){$('#hLine').textContent='—';return;}
+    const {from,to,λ,dE}=S.last;
+    const pc=photonColor(λ);
+    const tag=pc.tag?pc.tag.toLowerCase():colorName(λ);
+    $('#hLine').textContent=from+' → '+to+' · '+Math.round(λ)+' nm ('+tag+') · '+fmt(dE,2)+' eV';
+  }
+  function excite(n2){
+    if(n2===S.n) return;
+    S.n=n2; S.dt=rand(0.9,1.6);
+    $('#hN').textContent='n = '+n2;
+  }
+  for(let n2=2;n2<=6;n2++) $('#hb'+n2).addEventListener('click',()=>excite(n2));
+  $('#hAuto').addEventListener('change',e=>{S.auto=e.target.checked;});
+  c.style.cursor='pointer';
+  c.addEventListener('click',e=>{
+    const r=c.getBoundingClientRect();
+    const mx=e.clientX-r.left, my=e.clientY-r.top;
+    const w=c.clientWidth, h=c.clientHeight, cx=w*0.34, cy=h*0.52;
+    const dist=Math.hypot(mx-cx,my-cy);
+    for(let n2=1;n2<=6;n2++){
+      if(Math.abs(dist-orbitR(n2,w,h))<10){excite(n2); return;}
+    }
+  });
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const cx=w*0.34, cy=h*0.52;
+    S.nVis=lerp(S.nVis,S.n,Math.min(1,dt*8));
+    S.ang+=dt*(2.6/(S.nVis*S.nVis));
+    /* orbits */
+    for(let n2=1;n2<=6;n2++){
+      const r=orbitR(n2,w,h);
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU);
+      ctx.strokeStyle=n2===S.n?PAL.accent:PAL.line;
+      ctx.globalAlpha=n2===S.n?.85:.5;
+      ctx.lineWidth=n2===S.n?1.6:1;
+      ctx.stroke();
+      ctx.globalAlpha=1; ctx.lineWidth=1;
+      ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='left';
+      ctx.fillText('n='+n2, cx+r+3, cy+3);
+    }
+    /* nucleus */
+    const ng=ctx.createRadialGradient(cx,cy,0,cx,cy,14);
+    ng.addColorStop(0,PAL.accent); ng.addColorStop(1,'transparent');
+    ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(cx,cy,14,0,TAU); ctx.fill();
+    ctx.fillStyle=PAL.accent; ctx.beginPath(); ctx.arc(cx,cy,4.5,0,TAU); ctx.fill();
+    /* electron */
+    const er=orbitR(S.nVis,w,h);
+    const ex=cx+Math.cos(S.ang)*er, ey=cy+Math.sin(S.ang)*er;
+    ctx.beginPath(); ctx.arc(ex,ey,3.4,0,TAU); ctx.fillStyle=PAL.accent2; ctx.fill();
+    /* decay */
+    if(S.auto&&S.n>1){
+      S.dt-=dt;
+      if(S.dt<=0){
+        const to=1+Math.floor(Math.random()*S.n);
+        const dE=13.6*(1/(to*to)-1/(S.n*S.n));
+        const λ=1240/dE;
+        S.ph.push({x:ex,y:ey,λ});
+        S.last={from:S.n,to,λ,dE};
+        S.n=to; S.dt=rand(0.9,1.7);
+        $('#hN').textContent='n = '+S.n;
+        updateLastLine();
+      }
+    }
+    /* photons */
+    const stripX=w-58;
+    for(const p of S.ph) p.x+=230*dt;
+    for(let i=S.ph.length-1;i>=0;i--){
+      const p=S.ph[i];
+      if(p.x>=stripX){
+        S.ph.splice(i,1);
+        if(p.λ>=380&&p.λ<=780){
+          const idx=clamp(Math.round(p.λ)-380,0,400);
+          S.bumps[idx]=Math.min(140,S.bumps[idx]+8);
+        } else if(p.λ<380){S.uv={x:stripX+16,y:h*0.14,l:1};}
+        else {S.ir={x:stripX+16,y:h*0.86,l:1};}
+        continue;
+      }
+      const pc=photonColor(p.λ);
+      drawWiggle(ctx,p.x,p.y,0,22,10,2.6,pc.c,.95,pc.tag!=='');
+      if(pc.tag){
+        ctx.fillStyle=pc.c; ctx.font='9px '+MONO; ctx.textAlign='left';
+        ctx.fillText(pc.tag,p.x+18,p.y-6);
+      }
+    }
+    /* UV / IR flashes */
+    for(const key of ['uv','ir']){
+      const f=S[key];
+      if(f){
+        f.l-=dt*2;
+        ctx.globalAlpha=Math.max(0,f.l)*.8;
+        ctx.strokeStyle=PAL.warn;
+        ctx.beginPath(); ctx.arc(f.x,f.y,4+(1-f.l)*12,0,TAU); ctx.stroke();
+        ctx.globalAlpha=1;
+        if(f.l<=0) S[key]=null;
+      }
+    }
+    /* spectrum strip */
+    const x0=stripX+8, x1=stripX+26, yT=h*0.14, yB=h*0.86;
+    const yOf=λ=>yT+(λ-380)*(yB-yT)/400;
+    const grad=ctx.createLinearGradient(0,yT,0,yB);
+    for(let λ=380;λ<=780;λ+=40) grad.addColorStop((λ-380)/400, rgbStr(wavelengthToRGB(λ)));
+    ctx.fillStyle=grad; ctx.fillRect(x0,yT,x1-x0,yB-yT);
+    ctx.strokeStyle=PAL.lineStrong; ctx.strokeRect(x0,yT,x1-x0,yB-yT);
+    ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='center';
+    ctx.fillText('UV', (x0+x1)/2, yT-8);
+    ctx.fillText('IR', (x0+x1)/2, yB+14);
+    /* Balmer guide lines */
+    const balmer=[[656,'Hα'],[486,'Hβ'],[434,'Hγ'],[410,'Hδ']];
+    for(const [λ,name] of balmer){
+      const y=yOf(λ);
+      ctx.strokeStyle=PAL.faint;
+      ctx.beginPath(); ctx.moveTo(x0-4,y); ctx.lineTo(x0,y); ctx.stroke();
+      ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='right';
+      ctx.fillText(name, x0-6, y+3);
+    }
+    /* accumulated lines */
+    for(let i=0;i<401;i++){
+      const b=S.bumps[i];
+      if(b<=0) continue;
+      const λ=380+i, y=yOf(λ);
+      const rgb=wavelengthToRGB(λ);
+      const len=4+Math.log10(1+b)*22;
+      ctx.globalAlpha=.9;
+      ctx.strokeStyle=rgbStr(rgb); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0-len,y); ctx.stroke();
+      ctx.globalAlpha=1; ctx.lineWidth=1;
+    }
+    if(S.n===1){
+      ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO; ctx.textAlign='center';
+      ctx.fillText('ground state — excite to n = 2…6', cx, cy+orbitR(6,w,h)+20);
+    }
+  }};
+  addSim(sim);
+})();
+
+/* ================================================================
+   8 · BELL TEST (EPR → Bell → Aspect)
+================================================================ */
+(function(){
+  const c=$('#cBell');
+  const S={a:0,b:45,pairs:[],fl:[],N:0,pp:0,pm:0,mp:0,mm:0,E:0,chsh:null,st:0,acc:0};
+  bindRange('blA','blAOut','°',v=>{S.a=v;},0);
+  bindRange('blB','blBOut','°',v=>{S.b=v;},0);
+  function samplePair(a,b){
+    const A=Math.random()<.5?1:-1;
+    const s=Math.sin(rad(a-b));
+    const B=Math.random()<s*s?A:-A;
+    return [A,B];
+  }
+  const SETS=[[0,22.5],[0,67.5],[45,22.5],[45,67.5]];
+  $('#blChsh').addEventListener('click',()=>{
+    S.chsh={run:true,t:0,A:[0,0,0,0],N:[0,0,0,0],val:null};
+    $('#blS').textContent='…';
+  });
+  function polarizer(ctx,x,y,ang){
+    ctx.save(); ctx.translate(x,y);
+    ctx.strokeStyle=PAL.lineStrong;
+    ctx.beginPath(); ctx.arc(0,0,15,0,TAU); ctx.stroke();
+    ctx.rotate(rad(ang));
+    ctx.strokeStyle=PAL.accent; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(-13,0); ctx.lineTo(13,0); ctx.stroke();
+    ctx.restore(); ctx.lineWidth=1;
+  }
+  const sim={canvas:c,active:false,tick(dt,t){
+    const {ctx,w,h}=fit(c);
+    ctx.clearRect(0,0,w,h);
+    const y0=h*0.34, srcX=w/2;
+    const polX=[w*0.28,w*0.72], detX=[56,w-56];
+    /* CHSH offline accumulation */
+    if(S.chsh&&S.chsh.run){
+      S.chsh.t+=dt;
+      const m=Math.max(1,Math.round(2600*dt));
+      for(let i=0;i<4;i++)for(let k=0;k<m;k++){
+        const [A,B]=samplePair(SETS[i][0],SETS[i][1]);
+        S.chsh.A[i]+=A*B; S.chsh.N[i]++;
+      }
+      if(S.chsh.t>2.2){
+        S.chsh.run=false;
+        const e=S.chsh.N.map((n,i)=>n?S.chsh.A[i]/n:0);
+        S.chsh.val=Math.abs(e[0]-e[1]+e[2]+e[3]);
+        $('#blS').textContent=fmt(S.chsh.val,2);
+      }
+    }
+    /* source + arms */
+    roundRect(ctx,srcX-36,y0-16,72,32,8);
+    ctx.fillStyle=PAL.soft; ctx.fill();
+    ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+    ctx.fillStyle=PAL.muted; ctx.font='10px '+MONO; ctx.textAlign='center';
+    ctx.fillText('entangled source', srcX, y0+32);
+    ctx.strokeStyle=PAL.line;
+    ctx.beginPath(); ctx.moveTo(srcX-36,y0); ctx.lineTo(detX[0]+16,y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(srcX+36,y0); ctx.lineTo(detX[1]-16,y0); ctx.stroke();
+    polarizer(ctx,polX[0],y0,S.a);
+    polarizer(ctx,polX[1],y0,S.b);
+    ctx.fillStyle=PAL.faint; ctx.font='10px '+MONO;
+    ctx.fillText('a = '+S.a+'°', polX[0], y0+34);
+    ctx.fillText('b = '+S.b+'°', polX[1], y0+34);
+    for(const [x,name] of [[detX[0],'Alice'],[detX[1],'Bob']]){
+      roundRect(ctx,x-16,y0-14,32,28,6);
+      ctx.fillStyle=PAL.soft; ctx.fill();
+      ctx.strokeStyle=PAL.lineStrong; ctx.stroke();
+      ctx.fillStyle=PAL.muted; ctx.textAlign='center';
+      ctx.fillText(name,x,y0+30);
+    }
+    /* spawn + move pairs */
+    S.acc+=dt*5;
+    while(S.acc>1){
+      S.acc-=1;
+      const [A,B]=samplePair(S.a,S.b);
+      S.pairs.push({x:srcX,resA:A,resB:B});
+    }
+    for(const p of S.pairs) p.x+=200*dt;
+    for(let i=S.pairs.length-1;i>=0;i--){
+      const p=S.pairs[i];
+      if(srcX+p.x>=detX[1]-16){
+        S.pairs.splice(i,1);
+        S.N++;
+        if(p.resA===1&&p.resB===1)S.pp++;
+        else if(p.resA===1&&p.resB===-1)S.pm++;
+        else if(p.resA===-1&&p.resB===1)S.mp++;
+        else S.mm++;
+        S.fl.push({x:detX[0],y:y0,txt:p.resA>0?'+1':'−1',g:p.resA>0,l:1});
+        S.fl.push({x:detX[1],y:y0,txt:p.resB>0?'+1':'−1',g:p.resB>0,l:1});
+      } else {
+        drawWiggle(ctx,srcX-p.x,y0,PI,24,9,2.4,PAL.accent,.85);
+        drawWiggle(ctx,srcX+p.x,y0,0,24,9,2.4,PAL.accent2,.85);
+      }
+    }
+    /* outcome flashes */
+    for(const f of S.fl){f.l-=dt*1.4; f.y-=dt*22;}
+    S.fl=S.fl.filter(f=>f.l>0);
+    for(const f of S.fl){
+      ctx.globalAlpha=Math.max(0,f.l);
+      ctx.fillStyle=f.g?PAL.good:PAL.danger;
+      ctx.font='bold 12px '+MONO; ctx.textAlign='center';
+      ctx.fillText(f.txt,f.x,f.y);
+    }
+    ctx.globalAlpha=1;
+    /* tally matrix */
+    const bx=14, by=34, bw=52, bh=34;
+    ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='center';
+    ctx.fillText('B +', bx+bw/2, by-6);
+    ctx.fillText('B −', bx+bw+bw/2+6, by-6);
+    const cells=[[S.pp,S.pm],[S.mp,S.mm]];
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++){
+      const x=bx+j*(bw+6), y=by+i*(bh+6);
+      ctx.strokeStyle=PAL.line;
+      ctx.strokeRect(x,y,bw,bh);
+      ctx.fillStyle=PAL.text; ctx.font='600 15px '+MONO;
+      ctx.fillText(cells[i][j], x+bw/2, y+bh/2+5);
+    }
+    ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='right';
+    ctx.fillText('A +', bx-5, by+bh/2+3);
+    ctx.fillText('A −', bx-5, by+bh+bh/2+3);
+    /* correlation strip */
+    const px0=14, px1=w-14, pyTop=h-74, py=h-32;
+    S.E=S.N?(S.pp+S.mm-S.pm-S.mp)/S.N:0;
+    const yOfE=E=>py-((E+1)/2)*(py-pyTop);
+    ctx.strokeStyle=PAL.line;
+    ctx.beginPath(); ctx.moveTo(px0,py); ctx.lineTo(px1,py); ctx.stroke();
+    ctx.beginPath();
+    for(let dd=0;dd<=180;dd+=2){
+      const x=px0+(px1-px0)*dd/180;
+      const y=yOfE(-Math.cos(rad(2*dd)));
+      dd===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=PAL.accent; ctx.lineWidth=1.6; ctx.stroke(); ctx.lineWidth=1;
+    const ye=yOfE(S.E);
+    ctx.setLineDash([4,4]); ctx.strokeStyle=PAL.warn;
+    ctx.beginPath(); ctx.moveTo(px0,ye); ctx.lineTo(px1,ye); ctx.stroke();
+    ctx.setLineDash([]);
+    const ddc=Math.abs(S.a-S.b);
+    const xc=px0+(px1-px0)*ddc/180;
+    ctx.fillStyle=PAL.text;
+    ctx.beginPath(); ctx.arc(xc,yOfE(-Math.cos(rad(2*ddc))),3.4,0,TAU); ctx.fill();
+    ctx.fillStyle=PAL.faint; ctx.font='9px '+MONO; ctx.textAlign='center';
+    ctx.fillText('E(δ) = −cos 2δ  ·  white dot: current setting  ·  dashed: measured E', (px0+px1)/2, h-10);
+    /* CHSH gauge */
+    if(S.chsh){
+      const gx0=w*0.28, gx1=w*0.72, gy2=h-104;
+      const xOf=v=>gx0+(gx1-gx0)*clamp(v,0,3.4)/3.4;
+      ctx.strokeStyle=PAL.lineStrong;
+      ctx.beginPath(); ctx.moveTo(xOf(0),gy2); ctx.lineTo(xOf(3.4),gy2); ctx.stroke();
+      for(const [v2,lab,col] of [[2,'classical 2',PAL.danger],[2*Math.SQRT2,'QM 2√2',PAL.good]]){
+        ctx.strokeStyle=col;
+        ctx.beginPath(); ctx.moveTo(xOf(v2),gy2-8); ctx.lineTo(xOf(v2),gy2+8); ctx.stroke();
+        ctx.fillStyle=col; ctx.font='9px '+MONO; ctx.textAlign='center';
+        ctx.fillText(lab, xOf(v2), gy2-12);
+      }
+      if(S.chsh.val!=null){
+        ctx.strokeStyle=PAL.text; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(xOf(S.chsh.val),gy2-10); ctx.lineTo(xOf(S.chsh.val),gy2+10); ctx.stroke();
+        ctx.lineWidth=1;
+        ctx.fillStyle=PAL.text; ctx.font='11px '+MONO; ctx.textAlign='center';
+        ctx.fillText('|S| = '+fmt(S.chsh.val,2)+(S.chsh.val>2?'  → bound broken!':''), (gx0+gx1)/2, gy2+24);
+      } else {
+        ctx.fillStyle=PAL.warn; ctx.font='10px '+MONO; ctx.textAlign='center';
+        ctx.fillText('CHSH protocol running…', (gx0+gx1)/2, gy2+22);
+      }
+    }
+    S.st+=dt;
+    if(S.st>0.2){S.st=0;
+      $('#blN').textContent=S.N;
+      $('#blElive').textContent=fmt(S.E,2);
+      $('#blEth').textContent=fmt(-Math.cos(rad(2*Math.abs(S.a-S.b))),2);
+    }
+  }};
+  addSim(sim);
+})();
+</script>
+</body>
+</html>

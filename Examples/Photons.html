@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photons — The Photoelectric Effect</title>
+<style>
+:root{
+  --bg:#050a14;
+  --panel:#0d1424;
+  --panel2:#111a2c;
+  --line:#1d2b45;
+  --text:#e9f0fb;
+  --mut:#93a5c4;
+  --cyan:#43dfff;
+  --cyan2:#0ff2ff;
+  --amber:#ffd24a;
+  --red:#ff5f6e;
+  --mono:ui-monospace,"SFMono-Regular","Cascadia Code",Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--text);
+  background:
+    radial-gradient(circle at 78% -12%, rgba(30,80,160,.28), transparent 55%),
+    radial-gradient(circle at 8% 110%, rgba(0,120,140,.14), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgba(90,150,255,.045) 46px 47px),
+    linear-gradient(#0a1020,#050a14);
+}
+#bg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.wrap{width:min(1100px,92vw);margin:0 auto;position:relative;z-index:1}
+.topbar{
+  position:sticky;top:0;z-index:5;
+  background:rgba(5,10,20,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;flex-wrap:wrap}
+.brand{font-family:var(--mono);font-size:.95rem;letter-spacing:.12em;color:var(--text)}
+.brand .tag{color:var(--mut);margin-left:.6em;font-size:.75rem}
+nav{display:flex;gap:14px;flex-wrap:wrap}
+nav a{
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;color:var(--mut);
+  text-decoration:none;padding:6px 10px;border:1px solid transparent;border-radius:6px;
+  transition:all .25s;
+}
+nav a:hover{color:var(--cyan2);border-color:var(--line);background:rgba(20,30,50,.5)}
+
+.hero{padding:58px 0 10px}
+h1{
+  font-size:clamp(2.1rem,5vw,3.4rem);letter-spacing:.015em;margin:0 0 14px;color:#fff;
+}
+@supports ((-webkit-background-clip:text) and (background-clip:text)){
+  h1{
+    background:linear-gradient(90deg,#ffffff 0%,var(--cyan2) 55%,#6ea8ff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+}
+.lead{max-width:660px;color:var(--mut);line-height:1.65;margin:0 0 22px;font-size:1.02rem}
+.lead b{color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{
+  font-family:var(--mono);font-size:.8rem;color:var(--mut);
+  border:1px solid var(--line);border-radius:6px;padding:7px 12px;background:rgba(18,28,48,.55);
+}
+.chip b{color:var(--cyan2)}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:26px}
+.card{
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;
+  box-shadow:0 10px 26px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.year{font-family:var(--mono);color:var(--cyan2);font-size:1.25rem}
+.card h3{margin:8px 0 6px;font-size:.95rem}
+.card p{margin:0;color:var(--mut);font-size:.88rem;line-height:1.55}
+
+.sec{margin:54px 0}
+.sec h2{
+  font-family:var(--mono);color:var(--cyan);font-size:1rem;letter-spacing:.14em;text-transform:uppercase;
+  display:flex;align-items:center;gap:.7rem;margin:0 0 18px;font-weight:500;
+}
+.sec h2::before{content:"//";color:#5b6d95}
+.sec h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fact .k{font-family:var(--mono);color:var(--cyan2);font-size:.75rem;letter-spacing:.1em}
+.fact h3{margin:6px 0 6px;font-size:.98rem}
+.fact p{margin:0;color:var(--mut);font-size:.9rem;line-height:1.55}
+
+.eqs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.eq .f{font-family:var(--mono);font-size:1.35rem;color:var(--cyan2);margin:10px 0;letter-spacing:.03em}
+.eq .d{color:var(--mut);font-size:.86rem;line-height:1.55}
+.eq .note{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);color:var(--mut);font-size:.8rem;font-family:var(--mono)}
+
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:14px}
+.ctl{flex:1;min-width:240px}
+.ctl label{font-family:var(--mono);font-size:.72rem;color:var(--mut);display:block;margin-bottom:6px;letter-spacing:.1em}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;
+  background:linear-gradient(90deg,var(--cyan2),#2a3d60);outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--cyan2);box-shadow:0 0 14px rgba(0,242,255,.65);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;border:none;
+  background:var(--cyan2);box-shadow:0 0 14px rgba(0,242,255,.65);cursor:pointer;
+}
+.metal-row{display:flex;flex-wrap:wrap;gap:8px}
+.metal-btn{
+  font-family:var(--mono);font-size:.78rem;color:var(--mut);cursor:pointer;
+  background:transparent;border:1px solid var(--line);border-radius:6px;padding:8px 14px;
+  transition:all .25s;
+}
+.metal-btn:hover{color:var(--text);border-color:#31446a}
+.metal-btn.on{
+  color:var(--cyan2);background:rgba(0,242,255,.1);border-color:var(--cyan);
+  box-shadow:0 0 14px rgba(0,242,255,.25);
+}
+
+.cv{
+  display:block;width:100%;height:420px;border-radius:10px;
+  background:linear-gradient(180deg,#0c1322,#080d18);
+  border:1px solid var(--line);
+  box-shadow:0 10px 26px rgba(0,0,0,.35);
+}
+@media (max-width:640px){ .cv{height:300px} .facts{grid-template-columns:1fr} }
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+.ro{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.ro .v{font-family:var(--mono);color:var(--cyan2);font-size:1.05rem;margin-top:2px;word-break:break-all}
+.ro .l{font-family:var(--mono);font-size:.68rem;color:var(--mut);letter-spacing:.12em;text-transform:uppercase}
+.pill{
+  font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;padding:8px 14px;border-radius:6px;
+  border:1px solid var(--line);color:var(--mut);
+}
+.pill.ok{color:var(--cyan2);background:rgba(0,242,255,.08);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,242,255,.2)}
+.pill.no{color:var(--red);background:rgba(255,95,110,.08);border-color:var(--red);box-shadow:0 0 14px rgba(255,95,110,.25)}
+
+.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.app .glyph{font-size:1.6rem;color:var(--cyan2)}
+.app h3{margin:8px 0 6px;font-size:.98rem}
+.app p{margin:0;color:var(--mut);font-size:.88rem;line-height:1.55}
+
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+footer{
+  margin:60px 0 28px;font-family:var(--mono);font-size:.72rem;color:var(--mut);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  border-top:1px solid var(--line);padding-top:16px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <div class="wrap top">
+    <div class="brand">⚛ PHOTONICS LAB <span class="tag">// photoelectric effect</span></div>
+    <nav>
+      <a href="#overview">OVERVIEW</a>
+      <a href="#equation">EQUATION</a>
+      <a href="#graph">GRAPH</a>
+      <a href="#sim">SIMULATOR</a>
+      <a href="#apps">APPLICATIONS</a>
+      <a href="#timeline">TIMELINE</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="overview" class="hero">
+    <h1>The Photoelectric Effect</h1>
+    <p class="lead">
+      When light strikes a metal, energy arrives in indivisible packets — <b>photons</b>.
+      If a single photon carries enough energy to free an electron, the electron is ejected
+      with a maximum kinetic energy set <b>solely by the light's frequency</b>. Einstein's 1905
+      explanation of this effect turned the "wave" of light into a quantum object — and launched
+      all of quantum physics.
+    </p>
+    <div class="chips">
+      <div class="chip">h = <b>6.626 × 10⁻³⁴ J·s</b></div>
+      <div class="chip">c = <b>2.998 × 10⁸ m/s</b></div>
+      <div class="chip">e = <b>1.602 × 10⁻¹⁹ C</b></div>
+      <div class="chip">E = <b>hf</b> &nbsp;·&nbsp; Nobel Prize <b>1921</b></div>
+    </div>
+    <div class="stat-grid">
+      <div class="card"><div class="year">1887</div><h3>Hertz</h3><p>UV light is seen to knock electrons off a charged zinc plate — the first observation of the effect.</p></div>
+      <div class="card"><div class="year">1905</div><h3>Einstein</h3><p>Light quanta of energy hf explain every anomaly: thresholds, linearity, and zero thermal lag.</p></div>
+      <div class="card"><div class="year">1916</div><h3>Millikan</h3><p>Precision measurements of stopping potential confirm the straight line V₀ = (hf − φ)/e.</p></div>
+      <div class="card"><div class="year">1921</div><h3>Nobel Prize</h3><p>Awarded "for the discovery of the law of the photoelectric effect".</p></div>
+    </div>
+  </section>
+
+  <section id="overview2" class="sec">
+    <h2>The Phenomenon in Four Facts</h2>
+    <div class="facts">
+      <div class="card fact"><div class="k">01 · THRESHOLD</div><h3>A frequency cutoff</h3><p>No electrons emerge below f₀ = φ/h — no matter how intense the light. Wave theory cannot explain this sharp cliff.</p></div>
+      <div class="card fact"><div class="k">02 · ENERGY ↔ FREQUENCY</div><h3>K_max = hf − φ</h3><p>Maximum electron energy is strictly linear in frequency; the slope is h. Nothing else enters the equation.</p></div>
+      <div class="card fact"><div class="k">03 · INTENSITY ≠ ENERGY</div><h3>More light, same speed</h3><p>Brighter light ejects <i>more</i> electrons per second, but each one carries the same maximum kinetic energy.</p></div>
+      <div class="card fact"><div class="k">04 · INSTANTANEOUS</div><h3>No thermal lag</h3><p>Emission begins within ~10⁻⁹ s of illumination. Classical heat models predict a delay that is never observed.</p></div>
+    </div>
+  </section>
+
+  <section id="equation" class="sec">
+    <h2>The Governing Equation</h2>
+    <div class="eqs">
+      <div class="card eq">
+        <div class="f">E_γ = h·f</div>
+        <div class="d">Energy of a single photon. In eV: E[eV] = 4.136 × 10⁻¹⁵ · f[Hz].</div>
+      </div>
+      <div class="card eq">
+        <div class="f">K_max = h·f − φ</div>
+        <div class="d">Maximum kinetic energy of an emitted electron, where φ is the metal's work function (the escape price).</div>
+        <div class="note">If hf &lt; φ, no emission — however bright the source.</div>
+      </div>
+      <div class="card eq">
+        <div class="f">e·V₀ = h·f − φ</div>
+        <div class="d">The stopping potential V₀ is the retarding voltage needed to halt the fastest electrons. A plot of V₀ vs f is a straight line of slope h/e.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="graph" class="sec">
+    <h2>V₀ vs f — Interactive Plot</h2>
+    <div class="controls">
+      <div class="metal-row" id="metalRow"></div>
+      <div class="ctl">
+        <label>FREQUENCY f</label>
+        <input id="freq" type="range" min="1e14" max="2e15" step="1e13" value="1.2e15">
+      </div>
+    </div>
+    <canvas id="graphCv" class="cv" aria-label="Graph of stopping potential versus frequency"></canvas>
+    <div class="readouts">
+      <div class="ro"><div class="l">frequency</div><div class="v" id="rF"></div></div>
+      <div class="ro"><div class="l">wavelength λ = c/f</div><div class="v" id="rL"></div></div>
+      <div class="ro"><div class="l">photon energy h·f</div><div class="v" id="rE"></div></div>
+      <div class="ro"><div class="l">K_max</div><div class="v" id="rK"></div></div>
+      <div class="ro"><div class="l">stopping potential V₀</div><div class="v" id="rV"></div></div>
+      <div class="ro"><div class="l">status</div><div class="v" id="rS"></div></div>
+    </div>
+  </section>
+
+  <section id="sim" class="sec">
+    <h2>Photon Sandbox</h2>
+    <div class="controls">
+      <div class="ctl">
+        <label>LIGHT INTENSITY (photons/s)</label>
+        <input id="inten" type="range" min="1" max="100" step="1" value="50">
+      </div>
+      <div class="ctl" style="min-width:0">
+        <label>NOTES</label>
+        <div style="font-family:var(--mono);font-size:.72rem;color:var(--mut)">Photon colour follows frequency: red → violet. Electron speed ∝ √K_max.</div>
+      </div>
+    </div>
+    <canvas id="simCv" class="cv" aria-label="Animated simulation of photons striking a metal surface"></canvas>
+    <div class="readouts">
+      <div class="ro"><div class="l">photons / s</div><div class="v" id="sP"></div></div>
+      <div class="ro"><div class="l">electrons / s</div><div class="v" id="sE"></div></div>
+      <div class="ro"><div class="l">v_max = √(2K/m)</div><div class="v" id="sV"></div></div>
+      <div class="ro"><div class="l">emission</div><div class="v" id="sS"></div></div>
+    </div>
+  </section>
+
+  <section id="apps" class="sec">
+    <h2>Where Photons Do Work</h2>
+    <div class="apps">
+      <div class="card app"><div class="glyph">☀</div><h3>Solar cells</h3><p>Each absorbed photon liberates an electron–hole pair. The photoelectric effect is literally the engine inside every photovoltaic cell.</p></div>
+      <div class="card app"><div class="glyph">◉</div><h3>Photomultipliers</h3><p>One photon can cascade into thousands of electrons. Night-vision systems, dark-light detectors, and particle physics rely on this gain.</p></div>
+      <div class="card app"><div class="glyph">▤</div><h3>Photodiodes</h3><p>Light becomes current: IR remotes, light meters, optical communication, and smoke alarms all count photons as charge.</p></div>
+      <div class="card app"><div class="glyph">▦</div><h3>Image sensors</h3><p>CCD and CMOS pixels are vast photon counters with single-photon sensitivity — the heart of digital cameras and telescopes.</p></div>
+      <div class="card app"><div class="glyph">✶</div><h3>X-ray photoionization</h3><p>Hard photons strip inner-shell electrons, enabling X-ray absorption spectroscopy and radiation imaging.</p></div>
+      <div class="card app"><div class="glyph">⌖</div><h3>Quantum metrology</h3><p>Photon counting, single-photon sources, and photon statistics probe the quantum nature of light itself.</p></div>
+    </div>
+  </section>
+
+  <section id="timeline" class="sec">
+    <h2>Mission Log</h2>
+    <div class="tl">
+      <div class="card"><div class="year">1887</div><h3>Hertz</h3><p>UV discharge from zinc plates is recorded — the effect enters the laboratory.</p></div>
+      <div class="card"><div class="year">1899</div><h3>Lenard</h3><p>Systematic measurements of electron energy vs frequency confirm the threshold and linearity.</p></div>
+      <div class="card"><div class="year">1905</div><h3>Einstein</h3><p>"Light quanta" explain the effect — quantum theory is born.</p></div>
+      <div class="card"><div class="year">1916</div><h3>Millikan</h3><p>High-precision verification of E = hf using stopping potentials.</p></div>
+      <div class="card"><div class="year">1954</div><h3>Solar cell</h3><p>Bardeen, Becker & Whitfield patent a silicon photovoltaic cell — the effect becomes an industry.</p></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>PHOTONICS LAB — single-file interactive explainer · h = 6.626 × 10⁻³⁴ J·s</span>
+  <span>E = h·f &nbsp;·&nbsp; K_max = h·f − φ &nbsp;·&nbsp; no external assets</span>
+</footer>
+
+<script>
+'use strict';
+/* ---------- constants & helpers ---------- */
+const H_EV   = 4.135667e-15;   // eV·s
+const C      = 2.99792458e8;   // m/s
+const E_CH   = 1.602176634e-19;// C
+const M_E    = 9.10938356e-31; // kg
+const SUP = {'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const sup = n => String(n).split('').map(c => SUP[c] || c).join('');
+function sci(x, sig = 3){
+  if(!isFinite(x) || x === 0) return '0';
+  const e = Math.floor(Math.log10(Math.abs(x)));
+  const m = x / Math.pow(10, e);
+  return m.toFixed(sig - 1) + ' × 10' + sup(e);
+}
+
+/* ---------- state ---------- */
+const METALS = [
+  {n:'Cesium',   phi:1.95},
+  {n:'Sodium',   phi:2.28},
+  {n:'Potassium',phi:2.30},
+  {n:'Calcium',  phi:2.87},
+  {n:'Zinc',     phi:4.33},
+  {n:'Copper',   phi:4.49},
+  {n:'Platinum', phi:5.30}
+];
+let metalIdx = 1, f = 1.2e15, intensity = 50;
+
+/* ---------- metal buttons ---------- */
+const metalRow = document.getElementById('metalRow');
+METALS.forEach((m, i) => {
+  const b = document.createElement('button');
+  b.className = 'metal-btn' + (i === metalIdx ? ' on' : '');
+  b.textContent = m.n;
+  b.addEventListener('click', () => {
+    metalIdx = i;
+    [...metalRow.children].forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    updReads(); syncPills(); drawGraph();
+  });
+  metalRow.appendChild(b);
+});
+
+/* ---------- canvases ---------- */
+const gCv = document.getElementById('graphCv');
+const sCv = document.getElementById('simCv');
+const bgCv = document.getElementById('bg');
+let gW = 0, gH = 0, sW = 0, sH = 0, bW = 0, bH = 0, dpr = 1;
+
+/* Fit a canvas backing store to its live CSS box (with a safe fallback) so it
+   can never be left at 0x0 and therefore can never render blank. Called every
+   frame, so it self-heals even if the first layout happens after load. */
+function fit(cv, fw, fh){
+  const w = cv.clientWidth > 10 ? cv.clientWidth : fw;
+  const h = cv.clientHeight > 10 ? cv.clientHeight : fh;
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  const bw = Math.max(1, Math.round(w * dpr));
+  const bh = Math.max(1, Math.round(h * dpr));
+  if(cv.width !== bw) cv.width = bw;
+  if(cv.height !== bh) cv.height = bh;
+  return { w, h };
+}
+function fitAll(){
+  const g = fit(gCv, 860, 420); gW = g.w; gH = g.h;
+  const s = fit(sCv, 860, 420); sW = s.w; sH = s.h;
+  const b = fit(bgCv, 1200, 800); bW = b.w; bH = b.h;
+}
+window.addEventListener('resize', fitAll);
+
+/* ---------- graph ---------- */
+const gctx = gCv.getContext('2d');
+function drawGraph(){
+  if(!gW || !gH) return;
+  gctx.setTransform(1, 0, 0, 1, 0, 0);
+  gctx.scale(dpr, dpr);
+  gctx.clearRect(0, 0, gW, gH);
+  const x0 = 0, x1 = 2e15, y0 = 0, y1 = 9;
+  const pl = 58, pr = 18, pt = 18, pb = 38;
+  const px = f2 => pl + (f2 - x0) / (x1 - x0) * (gW - pl - pr);
+  const py = y2 => pt + (y1 - y2) / (y1 - y0) * (gH - pt - pb);
+  gctx.lineWidth = 1;
+  // grid
+  gctx.strokeStyle = 'rgba(60,90,150,.25)';
+  for(let y = 0; y <= y1; y++){
+    gctx.beginPath(); gctx.moveTo(pl, py(y)); gctx.lineTo(gW - pr, py(y)); gctx.stroke();
+    gctx.fillStyle = 'rgba(147,165,196,.8)'; gctx.font = '11px ui-monospace, monospace';
+    gctx.fillText(y + ' eV', 8, py(y) + 4);
+  }
+  gctx.strokeStyle = 'rgba(60,90,150,.25)';
+  for(let f2 = 2e14; f2 <= x1; f2 += 2e14){
+    gctx.beginPath(); gctx.moveTo(px(f2), pt); gctx.lineTo(px(f2), gH - pb); gctx.stroke();
+    gctx.fillStyle = 'rgba(147,165,196,.8)';
+    gctx.fillText((f2 / 1e14).toFixed(0), px(f2) - 8, gH - pb + 14);
+  }
+  gctx.fillStyle = 'rgba(147,165,196,.9)'; gctx.font = '11px ui-monospace, monospace';
+  gctx.fillText('f / 10¹⁴ Hz', gW / 2 - 30, gH - 10);
+  gctx.fillText('K_max / eV', 10, pt - 6 < 10 ? 12 : pt - 6);
+  // lines
+  for(let i = 0; i < METALS.length; i++){
+    const phi = METALS[i].phi;
+    const f0 = Math.min(phi / H_EV, x1);
+    gctx.beginPath();
+    gctx.moveTo(px(f0), py(0));
+    gctx.lineTo(px(x1), py(H_EV * x1 - phi));
+    if(i === metalIdx){
+      gctx.strokeStyle = '#0ff2ff'; gctx.lineWidth = 1.8;
+      gctx.shadowColor = 'rgba(0,242,255,.8)'; gctx.shadowBlur = 8;
+      gctx.stroke();
+      gctx.shadowBlur = 0;
+      gctx.fillStyle = '#0ff2ff';
+      gctx.font = '11px ui-monospace, monospace';
+      gctx.fillText(METALS[i].n, Math.min(px(x1) - 8, gW - pr - 70), py(H_EV * x1 - phi) - 8);
+    } else {
+      gctx.strokeStyle = 'rgba(140,170,215,.3)'; gctx.lineWidth = 1;
+      gctx.stroke();
+    }
+  }
+  // operating point
+  const K = Math.max(0, H_EV * f - METALS[metalIdx].phi);
+  const active = K > 0;
+  gctx.setLineDash([4, 4]);
+  gctx.strokeStyle = 'rgba(255,255,255,.25)';
+  gctx.beginPath(); gctx.moveTo(px(f), gH - pb); gctx.lineTo(px(f), py(K)); gctx.stroke();
+  gctx.setLineDash([]);
+  gctx.beginPath(); gctx.arc(px(f), py(K), 5, 0, Math.PI * 2);
+  gctx.shadowBlur = 10;
+  if(active){ gctx.fillStyle = '#0ff2ff'; gctx.shadowColor = 'rgba(0,242,255,.9)'; }
+  else      { gctx.fillStyle = '#ff5f6e'; gctx.shadowColor = 'rgba(255,95,110,.9)'; }
+  gctx.fill();
+  gctx.shadowBlur = 0;
+}
+
+/* ---------- readouts ---------- */
+const rF = document.getElementById('rF'), rL = document.getElementById('rL'),
+      rE = document.getElementById('rE'), rK = document.getElementById('rK'),
+      rV = document.getElementById('rV'), rS = document.getElementById('rS'),
+      sP = document.getElementById('sP'), sE = document.getElementById('sE'),
+      sV = document.getElementById('sV'), sS = document.getElementById('sS');
+function updReads(){
+  const phi = METALS[metalIdx].phi;
+  const E = H_EV * f, K = Math.max(0, E - phi);
+  rF.textContent = sci(f) + ' Hz';
+  rL.textContent = sci(C / f * 1e9, 3) + ' nm';
+  rE.textContent = E.toFixed(2) + ' eV';
+  rK.textContent = K.toFixed(2) + ' eV';
+  rV.textContent = K.toFixed(2) + ' V';
+  rS.textContent = K > 0 ? 'EMITTING' : 'BELOW THRESHOLD';
+  const rate = intensity * 0.5;
+  sP.textContent = rate.toFixed(1) + ' ph/s';
+  sE.textContent = (K > 0 ? rate.toFixed(1) : '0.0') + ' el/s';
+  sV.textContent = K > 0 ? sci(Math.sqrt(2 * K * E_CH / M_E)) + ' m/s' : '—';
+  sS.textContent = K > 0 ? 'ACTIVE' : 'CUT OFF';
+}
+function syncPills(){
+  const K = Math.max(0, H_EV * f - METALS[metalIdx].phi);
+  rS.style.color = K > 0 ? 'var(--cyan2)' : 'var(--red)';
+  sS.style.color = K > 0 ? 'var(--cyan2)' : 'var(--red)';
+}
+
+/* ---------- simulator ---------- */
+const sctx = sCv.getContext('2d');
+const PH = [], EL = [];
+let acc = 0, lastT = 0, lastUI = 0;
+const hueOfF = () => Math.max(0, Math.min(300, (f - 4e14) / 3.5e14 * 300));
+
+function tick(now){
+  if(!sW || !sH || sW < 10 || sH < 10) return;
+  const dt = Math.min(0.05, (now - lastT) / 1000) || 0.016;
+  lastT = now;
+  const phi = METALS[metalIdx].phi;
+  const K = H_EV * f - phi;
+  const active = K > 0.001;
+  // spawn photons
+  acc += intensity * 0.5 * dt;
+  while(acc >= 1){ acc -= 1; PH.push({x: -30, y: sH * (0.18 + 0.64 * Math.random()), vx: sW * 0.85, hue: hueOfF()}); }
+  const pw = sW * 0.12;
+  // advance photons
+  for(let i = PH.length - 1; i >= 0; i--){
+    const p = PH[i];
+    p.x += p.vx * dt;
+    if(p.x >= pw){
+      if(active) EL.push({x: pw + 2, y: p.y, vx: 500 * Math.sqrt(K), vy: 500 * Math.sqrt(K) * (Math.random() * 1.6 - 0.8)});
+      PH.splice(i, 1);
+    }
+  }
+  // advance electrons
+  for(let i = EL.length - 1; i >= 0; i--){
+    const e = EL[i];
+    e.x += e.vx * dt; e.y += e.vy * dt;
+    if(e.x > sW + 30 || e.y < -30 || e.y > sH + 30) EL.splice(i, 1);
+  }
+  // draw
+  sctx.setTransform(1, 0, 0, 1, 0, 0);
+  sctx.scale(dpr, dpr);
+  sctx.clearRect(0, 0, sW, sH);
+  // plate
+  const pg = sctx.createLinearGradient(0, 0, pw, 0);
+  pg.addColorStop(0, '#1b2537'); pg.addColorStop(1, '#2a3a52');
+  sctx.fillStyle = pg; sctx.fillRect(0, 0, pw, sH);
+  sctx.strokeStyle = 'rgba(0,242,255,.75)';
+  sctx.lineWidth = 2;
+  sctx.shadowColor = 'rgba(0,242,255,.8)'; sctx.shadowBlur = 8;
+  sctx.beginPath(); sctx.moveTo(pw, 0); sctx.lineTo(pw, sH); sctx.stroke();
+  sctx.shadowBlur = 0;
+  sctx.fillStyle = 'rgba(147,165,196,.85)'; sctx.font = '11px ui-monospace, monospace';
+  sctx.fillText('METAL', 10, sH - 12);
+  sctx.fillText('SURFACE', pw - 52, sH - 12);
+  // photons
+  for(const p of PH){
+    sctx.strokeStyle = `hsla(${p.hue},90%,65%,.45)`;
+    sctx.lineWidth = 1.4;
+    sctx.beginPath(); sctx.moveTo(p.x - 16, p.y); sctx.lineTo(p.x, p.y); sctx.stroke();
+    sctx.shadowColor = `hsla(${p.hue},95%,65%,.9)`; sctx.shadowBlur = 8;
+    sctx.fillStyle = `hsla(${p.hue},95%,70%,1)`;
+    sctx.beginPath(); sctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2); sctx.fill();
+    sctx.shadowBlur = 0;
+  }
+  // electrons
+  for(const e of EL){
+    sctx.strokeStyle = 'rgba(0,242,255,.35)';
+    sctx.lineWidth = 1;
+    const l = Math.max(0.001, Math.hypot(e.vx, e.vy) * dt);
+    const nx = e.vx / Math.hypot(e.vx, e.vy), ny = e.vy / Math.hypot(e.vx, e.vy);
+    sctx.beginPath(); sctx.moveTo(e.x - nx * l * 2.5, e.y - ny * l * 2.5); sctx.lineTo(e.x, e.y); sctx.stroke();
+    sctx.shadowColor = 'rgba(0,242,255,.9)'; sctx.shadowBlur = 6;
+    sctx.fillStyle = '#bfefff';
+    sctx.beginPath(); sctx.arc(e.x, e.y, 2.6, 0, Math.PI * 2); sctx.fill();
+    sctx.shadowBlur = 0;
+  }
+  if(now - lastUI > 250){ lastUI = now; updReads(); syncPills(); }
+}
+
+/* ---------- ambient background ---------- */
+const bctx = bgCv.getContext('2d');
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PTS = [];
+function initBg(){
+  PTS.length = 0;
+  for(let i = 0; i < 60; i++){
+    PTS.push({
+      x: Math.random() * bW, y: Math.random() * bH,
+      vx: (Math.random() - .5) * 9, vy: (Math.random() - .5) * 7,
+      r: 0.8 + Math.random() * 1.7, a: 0.07 + Math.random() * 0.3
+    });
+  }
+  drawBg(0.016);
+}
+function drawBg(dt){
+  if(!bW || bW < 10) return;
+  bctx.setTransform(1, 0, 0, 1, 0, 0);
+  bctx.scale(dpr, dpr);
+  bctx.clearRect(0, 0, bW, bH);
+  for(const p of PTS){
+    if(!reduced){
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if(p.x < -10) p.x = bW + 10; if(p.x > bW + 10) p.x = -10;
+      if(p.y < -10) p.y = bH + 10; if(p.y > bH + 10) p.y = -10;
+    }
+    bctx.shadowColor = 'rgba(110,215,255,.8)'; bctx.shadowBlur = 7;
+    bctx.fillStyle = `rgba(110,215,255,${p.a})`;
+    bctx.beginPath(); bctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); bctx.fill();
+  }
+  bctx.shadowBlur = 0;
+}
+
+/* ---------- main loop ---------- */
+function frame(now){
+  fitAll(); /* refresh sizes every frame -> canvases can never stay blank */
+  const dt = Math.min(0.05, (now - (frame._l || now)) / 1000) || 0.016;
+  frame._l = now;
+  drawBg(dt);
+  drawGraph(); /* redraw each frame so the plot can never go stale/blank */
+  tick(now);
+  requestAnimationFrame(frame);
+}
+
+/* ---------- controls ---------- */
+document.getElementById('freq').addEventListener('input', e => {
+  f = +e.target.value;
+  updReads(); syncPills(); drawGraph();
+});
+document.getElementById('inten').addEventListener('input', e => {
+  intensity = +e.target.value;
+  updReads(); syncPills();
+});
+
+fitAll();
+initBg();
+updReads(); syncPills();
+drawGraph();
+tick(0); /* immediate first paint of the sandbox, before rAF fires */
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

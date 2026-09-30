@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resonance — A Study of Superconductivity</title>
+<meta name="description" content="Why superconductors work only when the lattice and its electrons fall into harmonic sync — and what dissonance costs in resistance and loss.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23070b12'/%3E%3Cpath d='M4 16 C 8 6, 12 6, 16 16 S 24 26, 28 16' fill='none' stroke='%234fd8ff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('reson-theme');if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root, [data-theme="dark"]{
+  --bg:#070b12; --bg2:#0a101c; --panel:#0d1526; --panel2:#101a2e;
+  --brd:rgba(120,170,255,.15); --brd-strong:rgba(120,180,255,.32);
+  --ink:#e8eff9; --muted:#90a2ba; --faint:#5d6f8a;
+  --cyan:#4fd8ff; --cyan-ink:#04121e; --amber:#ffb35c; --violet:#9d8cff;
+  --stage:#0a1120;
+  --shadow:0 22px 50px rgba(0,0,0,.45);
+  --noise-op:.05;
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#f2f5fa; --bg2:#e9eef6; --panel:#ffffff; --panel2:#f6f9fd;
+  --brd:rgba(20,45,90,.16); --brd-strong:rgba(20,70,140,.34);
+  --ink:#13233a; --muted:#4d6079; --faint:#8494ab;
+  --cyan:#0a7fc0; --cyan-ink:#ffffff; --amber:#c25e0a; --violet:#6a5ae0;
+  --stage:#e9eef7;
+  --shadow:0 18px 40px rgba(30,60,120,.10);
+  --noise-op:.04;
+  color-scheme:light;
+}
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth; scroll-padding-top:88px}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--cyan); color:var(--cyan-ink)}
+h1,h2,h3,.display{font-family:'Space Grotesk','Avenir Next','Segoe UI',sans-serif; letter-spacing:-.015em}
+.mono{font-family:'IBM Plex Mono',ui-monospace,'SF Mono',monospace}
+a{color:inherit; text-decoration:none}
+img,svg{display:block}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:4px}
+.wrap{max-width:1140px; margin:0 auto; padding-inline:clamp(18px,4vw,32px)}
+section{padding-block:clamp(72px,9vw,118px); position:relative}
+/* noise grain */
+.noise{position:fixed; inset:0; z-index:40; pointer-events:none; opacity:var(--noise-op); mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.7'/%3E%3C/svg%3E");}
+/* scroll progress */
+#progress{position:fixed; top:0; left:0; height:2px; width:100%; z-index:80; background:linear-gradient(90deg,var(--cyan),var(--violet)); transform:scaleX(0); transform-origin:0 0}
+/* ============ NAV ============ */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50;
+  background:color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--brd);}
+.nav-inner{max-width:1140px; margin:0 auto; padding:0 clamp(18px,4vw,32px); height:66px; display:flex; align-items:center; gap:26px}
+.brand{display:flex; align-items:center; gap:11px; margin-right:auto}
+.brand svg{width:30px; height:18px; stroke:var(--cyan); stroke-width:2.2; fill:none; stroke-linecap:round}
+.brand-name{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; letter-spacing:.14em}
+.brand-sub{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--faint); letter-spacing:.08em}
+.nav-links{display:flex; gap:4px}
+.nav-links a{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.06em; color:var(--muted); padding:8px 12px; border-radius:8px; transition:color .25s, background .25s}
+.nav-links a:hover{color:var(--ink); background:color-mix(in srgb, var(--cyan) 10%, transparent)}
+.theme-btn{width:38px; height:38px; border:1px solid var(--brd); border-radius:50%; display:grid; place-items:center; transition:border-color .25s, transform .25s, box-shadow .25s}
+.theme-btn:hover{border-color:var(--brd-strong); transform:rotate(18deg); box-shadow:0 0 18px color-mix(in srgb, var(--cyan) 30%, transparent)}
+.theme-btn svg{width:17px; height:17px; stroke:var(--ink); fill:none; stroke-width:1.8; stroke-linecap:round}
+[data-theme="dark"] .i-moon{display:none}
+[data-theme="light"] .i-sun{display:none}
+@media (max-width:760px){ .nav-links{display:none} }
+/* ============ HERO ============ */
+.hero{min-height:94vh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding-top:120px; padding-bottom:0}
+#heroCanvas{position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
+.hero .wrap{position:relative; z-index:1}
+.eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:12px}
+.eyebrow::before{content:""; width:34px; height:1px; background:var(--cyan); opacity:.6}
+.hero h1{font-size:clamp(2.7rem,7.2vw,5.1rem); font-weight:700; line-height:1.04; margin:26px 0 24px; max-width:14ch}
+.hero h1 em{font-style:normal; color:var(--cyan); text-shadow:0 0 34px color-mix(in srgb, var(--cyan) 45%, transparent)}
+.line-mask{display:block; overflow:hidden}
+.line-mask > span{display:block; transform:translateY(112%); animation:rise 1s cubic-bezier(.2,.7,.15,1) forwards; animation-delay:var(--d,0s)}
+@keyframes rise{to{transform:translateY(0)}}
+.hero-sub{max-width:56ch; color:var(--muted); font-size:clamp(1rem,1.4vw,1.13rem); opacity:0; animation:fadeUp .9s ease .55s forwards}
+.hero-sub b{color:var(--ink); font-weight:600}
+@keyframes fadeUp{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
+.hero-cta{display:flex; gap:14px; flex-wrap:wrap; margin-top:38px; opacity:0; animation:fadeUp .9s ease .75s forwards}
+.btn{display:inline-flex; align-items:center; gap:9px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; padding:13px 24px; border-radius:11px; transition:transform .25s, box-shadow .25s, border-color .25s, color .25s}
+.btn svg{width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.btn-primary{background:var(--cyan); color:var(--cyan-ink); box-shadow:0 10px 30px -8px color-mix(in srgb, var(--cyan) 55%, transparent)}
+.btn-primary:hover{transform:translateY(-3px); box-shadow:0 16px 38px -8px color-mix(in srgb, var(--cyan) 65%, transparent)}
+.btn-ghost{border:1px solid var(--brd-strong); color:var(--ink)}
+.btn-ghost:hover{transform:translateY(-3px); border-color:var(--cyan); color:var(--cyan)}
+.hero-stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--brd); border:1px solid var(--brd); border-radius:16px; overflow:hidden; margin-top:64px; opacity:0; animation:fadeUp 1s ease .95s forwards}
+.hs{background:var(--panel); padding:20px 22px 18px; transition:background .3s}
+.hs:hover{background:var(--panel2)}
+.hs-num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.35rem,2.4vw,1.85rem); letter-spacing:-.01em}
+.hs-num small{font-size:.62em; color:var(--cyan); font-weight:600; margin-left:2px}
+.hs-lab{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.08em; color:var(--faint); text-transform:uppercase; margin-top:6px; line-height:1.5}
+@media (max-width:760px){ .hero-stats{grid-template-columns:1fr 1fr} }
+/* ============ TICKER ============ */
+.ticker{border-block:1px solid var(--brd); background:var(--bg2); overflow:hidden}
+.ticker-track{display:flex; width:max-content; animation:tick 30s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-set{display:flex; align-items:center; gap:0; padding-block:13px}
+.tk{font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:.06em; color:var(--muted); white-space:nowrap; padding-inline:26px; display:flex; align-items:center; gap:26px}
+.tk b{color:var(--ink); font-weight:500}
+.tk .k{color:var(--cyan)}
+.tk::after{content:"◆"; font-size:7px; color:var(--faint); opacity:.7}
+@keyframes tick{to{transform:translateX(-50%)}}
+/* ============ SECTION HEADS ============ */
+.s-head{max-width:760px; margin-bottom:clamp(40px,5vw,64px)}
+.s-head h2{font-size:clamp(1.9rem,4vw,2.7rem); font-weight:700; margin:16px 0 14px; line-height:1.12}
+.lede{color:var(--muted); font-size:1.05rem; max-width:60ch}
+.lede b{color:var(--ink); font-weight:600}
+/* ============ REGIMES ============ */
+.regimes-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:clamp(16px,2.5vw,28px); align-items:stretch}
+.regime{position:relative; background:var(--panel); border:1px solid var(--brd); border-radius:18px; padding:clamp(24px,3vw,36px); overflow:hidden; transition:transform .35s, border-color .35s, box-shadow .35s}
+.regime:hover{transform:translateY(-6px)}
+.regime-a:hover{border-color:color-mix(in srgb, var(--cyan) 55%, transparent); box-shadow:0 24px 60px -20px color-mix(in srgb, var(--cyan) 35%, transparent)}
+.regime-b:hover{border-color:color-mix(in srgb, var(--amber) 55%, transparent); box-shadow:0 24px 60px -20px color-mix(in srgb, var(--amber) 32%, transparent)}
+.regime::after{content:""; position:absolute; inset:0 0 auto 0; height:2px; opacity:.85}
+.regime-a::after{background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.regime-b::after{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.regime-chip{position:absolute; top:20px; right:20px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; padding:4px 11px; border-radius:99px; border:1px solid var(--brd-strong); color:var(--muted)}
+.regime h3{font-size:clamp(1.4rem,2.4vw,1.8rem); font-weight:700; margin-bottom:8px}
+.regime-a h3{color:var(--cyan)} .regime-b h3{color:var(--amber)}
+.regime-sub{color:var(--muted); font-size:.98rem; max-width:40ch; min-height:3.2em}
+.regime-wave{width:100%; height:74px; margin:18px 0 20px}
+.ticks{list-style:none; display:grid; gap:11px}
+.ticks li{position:relative; padding-left:22px; color:var(--muted); font-size:.95rem}
+.ticks li b{color:var(--ink); font-weight:600}
+.ticks li::before{content:""; position:absolute; left:2px; top:.52em; width:7px; height:7px; transform:rotate(45deg)}
+.regime-a .ticks li::before{background:var(--cyan)}
+.regime-b .ticks li::before{background:var(--amber)}
+.tc-pill{align-self:center; display:flex; flex-direction:column; align-items:center; gap:10px}
+.tc-pill .vline{width:1px; flex:1; background:linear-gradient(180deg,transparent,var(--brd-strong),transparent)}
+.tc-pill .dot{width:44px; height:44px; border-radius:50%; border:1px solid var(--brd-strong); display:grid; place-items:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; color:var(--violet); background:color-mix(in srgb, var(--violet) 10%, var(--panel)); box-shadow:0 0 26px color-mix(in srgb, var(--violet) 30%, transparent)}
+@media (max-width:860px){
+  .regimes-grid{grid-template-columns:1fr}
+  .tc-pill{flex-direction:row; padding:6px 0}
+  .tc-pill .vline{width:auto; height:1px; flex:1; background:linear-gradient(90deg,transparent,var(--brd-strong),transparent)}
+}
+/* ============ LAB ============ */
+#lab{background:var(--bg2); border-block:1px solid var(--brd)}
+.spec{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.07em; color:var(--faint); margin-bottom:16px}
+.spec b{color:var(--muted); font-weight:500}
+.lab-controls{display:grid; grid-template-columns:1.2fr 1fr auto; gap:clamp(16px,2.5vw,30px); align-items:end; background:var(--panel); border:1px solid var(--brd); border-radius:16px; padding:clamp(16px,2.4vw,24px)}
+.ctl-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; gap:10px}
+.ctl label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.ctl .val{font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:var(--ink)}
+.ctl .val small{color:var(--faint); font-size:10px; font-weight:400; display:block; text-align:right; letter-spacing:.05em}
+input[type="range"]{-webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:3px; background:linear-gradient(90deg,var(--cyan),var(--violet) 55%,var(--amber)); outline-offset:6px; cursor:pointer}
+#iSlider{background:var(--brd-strong)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none; width:19px; height:19px; border-radius:50%; background:var(--ink); border:3px solid var(--cyan); box-shadow:0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent), 0 4px 12px rgba(0,0,0,.35); transition:transform .2s}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+input[type="range"]::-moz-range-thumb{width:17px; height:17px; border-radius:50%; background:var(--ink); border:3px solid var(--cyan); box-shadow:0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent)}
+.ctl-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.chip{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.05em; padding:8px 13px; border:1px solid var(--brd); border-radius:9px; color:var(--muted); transition:all .25s; background:var(--panel2)}
+.chip:hover{color:var(--ink); border-color:var(--brd-strong); transform:translateY(-2px)}
+.chip.cold:hover{border-color:var(--cyan); color:var(--cyan); box-shadow:0 6px 18px -6px color-mix(in srgb, var(--cyan) 40%, transparent)}
+.chip.hot:hover{border-color:var(--amber); color:var(--amber); box-shadow:0 6px 18px -6px color-mix(in srgb, var(--amber) 40%, transparent)}
+.icon-btn{width:36px; height:36px; border:1px solid var(--brd); border-radius:9px; display:grid; place-items:center; color:var(--muted); transition:all .25s}
+.icon-btn:hover{color:var(--cyan); border-color:var(--cyan); transform:translateY(-2px)}
+.icon-btn svg{width:15px; height:15px; fill:currentColor}
+.lab-stage{position:relative; margin-top:18px; border:1px solid var(--brd); border-radius:18px; overflow:hidden; background:var(--stage); box-shadow:inset 0 0 60px rgba(0,0,0,.18)}
+[data-theme="light"] .lab-stage{box-shadow:inset 0 0 40px rgba(30,60,120,.05)}
+#labCanvas{width:100%; height:clamp(400px,52vw,540px); display:block}
+.lane-tag{position:absolute; left:18px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.16em; color:var(--faint); pointer-events:none; display:flex; align-items:center; gap:8px}
+.lane-tag b{font-weight:600; letter-spacing:.1em}
+.tag-a{top:16px} .tag-a b{color:var(--cyan)}
+.tag-b{top:calc(50% + 16px)} .tag-b b{color:var(--amber)}
+.lane-tag::before{content:""; width:8px; height:8px; border-radius:2px; transform:rotate(45deg)}
+.tag-a::before{background:var(--cyan); box-shadow:0 0 10px var(--cyan)}
+.tag-b::before{background:var(--amber); box-shadow:0 0 10px var(--amber)}
+.lab-caption{margin-top:14px; color:var(--faint); font-size:.92rem; max-width:82ch}
+.lab-caption b{color:var(--muted); font-weight:600}
+.lab-bottom{display:grid; grid-template-columns:1fr 1fr 1.15fr; gap:18px; margin-top:18px}
+@media (max-width:920px){ .lab-bottom{grid-template-columns:1fr 1fr} .chart-panel{grid-column:1/-1} .lab-controls{grid-template-columns:1fr} }
+@media (max-width:560px){ .lab-bottom{grid-template-columns:1fr} }
+.ro{position:relative; background:var(--panel); border:1px solid var(--brd); border-radius:16px; padding:20px 22px; overflow:hidden}
+.ro::before{content:""; position:absolute; inset:0 0 auto 0; height:2px; opacity:.75}
+.ro-a::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.ro-b::before{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.ro-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:16px}
+.ro-name{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; letter-spacing:.02em}
+.ro-name small{display:block; font-family:'IBM Plex Mono',monospace; font-weight:400; font-size:10px; color:var(--faint); letter-spacing:.12em; margin-top:3px; text-transform:uppercase}
+.pill{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.12em; padding:4px 11px; border-radius:99px; border:1px solid; white-space:nowrap; transition:all .3s}
+.p-cyan{color:var(--cyan); border-color:color-mix(in srgb, var(--cyan) 55%, transparent); background:color-mix(in srgb, var(--cyan) 10%, transparent)}
+.p-amber{color:var(--amber); border-color:color-mix(in srgb, var(--amber) 55%, transparent); background:color-mix(in srgb, var(--amber) 10%, transparent)}
+.p-mix{color:var(--violet); border-color:color-mix(in srgb, var(--violet) 55%, transparent); background:color-mix(in srgb, var(--violet) 10%, transparent)}
+.ro-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 20px}
+.ro-grid div{display:flex; justify-content:space-between; align-items:baseline; gap:8px; border-bottom:1px dashed var(--brd); padding-bottom:7px}
+.ro-grid dt{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; color:var(--faint); text-transform:uppercase}
+.ro-grid dd{font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums}
+.ro-b .ro-grid dd{color:var(--ink)}
+.chart-panel{background:var(--panel); border:1px solid var(--brd); border-radius:16px; padding:18px 20px}
+.chart-title{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between}
+.chart-title span{color:var(--faint)}
+.rt-svg{width:100%; height:auto}
+.rt-svg .axis{stroke:var(--brd-strong); stroke-width:1}
+.rt-svg .grid{stroke:var(--brd); stroke-width:1}
+.rt-svg text{fill:var(--faint); font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:.05em}
+.rt-svg .tcline{stroke:var(--violet); stroke-width:1; stroke-dasharray:3 4}
+.rt-svg .tclabel{fill:var(--violet)}
+/* theme-aware svg paint helpers (var() is invalid in presentation attributes) */
+.c-cyan{stroke:var(--cyan)} .c-amber{stroke:var(--amber)} .c-violet{stroke:var(--violet)}
+.f-cyan{fill:var(--cyan)} .f-amber{fill:var(--amber)} .f-violet{fill:var(--violet)} .f-faint{fill:var(--faint)} .f-muted{fill:var(--muted)}
+#rtDot,#rtDotGlow{stroke:var(--bg); transition:cx .12s linear, cy .12s linear}
+.dot-cyan{fill:var(--cyan)} .dot-amber{fill:var(--amber)}
+/* ============ PHYSICS ============ */
+.phys-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(16px,2.2vw,24px)}
+@media (max-width:900px){ .phys-grid{grid-template-columns:1fr} }
+.pcard{background:var(--panel); border:1px solid var(--brd); border-radius:18px; padding:clamp(22px,2.6vw,30px); transition:transform .35s, border-color .35s, box-shadow .35s; display:flex; flex-direction:column; gap:14px}
+.pcard:hover{transform:translateY(-6px); border-color:var(--brd-strong); box-shadow:var(--shadow)}
+.pcard .idx{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; color:var(--faint)}
+.pcard h3{font-size:1.28rem; font-weight:700}
+.pcard p{color:var(--muted); font-size:.96rem}
+.pcard p b{color:var(--ink); font-weight:600}
+.pcard .fig{margin-top:auto; background:var(--panel2); border:1px solid var(--brd); border-radius:12px; padding:14px; display:grid; place-items:center}
+.pcard .fig svg{width:100%; height:110px}
+.formula{font-family:'IBM Plex Mono',monospace; font-size:15px; color:var(--amber); letter-spacing:.04em}
+/* ============ PAIRS ============ */
+.pairs-wrap{display:grid; grid-template-columns:1fr 1.15fr; gap:clamp(24px,4vw,56px); align-items:start}
+.pairs-sticky{position:sticky; top:110px}
+@media (max-width:900px){ .pairs-wrap{grid-template-columns:1fr} .pairs-sticky{position:static} }
+.pull{font-family:'Space Grotesk',sans-serif; font-size:clamp(1.5rem,2.8vw,2.1rem); font-weight:600; line-height:1.3; letter-spacing:-.01em}
+.pull .hl{color:var(--cyan)}
+.pull-src{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase; margin-top:16px}
+.pairs-note{color:var(--muted); margin-top:26px; max-width:46ch; font-size:.98rem}
+.steps{display:grid; gap:16px}
+.step{display:grid; grid-template-columns:64px 1fr; gap:18px; background:var(--panel); border:1px solid var(--brd); border-radius:16px; padding:clamp(18px,2.2vw,26px); transition:transform .3s, border-color .3s}
+.step:hover{transform:translateX(8px); border-color:color-mix(in srgb, var(--cyan) 45%, transparent)}
+.step .num{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.7rem; color:var(--faint); -webkit-text-stroke:1px var(--brd-strong); line-height:1.1; transition:color .3s}
+.step:hover .num{color:var(--cyan); -webkit-text-stroke:1px var(--cyan)}
+.step h3{font-size:1.06rem; font-weight:700; margin-bottom:6px}
+.step p{color:var(--muted); font-size:.93rem}
+.step p b{color:var(--ink); font-weight:600}
+.pair-orbit{width:120px; height:120px; margin-top:28px; position:relative}
+.pair-orbit .ring{position:absolute; inset:24px; border:1px dashed var(--brd-strong); border-radius:50%}
+.pair-orbit .orb{position:absolute; top:50%; left:50%; width:14px; height:14px; margin:-7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 16px var(--cyan); animation:orbit 3.2s linear infinite}
+.pair-orbit .orb.o2{animation-delay:-1.6s; background:var(--violet); box-shadow:0 0 16px var(--violet)}
+@keyframes orbit{from{transform:rotate(0deg) translateX(54px) rotate(0deg)} to{transform:rotate(360deg) translateX(54px) rotate(-360deg)}}
+/* ============ APPS ============ */
+.apps-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(14px,2vw,22px)}
+@media (max-width:900px){ .apps-grid{grid-template-columns:1fr 1fr} }
+@media (max-width:600px){ .apps-grid{grid-template-columns:1fr} }
+.app{position:relative; background:var(--panel); border:1px solid var(--brd); border-radius:16px; padding:24px; overflow:hidden; transition:transform .35s, border-color .35s, box-shadow .35s}
+.app::before{content:""; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 70%); opacity:0; transition:opacity .4s}
+.app:hover{transform:translateY(-6px); border-color:color-mix(in srgb, var(--cyan) 40%, transparent); box-shadow:var(--shadow)}
+.app:hover::before{opacity:1}
+.app-ico{width:44px; height:44px; border:1px solid var(--brd-strong); border-radius:12px; display:grid; place-items:center; margin-bottom:16px; transition:transform .35s, border-color .35s, color .35s; color:var(--muted)}
+.app:hover .app-ico{transform:translateY(-3px) rotate(-4deg); border-color:var(--cyan); color:var(--cyan)}
+.app-ico svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.app h3{font-size:1.05rem; font-weight:700; margin-bottom:6px}
+.app p{color:var(--muted); font-size:.9rem; min-height:4.2em}
+.app-chip{display:inline-block; margin-top:14px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.1em; color:var(--cyan); border:1px solid color-mix(in srgb, var(--cyan) 40%, transparent); background:color-mix(in srgb, var(--cyan) 8%, transparent); padding:4px 10px; border-radius:99px}
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--brd); background:var(--bg2); padding:44px 0 54px}
+.foot-inner{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; align-items:flex-end}
+.foot-brand{display:flex; align-items:center; gap:11px}
+.foot-brand svg{width:28px; height:17px; stroke:var(--cyan); stroke-width:2.2; fill:none; stroke-linecap:round}
+.foot-note{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--faint); letter-spacing:.05em; max-width:52ch; line-height:1.9}
+.foot-note b{color:var(--muted); font-weight:500}
+.top-link{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:.14em; color:var(--muted); display:inline-flex; gap:8px; align-items:center; transition:color .25s}
+.top-link:hover{color:var(--cyan)}
+/* ============ REVEAL ============ */
+.reveal{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay:var(--d,0s)}
+.reveal.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
+  .reveal{opacity:1; transform:none}
+  .line-mask > span{transform:none; animation:none}
+  .hero-sub,.hero-cta,.hero-stats{opacity:1; animation:none}
+  .ticker-track{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="progress" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Resonance — home">
+      <svg viewBox="0 0 30 16" aria-hidden="true"><path d="M1 8 C 5 1, 9 1, 13 8 S 21 15, 25 8"/></svg>
+      <span>
+        <span class="brand-name">RESONANCE</span><br>
+        <span class="brand-sub">superconductivity study</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#regimes">01 Regimes</a>
+      <a href="#lab">02 Lab</a>
+      <a href="#physics">03 Physics</a>
+      <a href="#pairs">04 Sync</a>
+      <a href="#apps">05 Applications</a>
+    </nav>
+    <button id="themeToggle" class="theme-btn" aria-label="Switch to light theme" aria-pressed="false">
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M4.9 4.9l1.9 1.9M17.2 17.2l1.9 1.9M19.1 4.9l-1.9 1.9M6.8 17.2l-1.9 1.9"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.3 8.3 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <canvas id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="eyebrow">A field guide to lossless current</p>
+    <h1>
+      <span class="line-mask"><span style="--d:.15s">Superconductors run</span></span>
+      <span class="line-mask"><span style="--d:.32s">on <em>harmony.</em></span></span>
+    </h1>
+    <p class="hero-sub">
+      Below a critical temperature, a material's vibrating lattice and its flowing electrons
+      fall into the <b>same rhythm — one shared phase</b>. In that harmonic sync, resistance
+      collapses to exactly zero, and current flows for years without a single watt of loss.
+      Break the sync, and every electron starts to bump.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#lab">Enter the lab
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14M6 13l6 6 6-6"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="#physics">Read the physics</a>
+    </div>
+    <div class="hero-stats" role="list">
+      <div class="hs" role="listitem"><div class="hs-num">0<small>Ω</small></div><div class="hs-lab">dc resistance, below Tc</div></div>
+      <div class="hs" role="listitem"><div class="hs-num">1911</div><div class="hs-lab">mercury goes lossless at 4.2 K</div></div>
+      <div class="hs" role="listitem"><div class="hs-num">92<small>K</small></div><div class="hs-lab">high-Tc cuprates, 1986</div></div>
+      <div class="hs" role="listitem"><div class="hs-num">≈260<small>K</small></div><div class="hs-lab">record under extreme pressure</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TICKER ================= -->
+<div class="ticker" aria-label="Record critical temperatures of known superconductors">
+  <div class="ticker-track">
+    <div class="ticker-set">
+      <span class="tk"><b>Sn</b> · <span class="k">3.7 K</span></span>
+      <span class="tk"><b>Pb</b> · <span class="k">7.2 K</span></span>
+      <span class="tk"><b>Tc</b> · <span class="k">7.9 K</span></span>
+      <span class="tk"><b>NbTi</b> · <span class="k">9.4 K</span></span>
+      <span class="tk"><b>Nb₃Sn</b> · <span class="k">18 K</span></span>
+      <span class="tk"><b>MgB₂</b> · <span class="k">39 K</span></span>
+      <span class="tk"><b>YBCO</b> · <span class="k">92 K</span></span>
+      <span class="tk"><b>HgBaCaCuO</b> · <span class="k">133 K</span></span>
+      <span class="tk"><b>H₃S</b> · <span class="k">203 K</span></span>
+      <span class="tk"><b>LaH₁₀</b> · <span class="k">260 K</span></span>
+    </div>
+    <div class="ticker-set" aria-hidden="true">
+      <span class="tk"><b>Sn</b> · <span class="k">3.7 K</span></span>
+      <span class="tk"><b>Pb</b> · <span class="k">7.2 K</span></span>
+      <span class="tk"><b>Tc</b> · <span class="k">7.9 K</span></span>
+      <span class="tk"><b>NbTi</b> · <span class="k">9.4 K</span></span>
+      <span class="tk"><b>Nb₃Sn</b> · <span class="k">18 K</span></span>
+      <span class="tk"><b>MgB₂</b> · <span class="k">39 K</span></span>
+      <span class="tk"><b>YBCO</b> · <span class="k">92 K</span></span>
+      <span class="tk"><b>HgBaCaCuO</b> · <span class="k">133 K</span></span>
+      <span class="tk"><b>H₃S</b> · <span class="k">203 K</span></span>
+      <span class="tk"><b>LaH₁₀</b> · <span class="k">260 K</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ================= REGIMES ================= -->
+<section id="regimes">
+  <div class="wrap">
+    <header class="s-head reveal">
+      <p class="eyebrow">01 · The two regimes</p>
+      <h2>One material. Two states.</h2>
+      <p class="lede">Nothing about the wire changes between these two cards — same atoms, same electrons, same current.
+      Only the <b>relationship</b> between the lattice and the electrons changes. That relationship is the whole story.</p>
+    </header>
+    <div class="regimes-grid">
+      <article class="regime regime-a reveal" style="--d:.05s">
+        <span class="regime-chip">T &lt; Tc</span>
+        <h3>In harmony</h3>
+        <p class="regime-sub">Below Tc, the lattice wave and the electron wave ride the same beat — a single, rigid quantum phase.</p>
+        <svg class="regime-wave" viewBox="0 0 320 74" aria-hidden="true">
+          <path d="M0 37 C 20 12, 40 12, 60 37 S 100 62, 120 37 S 160 12, 180 37 S 220 62, 240 37 S 280 12, 300 37 S 330 62, 340 40" fill="none" class="c-cyan" stroke-width="2" opacity=".8"/>
+          <circle cx="60" cy="37" r="4.5" class="f-cyan"/><circle cx="120" cy="37" r="4.5" class="f-cyan"/>
+          <circle cx="180" cy="37" r="4.5" class="f-cyan"/><circle cx="240" cy="37" r="4.5" class="f-cyan"/>
+          <circle cx="300" cy="37" r="4.5" class="f-cyan"/>
+        </svg>
+        <ul class="ticks">
+          <li><b>Phase-locked:</b> lattice and electrons share one rhythm</li>
+          <li><b>Cooper pairs</b> form and condense into a single state</li>
+          <li><b>The gap Δ</b> closes off every scattering channel</li>
+          <li><b>R = 0</b> — current persists for years, losslessly</li>
+        </ul>
+      </article>
+      <div class="tc-pill reveal" style="--d:.15s" aria-hidden="true">
+        <div class="vline"></div>
+        <div class="dot">T<sub>c</sub></div>
+        <div class="vline"></div>
+      </div>
+      <article class="regime regime-b reveal" style="--d:.22s">
+        <span class="regime-chip">T &gt; Tc</span>
+        <h3>In dissonance</h3>
+        <p class="regime-sub">Above Tc, phonons play out of tempo. The electron crowd gets knocked around, and order turns into heat.</p>
+        <svg class="regime-wave" viewBox="0 0 320 74" aria-hidden="true">
+          <path d="M0 37 L 14 22 L 26 48 L 40 15 L 54 55 L 68 30 L 82 44 L 96 18 L 110 58 L 124 34 L 138 24 L 152 50 L 166 12 L 180 46 L 194 30 L 208 60 L 222 20 L 236 42 L 250 16 L 264 52 L 278 28 L 292 45 L 306 22 L 320 38" fill="none" class="c-amber" stroke-width="1.8" opacity=".8"/>
+          <circle cx="54" cy="55" r="4.5" class="f-amber"/><circle cx="152" cy="50" r="4.5" class="f-amber"/>
+          <circle cx="250" cy="16" r="4.5" class="f-amber"/>
+        </svg>
+        <ul class="ticks">
+          <li><b>Phonons vibrate at random phases</b> — the lattice is noisy</li>
+          <li>Electrons <b>scatter</b> off every out-of-sync bump</li>
+          <li>Momentum lost to ions = <b>Joule heat</b>: P = I²R</li>
+          <li><b>Resistance returns</b> — and the losses grow with T</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LAB ================= -->
+<section id="lab">
+  <div class="wrap">
+    <header class="s-head reveal">
+      <p class="eyebrow">02 · The resonance lab</p>
+      <h2>Break the sync. Watch the bill arrive.</h2>
+      <p class="lede">Lane A holds a perfect phase lock at 4.2 K — the reference. Lane B is your sample.
+      Drag the lattice temperature across the <b>Tc knee at 9 K</b> and watch the material lose its harmony,
+      its electrons start to scatter, and P = I²R appear as heat.</p>
+    </header>
+
+    <p class="spec reveal">SAMPLE — thin-film wire · <b>R(300 K) = 0.182 Ω</b> · <b>Tc ≈ 9 K</b> · energy gap Δ opens below Tc</p>
+
+    <div class="lab-controls reveal" style="--d:.08s">
+      <div class="ctl">
+        <div class="ctl-top">
+          <label for="tSlider">Lattice temperature</label>
+          <span class="val"><span id="tVal">200 K</span><small>cold ← → hot · cross 9 K</small></span>
+        </div>
+        <input type="range" id="tSlider" min="4" max="300" step="1" value="200" aria-label="Lattice temperature in kelvin">
+      </div>
+      <div class="ctl">
+        <div class="ctl-top">
+          <label for="iSlider">Drive current</label>
+          <span class="val"><span id="iVal">20 A</span><small>P = I²R</small></span>
+        </div>
+        <input type="range" id="iSlider" min="1" max="50" step="1" value="20" aria-label="Drive current in amperes">
+      </div>
+      <div class="ctl-actions">
+        <button class="chip cold" id="chipCold" title="Set the sample to cryogenic temperature">◉ 4 K</button>
+        <button class="chip hot" id="chipHot" title="Set the sample to room temperature">◉ 300 K</button>
+        <button class="icon-btn" id="playBtn" aria-pressed="true" aria-label="Pause simulation" title="Pause / resume">
+          <svg id="icoPause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          <svg id="icoPlay" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M7 5l12 7-12 7z"/></svg>
+        </button>
+        <button class="icon-btn" id="resetBtn" aria-label="Reset simulation" title="Reset">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 6.3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="lab-stage reveal" style="--d:.14s">
+      <canvas id="labCanvas" role="img" aria-label="Live simulation: lane A shows electrons in harmonic phase lock with a calm lattice, zero resistance. Lane B shows the same material at adjustable temperature, where thermal dissonance scatters electrons and produces heat."></canvas>
+      <div class="lane-tag tag-a">LANE A <b>· PHASE-LOCKED REFERENCE · 4.2 K</b></div>
+      <div class="lane-tag tag-b">LANE B <b>· SAMPLE UNDER TEST</b></div>
+    </div>
+    <p class="lab-caption reveal">The dashed line in lane B is the <b>ideal sync wave</b> — what the lattice would do if it were locked.
+    As temperature climbs, atoms break away from it (the rattle), electrons stop riding the wave, collisions flash amber, and the power meter starts to move.
+    Below Tc, nothing in lane B is left to lose energy to: <b>resistance is exactly zero.</b></p>
+
+    <div class="lab-bottom">
+      <div class="ro ro-a reveal" style="--d:.05s">
+        <div class="ro-head">
+          <div class="ro-name">Lane A — Reference<small>phase-locked · 4.2 K</small></div>
+          <span class="pill p-cyan">SUPERCONDUCTING</span>
+        </div>
+        <dl class="ro-grid">
+          <div><dt>Resistance</dt><dd>0.0000 Ω</dd></div>
+          <div><dt>Power loss</dt><dd>0.000 W</dd></div>
+          <div><dt>Coherence</dt><dd>100 %</dd></div>
+          <div><dt>Drift velocity</dt><dd>100 %</dd></div>
+        </dl>
+      </div>
+      <div class="ro ro-b reveal" style="--d:.12s">
+        <div class="ro-head">
+          <div class="ro-name">Lane B — Sample<small>under test · adjustable T</small></div>
+          <span class="pill p-amber" id="pillB">RESISTIVE</span>
+        </div>
+        <dl class="ro-grid">
+          <div><dt>Temperature</dt><dd id="bT">200.0 K</dd></div>
+          <div><dt>Resistance</dt><dd id="bR">0.1193 Ω</dd></div>
+          <div><dt>Power loss</dt><dd id="bP">47.7 W</dd></div>
+          <div><dt>Coherence</dt><dd id="bCoh">34 %</dd></div>
+          <div><dt>Drift velocity</dt><dd id="bDrift">77 %</dd></div>
+          <div><dt>Scatter events</dt><dd id="bScat">0 / s</dd></div>
+        </dl>
+      </div>
+      <div class="chart-panel reveal" style="--d:.2s">
+        <div class="chart-title">Resistance vs temperature <span>live marker ◆</span></div>
+        <svg class="rt-svg" viewBox="0 0 352 190" role="img" aria-label="Chart: resistance is zero below Tc, then rises linearly with temperature up to 300 kelvin">
+          <line class="grid" x1="138" y1="20" x2="138" y2="160"/>
+          <line class="grid" x1="232" y1="20" x2="232" y2="160"/>
+          <line class="axis" x1="44" y1="160" x2="330" y2="160"/>
+          <line class="axis" x1="44" y1="20" x2="44" y2="160"/>
+          <text x="44" y="176" text-anchor="middle">0</text>
+          <text x="138" y="176" text-anchor="middle">100</text>
+          <text x="232" y="176" text-anchor="middle">200</text>
+          <text x="326" y="176" text-anchor="middle">300 K</text>
+          <text x="22" y="26" text-anchor="middle">R</text>
+          <text x="34" y="176" text-anchor="end">Ω</text>
+          <path d="M 52.5 160 L 326 20 L 326 160 Z" class="f-amber" opacity="0.09"/>
+          <path d="M 44 160 L 52.5 160" fill="none" class="c-cyan" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M 52.5 160 L 326 20" fill="none" class="c-amber" stroke-width="2.4" stroke-linecap="round"/>
+          <line class="tcline" x1="52.5" y1="20" x2="52.5" y2="160"/>
+          <text class="tclabel" x="58" y="32">Tc ≈ 9 K</text>
+          <circle id="rtDotGlow" cx="317.5" cy="39" r="9" class="dot-cyan" opacity="0.22"/>
+          <circle id="rtDot" cx="317.5" cy="39" r="4.2" class="dot-cyan" stroke-width="1.6"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PHYSICS ================= -->
+<section id="physics">
+  <div class="wrap">
+    <header class="s-head reveal">
+      <p class="eyebrow">03 · Why dissonance costs</p>
+      <h2>The physics of the out-of-sync state</h2>
+      <p class="lede">A normal conductor is not broken — it is simply <b>out of tune</b>. Here is exactly where the
+      harmony goes, and what each lost beat costs.</p>
+    </header>
+    <div class="phys-grid">
+      <article class="pcard reveal" style="--d:.05s">
+        <span class="idx">/ 01</span>
+        <h3>The scatter</h3>
+        <p>Above Tc the lattice is a drum kit struck at random. Every out-of-phase vibration — a
+        <b>phonon</b> — can knock an electron off its course. Momentum lost to the ions is momentum
+        the current has permanently paid for.</p>
+        <div class="fig">
+          <svg viewBox="0 0 240 110" aria-hidden="true">
+            <path d="M14 78 L 60 60 L 74 44 L 120 52 L 138 30 L 196 38 L 226 24" fill="none" class="c-amber" stroke-width="2" stroke-dasharray="5 5"/>
+            <circle cx="74" cy="44" r="5" class="f-amber"/><circle cx="138" cy="30" r="5" class="f-amber"/>
+            <circle cx="60" cy="60" r="3" class="f-muted"/><circle cx="196" cy="38" r="3" class="f-muted"/>
+            <path d="M14 78 l 10 2" class="c-cyan" stroke-width="2.4" stroke-linecap="round"/>
+            <text x="14" y="98" class="f-faint" font-family="IBM Plex Mono, monospace" font-size="9">e⁻ drift →</text>
+          </svg>
+        </div>
+      </article>
+      <article class="pcard reveal" style="--d:.14s">
+        <span class="idx">/ 02</span>
+        <h3>The bill: <span class="formula">P = I²R</span></h3>
+        <p>Every scattered electron ends up as heat. A 1 kA power cable with just
+        <b>0.01 Ω</b> of resistance burns <b>10 kW</b> — a furnace welded to a wire.
+        Grids, MRI magnets and accelerators feel that bill every second they are out of tune.</p>
+        <div class="fig">
+          <svg viewBox="0 0 240 110" aria-hidden="true">
+            <rect x="30" y="70" width="26" height="24" class="f-cyan" opacity=".85"/>
+            <rect x="70" y="52" width="26" height="42" class="f-violet" opacity=".85"/>
+            <rect x="110" y="30" width="26" height="64" class="f-amber" opacity=".85"/>
+            <rect x="150" y="8" width="26" height="86" class="f-amber"/>
+            <text x="30" y="105" class="f-faint" font-family="IBM Plex Mono, monospace" font-size="9">I²</text>
+            <text x="196" y="55" class="f-muted" font-family="IBM Plex Mono, monospace" font-size="10">heat ↑</text>
+            <path d="M196 62 q 6 -12 0 -22" fill="none" class="c-amber" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </article>
+      <article class="pcard reveal" style="--d:.22s">
+        <span class="idx">/ 03</span>
+        <h3>The lock: gap Δ</h3>
+        <p>Below Tc the electron gas opens an <b>energy gap Δ</b>. The lattice's vibration quanta
+        carry ℏω — and the sync is tuned so <b>ℏω &lt; Δ</b>. There is simply no channel left to
+        scatter through. The current has nowhere to lose itself.</p>
+        <div class="fig">
+          <svg viewBox="0 0 240 110" aria-hidden="true">
+            <path d="M40 100 Q 120 100 120 62 L 120 48 Q 120 10 200 10" fill="none" class="c-cyan" stroke-width="2"/>
+            <line x1="100" y1="48" x2="140" y2="48" class="c-violet" stroke-width="2" stroke-dasharray="4 4"/>
+            <text x="146" y="52" class="f-violet" font-family="IBM Plex Mono, monospace" font-size="10">Δ</text>
+            <text x="40" y="24" class="f-faint" font-family="IBM Plex Mono, monospace" font-size="9">E</text>
+            <text x="208" y="24" class="f-faint" font-family="IBM Plex Mono, monospace" font-size="9">k</text>
+            <circle cx="120" cy="62" r="3.4" class="f-cyan"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PAIRS ================= -->
+<section id="pairs" style="background:var(--bg2); border-block:1px solid var(--brd)">
+  <div class="wrap pairs-wrap">
+    <div class="pairs-sticky reveal">
+      <p class="eyebrow">04 · How the sync is made</p>
+      <p class="pull" style="margin-top:20px">A superconductor is not a crowd of electrons that avoids collisions.
+      It is a crowd that <span class="hl">moves as one.</span></p>
+      <p class="pull-src">— the working image of BCS theory, 1957</p>
+      <p class="pairs-note">Bardeen, Cooper and Schrieffer showed that the harmony is not imposed — it is
+      <b>self-organizing</b>. The electrons build the lock themselves, using the lattice as the tuning fork.</p>
+      <div class="pair-orbit" aria-hidden="true">
+        <div class="ring"></div>
+        <div class="orb"></div><div class="orb o2"></div>
+      </div>
+    </div>
+    <div class="steps">
+      <article class="step reveal" style="--d:.04s">
+        <div class="num">01</div>
+        <div><h3>The handshake</h3>
+        <p>A passing electron drags the lattice into a slight positive ripple. A second electron is drawn into
+        that ripple. The middleman is a <b>virtual phonon</b> — the two electrons become a <b>Cooper pair</b>.</p></div>
+      </article>
+      <article class="step reveal" style="--d:.12s">
+        <div class="num">02</div>
+        <div><h3>The crowd becomes one</h3>
+        <p>Millions of pairs slide into a <b>single quantum state</b>. They are no longer individuals with
+        trajectories; they are one extended wave with collective momentum.</p></div>
+      </article>
+      <article class="step reveal" style="--d:.2s">
+        <div class="num">03</div>
+        <div><h3>One phase</h3>
+        <p>Every pair shares a single <b>phase angle</b>. The current is the coherent motion of that shared
+        phase — which is exactly why it can flow without friction. The material is <b>harmonically in sync</b>
+        with its own electrons.</p></div>
+      </article>
+      <article class="step reveal" style="--d:.28s">
+        <div class="num">04</div>
+        <div><h3>Self-defense</h3>
+        <p>To scatter, an electron would have to jump across the gap <b>Δ</b>. A thermal kick at 4 K doesn't
+        come close, and the lattice can't rattle hard enough to bridge it. The sync <b>defends itself</b> —
+        until T crosses Tc and the lock breaks.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APPS ================= -->
+<section id="apps">
+  <div class="wrap">
+    <header class="s-head reveal">
+      <p class="eyebrow">05 · Where harmony pays</p>
+      <h2>Zero loss, at scale</h2>
+      <p class="lede">Every technology below exists because a material was convinced to fall in tune —
+      and kept there by cryogens, with the sync doing the work.</p>
+    </header>
+    <div class="apps-grid">
+      <article class="app reveal" style="--d:.03s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v7a6 6 0 0 0 12 0V3"/><path d="M6 3h4M14 3h4M6 11h4M14 11h4"/></svg></div>
+        <h3>MRI &amp; NMR magnets</h3>
+        <p>Fields that would vaporize a copper coil, held steady for months at constant current. Lossless means the bore stays quiet and cold.</p>
+        <span class="app-chip">3 T · 4.2 K</span>
+      </article>
+      <article class="app reveal" style="--d:.09s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="3"/><path d="M4 12h16M8 20l-1.5 1.5M16 20l1.5 1.5"/><circle cx="8.5" cy="18.5" r="1.4"/><circle cx="15.5" cy="18.5" r="1.4"/></svg></div>
+        <h3>Maglev &amp; propulsion</h3>
+        <p>Persistent-current levitation: no contact, no friction, no brake dust. The train floats on a current that will not fade.</p>
+        <span class="app-chip">500+ km/h trials</span>
+      </article>
+      <article class="app reveal" style="--d:.15s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><path d="M12 4.5V2M12 22v-2.5M4.5 12H2M22 12h-2.5"/></svg></div>
+        <h3>SQUID sensors</h3>
+        <p>The most sensitive magnetometers ever built. They can detect the magnetic field of a beating heart from outside the body.</p>
+        <span class="app-chip">≈ 10⁻¹⁵ T</span>
+      </article>
+      <article class="app reveal" style="--d:.21s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12c2.5-5 5-5 7.5 0s5 5 7.5 0 3-3.5 5-1.5"/><circle cx="21.5" cy="10.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
+        <h3>Power grid</h3>
+        <p>Cables and fault-current limiters carrying city-scale current with zero I²R loss — no skin, no heat, no sag.</p>
+        <span class="app-chip">1 kA · 0 Ω</span>
+      </article>
+      <article class="app reveal" style="--d:.27s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2" stroke-dasharray="2 3"/><circle cx="12" cy="4" r="1.3" fill="currentColor" stroke="none"/><circle cx="19" cy="16" r="1.3" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor" stroke="none"/></svg></div>
+        <h3>Particle accelerators</h3>
+        <p>The LHC steers protons to 99.999999 % of light speed with 1,233 superconducting dipole magnets at 1.9 K.</p>
+        <span class="app-chip">1,233 dipoles · 1.9 K</span>
+      </article>
+      <article class="app reveal" style="--d:.33s">
+        <div class="app-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="3.6"/><circle cx="12" cy="16.5" r="3.6"/><path d="M12 11.1v1.8"/></svg></div>
+        <h3>Quantum computing</h3>
+        <p>Qubits are superconducting circuits. The gate is the Josephson effect — two conductors, one shared phase.</p>
+        <span class="app-chip">mK · Josephson</span>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="foot-brand">
+        <svg viewBox="0 0 30 16" aria-hidden="true"><path d="M1 8 C 5 1, 9 1, 13 8 S 21 15, 25 8"/></svg>
+        <span class="brand-name">RESONANCE</span>
+      </div>
+      <p class="foot-note" style="margin-top:14px">
+        <b>A single-file study of superconductivity.</b> One HTML file — no frameworks, no trackers.
+        Values are textbook-typical; the lab's Tc is illustrative. Your sample may vary.
+      </p>
+    </div>
+    <a class="top-link" href="#top">↑ BACK TO THE SURFACE</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+/* ---------- constants ---------- */
+var root = document.documentElement;
+var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var SPEED = RM ? 0.25 : 1;
+var TC = 9, TMAX = 300, RMAX = 0.182;
+var WK = Math.PI*2/170, WO = 2.6, WA = 9;
+var TWO_PI = Math.PI*2;
+
+/* ---------- canvas palettes ---------- */
+var THEMES = {
+  dark: {
+    stage:'#0a1120', lane:'rgba(148,190,255,0.035)', gridDot:'rgba(160,195,255,0.07)',
+    bond:'rgba(150,190,255,0.10)', waveGuide:'rgba(79,216,255,0.16)',
+    atom:'#26456e', atomEdge:'rgba(140,190,255,0.55)',
+    electron:'#d9f4ff', electronHot:'#ffe3c2',
+    cyanRGB:'79,216,255', amberRGB:'255,179,92', heatRGB:'255,150,60',
+    spark:'#ffcf8a', divider:'rgba(150,190,255,0.22)', heroDot:'rgba(150,195,255,0.05)',
+    pairLine:'rgba(79,216,255,0.4)'
+  },
+  light: {
+    stage:'#e9eef7', lane:'rgba(20,50,100,0.03)', gridDot:'rgba(30,60,110,0.10)',
+    bond:'rgba(30,70,130,0.12)', waveGuide:'rgba(11,127,192,0.18)',
+    atom:'#8aa5c8', atomEdge:'rgba(20,60,120,0.5)',
+    electron:'#0a7fc0', electronHot:'#c25e0a',
+    cyanRGB:'10,127,192', amberRGB:'194,94,10', heatRGB:'220,120,40',
+    spark:'#e08a2e', divider:'rgba(30,70,130,0.25)', heroDot:'rgba(30,60,110,0.08)',
+    pairLine:'rgba(10,127,192,0.35)'
+  }
+};
+var PAL = THEMES[root.dataset.theme] || THEMES.dark;
+
+/* ---------- dom ---------- */
+var $ = function(id){ return document.getElementById(id); };
+var el = {
+  tSlider:$('tSlider'), tVal:$('tVal'), iSlider:$('iSlider'), iVal:$('iVal'),
+  pillB:$('pillB'), bT:$('bT'), bR:$('bR'), bP:$('bP'), bCoh:$('bCoh'),
+  bDrift:$('bDrift'), bScat:$('bScat'),
+  rtDot:$('rtDot'), rtDotGlow:$('rtDotGlow'),
+  playBtn:$('playBtn'), icoPlay:$('icoPlay'), icoPause:$('icoPause'),
+  progress:$('progress')
+};
+
+/* ---------- state ---------- */
+var lab = { T:200, I:20, running:true, colAcc:0, colTimer:0, colRate:0, roTimer:0 };
+var simT = 0, needsDraw = true;
+
+/* ---------- theme toggle ---------- */
+var themeBtn = $('themeToggle');
+themeBtn.addEventListener('click', function(){
+  var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  root.dataset.theme = next;
+  try{ localStorage.setItem('reson-theme', next); }catch(e){}
+  PAL = THEMES[next];
+  themeBtn.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
+  themeBtn.setAttribute('aria-label', next === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+  needsDraw = true;
+});
+
+/* ---------- scroll progress ---------- */
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var max = h.scrollHeight - h.clientHeight;
+  el.progress.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')';
+}, {passive:true});
+
+/* ---------- reveal on scroll ---------- */
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(function(node){ io.observe(node); });
+
+/* ---------- canvas fitting ---------- */
+var heroCv = $('heroCanvas'), labCv = $('labCanvas');
+var H = {ctx:null, w:0, h:0}, L = {ctx:null, w:0, h:0};
+function fit(cv, store){
+  var r = cv.getBoundingClientRect();
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = Math.max(1, Math.round(r.width*dpr));
+  cv.height = Math.max(1, Math.round(r.height*dpr));
+  var ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  store.ctx = ctx; store.w = r.width; store.h = r.height;
+}
+function fitAll(){
+  fit(heroCv, H); fit(labCv, L);
+  buildLanes();
+  needsDraw = true;
+}
+var rto;
+window.addEventListener('resize', function(){
+  clearTimeout(rto);
+  rto = setTimeout(fitAll, 120);
+});
+document.addEventListener('visibilitychange', function(){ last = performance.now(); });
+
+/* ---------- lanes ---------- */
+var lanes = {A:{}, B:{}};
+function buildLanes(){
+  var pad = 14, gap = 44;
+  var laneH = Math.max(120, (L.h - pad*2 - gap) / 2);
+  lanes.A.rect = {x:0, y:pad, w:L.w, h:laneH};
+  lanes.B.rect = {x:0, y:pad + laneH + gap, w:L.w, h:laneH};
+  ['A','B'].forEach(function(key){
+    var r = lanes[key].rect;
+    var cols = Math.max(7, Math.floor((r.w - 60) / 40) + 1);
+    var colStep = (r.w - 60) / (cols - 1);
+    var atoms = [];
+    for(var row=0; row<3; row++){
+      for(var c=0; c<cols; c++){
+        atoms.push({
+          bx: 30 + c*colStep,
+          by: r.y + r.h * [0.28, 0.5, 0.72][row],
+          ph: Math.random()*TWO_PI,
+          amp: 0.6 + Math.random()*1.5,
+          om: 1.3 + Math.random()*2.4,
+          px:0, py:0
+        });
+      }
+    }
+    var n = Math.max(7, Math.min(15, Math.round(r.w/85)));
+    var electrons = [];
+    for(var i=0; i<n; i++){
+      electrons.push({
+        x:(i + 0.5 + Math.random()*0.5) * (r.w/n) - 10,
+        y:r.y + r.h/2, jy:0, seed:Math.random()*10,
+        heat:0, cool:0, slow:0
+      });
+    }
+    lanes[key].atoms = atoms;
+    lanes[key].electrons = electrons;
+    lanes[key].cols = cols;
+    lanes[key].colStep = colStep;
+    lanes[key].sparks = [];
+  });
+}
+
+/* ---------- physics sampling ---------- */
+function sampleState(){
+  var T = lab.T, I = lab.I;
+  var d = Math.max(0, (T - TC) / (TMAX - TC));
+  var R = d > 0 ? RMAX * d : 0;
+  var P = I * I * R;
+  return {
+    T:T, I:I, d:d, R:R, P:P,
+    coherence:(1 - d) * 100,
+    drift:(1 - 0.55 * d) * 100
+  };
+}
+
+/* ---------- update ---------- */
+function updateLane(key, dt, t, d){
+  var r = lanes[key].rect, cy = r.y + r.h/2, v0 = 70;
+  var es = lanes[key].electrons, atoms = lanes[key].atoms;
+  var cols = lanes[key].cols, colStep = lanes[key].colStep;
+  for(var i=0; i<es.length; i++){
+    var e = es[i];
+    e.cool = Math.max(0, e.cool - dt);
+    e.slow = Math.max(0, e.slow - dt);
+    var wob = 0.9 + 0.1 * Math.sin(t*1.9 + e.seed);
+    var vx = v0 * (1 - 0.55*d) * wob * (e.slow > 0 ? 0.55 : 1);
+    e.x += vx * dt;
+    e.jy += (Math.random() - 0.5) * d * 3.4 * dt * 60;
+    e.jy *= Math.exp(-1.4*dt);
+    if(e.jy > 26) e.jy = 26; if(e.jy < -26) e.jy = -26;
+    var wy = WA * Math.sin(WK * e.x - WO * t);
+    var ty = cy + wy * (1 - 0.7*d) + e.jy;
+    e.y += (ty - e.y) * Math.min(1, dt * (d < 0.03 ? 12 : 5));
+    if(e.y < r.y + 12) e.y = r.y + 12;
+    if(e.y > r.y + r.h - 12) e.y = r.y + r.h - 12;
+    if(e.x > r.w + 24){ e.x = -24 - Math.random()*26; e.jy = 0; e.y = cy; }
+    if(d > 0.2 && e.cool <= 0){
+      var col = Math.round((e.x - 30) / colStep);
+      if(col >= 0 && col < cols){
+        for(var row=0; row<3; row++){
+          var a = atoms[row*cols + col];
+          var dx = a.px - e.x, dy = a.py - e.y;
+          if(dx*dx + dy*dy < 196){
+            e.cool = 0.45; e.slow = 0.5; e.heat = 1;
+            lab.colAcc += 1;
+            for(var s=0; s<5; s++){
+              var ang = Math.random()*TWO_PI, sp = 20 + Math.random()*70;
+              lanes[key].sparks.push({x:e.x, y:e.y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, life:1});
+            }
+            break;
+          }
+        }
+      }
+    }
+    e.heat *= Math.exp(-3.2*dt);
+  }
+  var sp = lanes[key].sparks;
+  for(var j=sp.length-1; j>=0; j--){
+    var p = sp[j];
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 26*dt; p.life -= dt*1.9;
+    if(p.life <= 0) sp.splice(j,1);
+  }
+}
+function updateLab(dt, t){
+  var s = sampleState();
+  updateLane('A', dt, t, 0);
+  updateLane('B', dt, t, s.d);
+  lab.colTimer += dt;
+  if(lab.colTimer >= 0.5){
+    lab.colRate = lab.colAcc / lab.colTimer;
+    lab.colAcc = 0; lab.colTimer = 0;
+  }
+  lab.roTimer += dt;
+  if(lab.roTimer > 0.12){ lab.roTimer = 0; syncReadouts(); }
+}
+
+/* ---------- draw: lanes ---------- */
+function drawLane(key, t, d, P){
+  var ctx = L.ctx, r = lanes[key].rect, cy = r.y + r.h/2;
+  var atoms = lanes[key].atoms, es = lanes[key].electrons;
+  ctx.fillStyle = PAL.lane;
+  ctx.fillRect(r.x, r.y, r.w, r.h);
+  ctx.fillStyle = PAL.gridDot;
+  for(var gx=18; gx<r.w; gx+=34){
+    for(var gy=r.y+14; gy<r.y+r.h; gy+=34){ ctx.fillRect(gx, gy, 1.5, 1.5); }
+  }
+  if(key === 'B' && P > 1){
+    var ha = Math.min(0.30, P / 240);
+    var g = ctx.createRadialGradient(r.w/2, cy, 10, r.w/2, cy, r.h*1.15);
+    g.addColorStop(0, 'rgba(' + PAL.heatRGB + ',' + ha.toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(' + PAL.heatRGB + ',0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(r.x, r.y, r.w, r.h);
+  }
+  for(var i=0; i<atoms.length; i++){
+    var a = atoms[i];
+    var wy = WA * Math.sin(WK * a.bx - WO * t);
+    var jx = d * 4.2 * a.amp * Math.sin(a.om*t*1.7 + a.ph);
+    var jy = d * 5.6 * a.amp * Math.sin(a.om*t + a.ph);
+    a.px = a.bx + jx;
+    a.py = a.by + wy * (1 - 0.3*d) + jy;
+  }
+  ctx.strokeStyle = PAL.bond; ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(var row=0; row<3; row++){
+    for(var c=0; c<lanes[key].cols-1; c++){
+      var a1 = atoms[row*lanes[key].cols + c], a2 = atoms[row*lanes[key].cols + c+1];
+      ctx.moveTo(a1.px, a1.py); ctx.lineTo(a2.px, a2.py);
+    }
+  }
+  ctx.stroke();
+  if(key === 'B'){
+    ctx.save();
+    ctx.setLineDash([4,6]);
+    ctx.strokeStyle = PAL.waveGuide; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for(var x=0; x<=r.w; x+=10){
+      var yy = cy + WA*Math.sin(WK*x - WO*t);
+      if(x === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  for(var m=0; m<atoms.length; m++){
+    var at = atoms[m];
+    ctx.beginPath(); ctx.arc(at.px, at.py, 4.4, 0, TWO_PI);
+    ctx.fillStyle = PAL.atom; ctx.fill();
+    ctx.strokeStyle = PAL.atomEdge; ctx.lineWidth = 1; ctx.stroke();
+  }
+  if(d < 0.92){
+    ctx.save();
+    ctx.globalAlpha = (1 - d) * 0.8;
+    ctx.strokeStyle = PAL.pairLine; ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    for(var q=0; q+1<es.length; q+=2){
+      var ea = es[q], eb = es[q+1];
+      if(Math.abs(ea.y - eb.y) < 12 && Math.abs(ea.x - eb.x) < 60){
+        ctx.moveTo(ea.x, ea.y); ctx.lineTo(eb.x, eb.y);
+      }
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  var eColor = (key === 'B' && d > 0.45) ? PAL.electronHot : PAL.electron;
+  var glow = (key === 'B' && d > 0.45) ? 'rgba(' + PAL.amberRGB + ',0.85)' : 'rgba(' + PAL.cyanRGB + ',0.85)';
+  for(var n=0; n<es.length; n++){
+    var e2 = es[n];
+    ctx.save();
+    ctx.shadowColor = glow; ctx.shadowBlur = 11;
+    ctx.beginPath(); ctx.arc(e2.x, e2.y, 3.8, 0, TWO_PI);
+    ctx.fillStyle = eColor; ctx.fill();
+    ctx.restore();
+    if(e2.heat > 0.03){
+      ctx.beginPath(); ctx.arc(e2.x, e2.y, 6 + 7*e2.heat, 0, TWO_PI);
+      ctx.strokeStyle = 'rgba(' + PAL.heatRGB + ',' + (e2.heat*0.55).toFixed(3) + ')';
+      ctx.lineWidth = 1.4; ctx.stroke();
+    }
+  }
+  for(var k2=0; k2<lanes[key].sparks.length; k2++){
+    var p = lanes[key].sparks[k2];
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = PAL.spark;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 1.7, 0, TWO_PI); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawLabFrame(t){
+  L.ctx.clearRect(0, 0, L.w, L.h);
+  L.ctx.fillStyle = PAL.stage;
+  L.ctx.fillRect(0, 0, L.w, L.h);
+  var s = sampleState();
+  drawLane('A', t, 0, 0);
+  drawLane('B', t, s.d, s.P);
+  var dy = lanes.A.rect.y + lanes.A.rect.h + 22;
+  L.ctx.save();
+  L.ctx.setLineDash([5,7]);
+  L.ctx.strokeStyle = PAL.divider;
+  L.ctx.lineWidth = 1;
+  L.ctx.beginPath();
+  L.ctx.moveTo(0, dy); L.ctx.lineTo(L.w, dy);
+  L.ctx.stroke();
+  L.ctx.restore();
+}
+
+/* ---------- draw: hero ---------- */
+function ribbonY(h, i, x, t){
+  var y0 = h * (0.22 + i*0.16);
+  return y0 + 18*Math.sin(x*0.008 - t*1.15 + i*0.55) + 7*Math.sin(x*0.016 - t*0.53 + i*1.7);
+}
+function drawHero(t){
+  var ctx = H.ctx, w = H.w, h = H.h;
+  if(!ctx || !w) return;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = PAL.heroDot;
+  var off = (t*10) % 52;
+  for(var x=-52; x<w+52; x+=52){
+    for(var y=8; y<h; y+=52){ ctx.fillRect(x + off*0.4, y, 1.6, 1.6); }
+  }
+  for(var i=0; i<4; i++){
+    ctx.beginPath();
+    for(var x2=0; x2<=w; x2+=12){
+      var y2 = ribbonY(h, i, x2, t);
+      if(x2 === 0) ctx.moveTo(x2, y2); else ctx.lineTo(x2, y2);
+    }
+    ctx.strokeStyle = 'rgba(' + PAL.cyanRGB + ',' + (0.20 - i*0.04).toFixed(3) + ')';
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+  }
+  var y0n = h*0.88;
+  ctx.beginPath();
+  for(var x3=0; x3<=w; x3+=10){
+    var y3 = y0n + 13*Math.sin(x3*0.006 - t*0.9) + 11*Math.sin(x3*0.11 - t*2.7)*Math.sin(x3*0.021 + t*0.8);
+    if(x3 === 0) ctx.moveTo(x3, y3); else ctx.lineTo(x3, y3);
+  }
+  ctx.strokeStyle = 'rgba(' + PAL.amberRGB + ',0.13)';
+  ctx.lineWidth = 1.1;
+  ctx.stroke();
+  for(var j=0; j<5; j++){
+    var rx = ((t*44 + j*(w/5)) % (w + 80)) - 40;
+    var ry = ribbonY(h, 1, rx, t);
+    ctx.save();
+    ctx.shadowColor = 'rgba(' + PAL.cyanRGB + ',0.9)';
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = 'rgba(' + PAL.cyanRGB + ',0.95)';
+    ctx.beginPath(); ctx.arc(rx, ry, 3, 0, TWO_PI); ctx.fill();
+    ctx.restore();
+  }
+}
+
+/* ---------- readouts ---------- */
+function placeMarker(s){
+  var x = 44 + (s.T / 300) * 282;
+  var y = 160 - (s.R / RMAX) * 140;
+  el.rtDot.setAttribute('cx', x); el.rtDot.setAttribute('cy', y);
+  el.rtDotGlow.setAttribute('cx', x); el.rtDotGlow.setAttribute('cy', y);
+  var fcol = s.d === 0 ? 'var(--cyan)' : 'var(--amber)';
+  el.rtDot.style.fill = fcol;
+  el.rtDotGlow.style.fill = fcol;
+}
+function syncReadouts(){
+  var s = sampleState();
+  el.bT.textContent = s.T.toFixed(1) + ' K';
+  el.bR.textContent = s.R.toFixed(4) + ' Ω';
+  el.bP.textContent = (s.P >= 10 ? s.P.toFixed(1) + ' W' : (s.P*1000).toFixed(0) + ' mW');
+  el.bCoh.textContent = s.coherence.toFixed(0) + ' %';
+  el.bDrift.textContent = s.drift.toFixed(0) + ' %';
+  el.bScat.textContent = lab.colRate.toFixed(0) + ' / s';
+  var cls, txt;
+  if(s.d === 0){ cls = 'p-cyan'; txt = 'SUPERCONDUCTING'; }
+  else if(s.d < 0.14){ cls = 'p-mix'; txt = 'QUASI-COHERENT'; }
+  else { cls = 'p-amber'; txt = 'RESISTIVE'; }
+  el.pillB.className = 'pill ' + cls;
+  el.pillB.textContent = txt;
+  placeMarker(s);
+}
+
+/* ---------- controls ---------- */
+function setTemp(v){
+  lab.T = v;
+  el.tSlider.value = v;
+  el.tVal.textContent = Math.round(v) + ' K';
+  syncReadouts();
+  needsDraw = true;
+}
+function setCurrent(v){
+  lab.I = v;
+  el.iSlider.value = v;
+  el.iVal.textContent = v + ' A';
+  syncReadouts();
+  needsDraw = true;
+}
+el.tSlider.addEventListener('input', function(e){ setTemp(+e.target.value); });
+el.iSlider.addEventListener('input', function(e){ setCurrent(+e.target.value); });
+$('chipCold').addEventListener('click', function(){ setTemp(4); });
+$('chipHot').addEventListener('click', function(){ setTemp(300); });
+el.playBtn.addEventListener('click', function(){
+  lab.running = !lab.running;
+  el.icoPause.style.display = lab.running ? 'block' : 'none';
+  el.icoPlay.style.display = lab.running ? 'none' : 'block';
+  el.playBtn.setAttribute('aria-pressed', String(lab.running));
+  el.playBtn.setAttribute('aria-label', lab.running ? 'Pause simulation' : 'Resume simulation');
+  last = performance.now();
+});
+$('resetBtn').addEventListener('click', function(){
+  lab.T = 200; lab.I = 20; lab.running = true;
+  el.icoPause.style.display = 'block'; el.icoPlay.style.display = 'none';
+  el.playBtn.setAttribute('aria-pressed', 'true');
+  buildLanes();
+  lab.colAcc = 0; lab.colRate = 0;
+  setTemp(200); setCurrent(20);
+  last = performance.now();
+});
+
+/* ---------- main loop ---------- */
+var last = performance.now();
+function frame(now){
+  var dt = Math.min((now - last) / 1000, 0.05);
+  last = now;
+  if(lab.running){
+    simT += dt * SPEED;
+    updateLab(dt * SPEED, simT);
+  }
+  if(lab.running || needsDraw){
+    drawHero(simT);
+    drawLabFrame(simT);
+    needsDraw = false;
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- init ---------- */
+fitAll();
+syncReadouts();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
