@@ -796,7 +796,9 @@ footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 const $ = s => document.querySelector(s);
 
 /* ---------------- The exact prompt ---------------- */
-const PROMPT_TEMPLATE = `Using my current resume, write a modern one-page ATS-compatible resume that is custom for this job description. Provide a short professional summary at the top. List relevant positions in full then summarize the remaining companies in one entry. Do not add skills that aren't already listed in the original resume. Collect relevant skills in their own section as a single compact, comma-delimited list to save space. Then, write a matching cover letter. Finally list 30 interview questions relevant to this role and potential answers. Provide no explanation or preamble. Make no comments after.
+const PROMPT_TEMPLATE = `Using my current resume, write a modern one-page ATS-compatible resume that is custom for this job description. Provide a short professional summary at the top. List only the relevant positions in full then summarize the remaining companies in one entry. Collect relevant skills in their own section as a single compact, comma-delimited list to save space. Then, write a matching cover letter. Finally list 30 interview questions relevant to this role and potential answers. 
+
+Do not add skills that aren't already listed in the original resume. Provide no explanation or preamble. Make no comments after. Do not think too long because you have very limited context.
 
 Respond in plain text, using exactly this structure, with the three parts back-to-back in this order and no labels or separators between them:
 
@@ -805,16 +807,14 @@ Part 1 — Resume
 2. Section headings are exactly these words, each alone on its own line, in Title Case: Professional Summary, Experience, Skills, Education.
 3. Bullet points start with the single character • (bullet symbol) followed by a space.
 4. One blank line between blocks.
-5. No markdown at all: no #, no *, no _, no backticks, no tables, no code fences.
 
 Part 2 — Cover Letter
 1. The single heading line "Cover Letter" immediately after the resume.
-2. Plain paragraphs separated by one blank line. No markdown.
+2. Plain paragraphs separated by one blank line.
 
 Part 3 — Interview Q&A
 1. The single heading line "Interview Questions" immediately after the letter.
 2. Exactly 30 items. Each item is two lines: "1. <question>" on its own line, then "Answer: <answer>". Number the items 1 to 30. One blank line between items.
-3. No markdown.
 
 <resume>
 ${'${resume}'}
