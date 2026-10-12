@@ -804,7 +804,7 @@ Do not add skills that aren't already listed in the original resume. Provide no 
 Respond in plain text, using exactly this structure, with the three parts back-to-back in this order and no labels or separators between them:
 
 Part 1 — Resume
-1. First line: the full name.
+1. First line: the full name. Second line: Contact information
 2. Section headings are exactly these words, each alone on its own line, in Title Case: Professional Summary, Experience, Skills, Education.
 3. Bullet points start with the single character • (bullet symbol) followed by a space.
 4. One blank line between blocks.
@@ -827,6 +827,7 @@ ${'${job}'}
 
 /* ---------------- Sample resume (Michael Carlos) ---------------- */
 const SAMPLE_RESUME = `Michael Carlos
+
 https://ca.linkedin.com/in/mcarlos
 michael.carlos@wxyz.com
 
@@ -838,17 +839,15 @@ Founder / AGI Labs Inc. / Aug 2014 - Sep 2026
 Skills: Artificial Intelligence
 
 Head of AI R&D / DataSolve Inc. / Feb 2024 - Apr 2026
-• I create custom workflows specializing in air-gapped, secure, local LLMs.
+• Created custom workflows specializing in air-gapped, secure, local LLMs.
 • Solutions included analytics, cybersecurity and voice/vision interfaces
 Skills: Artificial Intelligence (AI) · Python (Programming Language) · C++ · JavaScript
 
 Sr. Engineering Manager R&D / CD PROJEKT RED / Nov 2021 - Oct 2023
-• Sr. Engineering Manager at CD Projekt Red responsible for AI projects including Story Generation, Voice Cloning, Procedural Assets & Environments, AI-Driven Physics, Motion Generation & Vision Systems.
-• Prototyped AI applications for the next generation of games.
+• Managed AI projects including Story Generation, Voice Cloning, Procedural Assets & Environments, AI-Driven Physics, Motion Generation & Vision Systems for the next generation of games.
 • Producer on Cyberpunk 2077 and The Witcher 4 (pre-production).
-• Responsible for evaluating candidate coding tests (C++).
-• Managed the Vancouver Software Tool team.
-• Managed the Occupational Health & Safety team.
+• Responsible for Canadian recruitment and evaluating candidate coding tests (C++).
+• Managed the Vancouver Software Tool team and the Occupational Health & Safety team.
 Skills: Artificial Intelligence (AI) · Python (Programming Language) · C++ · Amazon Web Services (AWS) · 3D Graphics · Game Development · Agile Methodologies · Database Development · PHP · Project Management
 
 R&D Manager / Wenco International Mining Systems (Hitachi) / Apr 2021 - Oct 2021
@@ -892,9 +891,7 @@ Manager, Software Certification – Games Platform / Nokia Corporation / 2003 - 
 • Worked closely with business leaders to create the first sustainable ecommerce core for Nokia
 • Created infrastructure, processes and tools from the ground up. Designed and implemented a custom test database.
 
-C++ Developer
-Nokia Corporation
-2001 - 2003 · 2 yrs
+C++ Developer/ Nokia Corporation / 2001 - 2003
 • Defined technical requirements and created design documentation
 • Researched automation and unit testing tools and applied results to project
 • Implemented instant messaging and presence services
@@ -926,7 +923,7 @@ Volunteer work
 • Imaging the World, a non-profit organization that provides diagnostic imaging, primarily portable ultrasound, to underserved rural communities in countries like those in sub-Saharan Africa.`;
 
 /* ---------------- State ---------------- */
-const DEFAULTS = { endpoint:'http://localhost:1234/v1', key:'apiKey', model:'Local model', ctx:65536, temp:0.4 };
+const DEFAULTS = { endpoint:'http://localhost:1234/v1', key:'apiKey', model:'Local model', ctx:32768, temp:0.75 };
 const LS = { draft:'resumecrafter.draft.v1', settings:'resumecrafter.settings.v1', theme:'resumecrafter.theme.v1' };
 let settings = loadSettings();
 let running = false;
@@ -1367,12 +1364,21 @@ $('#outQa').addEventListener('click', e => {
 /* ---------------- Output action buttons ---------------- */
 let lastSections = { resume:'', cover:'', qa:'', raw:'' };
 let lastReasoning = '';
+/* Q&A export: the unmute.sh interview-me prompt up top, then the 30 Q&As */
+function buildQaExport(){
+  const qa = (lastSections.qa || '').trim();
+  if(!qa) return '';
+  const bar = '='.repeat(64);
+  return bar + '\nINTERVIEW PROMPT — paste into a voice interview tool like unmute.sh\n' + bar + '\n' +
+    buildInterviewPrompt() +
+    '\n\n' + bar + '\nINTERVIEW Q&A\n' + bar + '\n\n' + qa;
+}
 $('#btnCopyResumeOut').addEventListener('click', () => copyText(lastSections.resume, 'Resume copied'));
 $('#btnCopyLetter').addEventListener('click', () => copyText(lastSections.cover, 'Cover letter copied'));
-$('#btnCopyQa').addEventListener('click', () => copyText(lastSections.qa, 'Q&As copied'));
+$('#btnCopyQa').addEventListener('click', () => copyText(buildQaExport(), 'Interview prompt + Q&As copied'));
 $('#btnDownloadResume').addEventListener('click', () => downloadText('resume.txt', lastSections.resume));
 $('#btnDownloadLetter').addEventListener('click', () => downloadText('cover-letter.txt', lastSections.cover));
-$('#btnDownloadQa').addEventListener('click', () => downloadText('interview-qa.txt', lastSections.qa));
+$('#btnDownloadQa').addEventListener('click', () => downloadText('interview-qa.txt', buildQaExport()));
 $('#btnPrintResume').addEventListener('click', () => printHtml('Resume', '<h1>'+escHtml(paperTitle(lastSections.resume))+'</h1>' + plainToHtml(lastSections.resume)));
 $('#btnPrintLetter').addEventListener('click', () => printHtml('Cover Letter', '<h1>Cover Letter</h1>' + plainToHtml(lastSections.cover)));
 $('#btnCopyRaw').addEventListener('click', () => copyText(buildRaw(lastSections.raw, lastReasoning), 'Raw output copied'));
