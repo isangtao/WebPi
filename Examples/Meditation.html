@@ -1154,7 +1154,8 @@ const Viz = {
         a += (h + 1.2) * 0.05;
         if (a > 0.95) a = 0.95;
         if (a < 0.03) continue;
-        const ch = this.hash2(i, j, Math.floor(t * 0.9) + i * 17 + j * 31) < 0.52 ? '1' : '0',
+        //const ch = this.hash2(i, j, Math.floor(t * 0.9) + i * 17 + j * 31) < 0.52 ? '1' : '0',
+        const ch = this.hash2(i, j, i * 17 + j * 31) < 0.52 ? '1' : '0',
               fl = this.hash2(i, j, Math.floor(t * 3.3) + 5),
               ci = fl > 0.82 ? 1 : 0,
               gw = size * 0.62;
