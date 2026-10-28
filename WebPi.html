@@ -1528,32 +1528,18 @@ Use the provided tools systematically to complete all user requests accurately.`
 
       const conversationHistory = chatHistory.slice(firstUserIdx);
 
-      // SANITIZE & PRUNE PAST TURNS TO PROTECT PROMPT CACHE AND TOKEN BUDGET
+      // SANITIZE WITHOUT MUTATING PAST TOOL CALLS (PRESERVES EXACT LLM KV PROMPT CACHE PREFIX)
       const validHistory = conversationHistory
         .filter(m => m.role !== "system" && m.role !== "ui-error")
-        .filter(m => (m.content && m.content.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
-        .map((m, idx, arr) => {
-          const isPastTurn = idx < arr.length - 2;
-          const item = { role: m.role, content: m.content || "" };
+        .filter(m => (m.content && m.content.trim() !== "") || (m.rawContent && m.rawContent.trim() !== "") || (m.tool_calls && m.tool_calls.length > 0) || m.role === "tool")
+        .map((m) => {
+          // Use rawContent if present so prompt tokens match the exact streamed prefix
+          const textContent = (m.rawContent !== undefined && m.rawContent !== null) ? m.rawContent : (m.content || "");
+          const item = { role: m.role, content: textContent };
 
           if (m.tool_calls) {
-            // Compress past huge file write payloads in older turns to avoid re-sending megabytes of code
-            // (Note: edit_file is preserved intact to prevent confusing the model with dummy placeholder diffs)
-            item.tool_calls = m.tool_calls.map(tc => {
-              if (isPastTurn && tc.function?.name === "write_file") {
-                try {
-                  const parsed = JSON.parse(tc.function.arguments);
-                  return {
-                    ...tc,
-                    function: {
-                      ...tc.function,
-                      arguments: JSON.stringify({ path: parsed.path, content: `// [Content committed to ${parsed.path} (${(parsed.content || "").length} chars)]` })
-                    }
-                  };
-                } catch (e) { return tc; }
-              }
-              return tc;
-            });
+            // Unmutated tool calls guarantee identical tokens across turns for n_past reuse
+            item.tool_calls = m.tool_calls;
           }
 
           if (m.tool_call_id) {
@@ -1578,11 +1564,21 @@ Use the provided tools systematically to complete all user requests accurately.`
                      calcTokens([initialUserMsg]) +
                      calcTokens(subsequentTurns);
 
+      // Clean atomic turn-pair pruning if context window ever overflows
       while (subsequentTurns.length > 2 && totalEst > budget) {
         const removed = subsequentTurns.shift();
         totalEst -= (estimateTokens(removed.content) + estimateTokens(JSON.stringify(removed.tool_calls || "")));
+
+        // If an assistant tool_call turn was shifted out, also shift out its trailing tool responses
+        if (removed.role === "assistant" && removed.tool_calls) {
+          while (subsequentTurns.length > 0 && subsequentTurns[0].role === "tool") {
+            const toolRem = subsequentTurns.shift();
+            totalEst -= estimateTokens(toolRem.content);
+          }
+        }
       }
 
+      // Ensure no orphaned tool responses at the boundary of history
       while (subsequentTurns.length > 0 && subsequentTurns[0].role === "tool") {
         subsequentTurns.shift();
       }
@@ -1624,6 +1620,7 @@ Use the provided tools systematically to complete all user requests accurately.`
         chatHistory.push({
           role: "assistant",
           content: "",
+          rawContent: "",
           reasoning: "",
           reasoningOpen: false,
           tool_calls: null,
@@ -1748,6 +1745,7 @@ Use the provided tools systematically to complete all user requests accurately.`
 
                   const parsed = separateThinking(streamedRawContent, streamedReasoning);
                   chatHistory[currentMsgIndex].content = parsed.content;
+                  chatHistory[currentMsgIndex].rawContent = streamedRawContent;
                   chatHistory[currentMsgIndex].reasoning = parsed.reasoning;
 
                   updateStreamingDOM(currentMsgIndex, true);
@@ -1992,6 +1990,7 @@ Use the provided tools systematically to complete all user requests accurately.`
       chatHistory.push({
         role,
         content,
+        rawContent: content,
         tool_calls,
         tool_call_id,
         name,
