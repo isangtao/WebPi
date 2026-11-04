@@ -41,7 +41,7 @@ Features and limitations:
 | **LlamaCPP Runner** | Optimized launch script (See details below) | [**Download Script**](https://isangtao.github.io/WebPi/Tools/LlamaCPP-Qwen3.8-27B-65tps-262k-18GB.sh) |
 | **AgentCraft** | Prompt generation tool | [**Open AgentCraft**](https://isangtao.github.io/WebPi/Tools/AgentCraft%20%28Gemini3.8Flash%29.html) |
 | **ePub2Mobi Converter** | Stand-alone eBook conversion utility | [**Convert eBooks**](https://isangtao.github.io/WebPi/Tools/epub2mobi.html) |
-| **LocalVault4B** | WebPi powered by Qwen3.5-4B | [**Download (3.5GB)**](https://drive.google.com/file/d/1hML2O_5UQGFtCNzL3yU9smbdEkYQJf7q/view?usp=sharing) |
+| **LocalVault4B** | WebPi powered by Qwen3.5-4B (Linux/Mac/Win) | [**Download (3.5GB)**](https://drive.google.com/file/d/1hML2O_5UQGFtCNzL3yU9smbdEkYQJf7q/view?usp=sharing) |
 
 
 ---
