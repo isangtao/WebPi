@@ -53,9 +53,9 @@ Features and limitations:
 
 ---
 
-### LocalVault and Voice Setup (steps for Mac or Linux):
-* In terminal, grant executable permission: chmod +x LocalVault4B.exe
-* Run the file: ./LocalVault4B.exe
+### LocalVault/Voice Setup (steps for Mac or Linux):
+* In terminal, grant executable permission: chmod +x LocalVault4B.exe or chmod +x Voice1B.exe
+* Run the file: ./LocalVault4B.exe or ./Voice1B.exe
 * Open your browser (e.g. Chrome) and navigate to: http://localhost:1234
 
 ---
