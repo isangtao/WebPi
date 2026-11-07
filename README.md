@@ -42,7 +42,7 @@ Features and limitations:
 
 ---
 
-## 🚀 Utilities and Extras
+###  Utilities and Extras
 
 | Component | Description | Direct Access |
 | :--- | :--- | :--- |
@@ -50,6 +50,13 @@ Features and limitations:
 | **AgentCraft** | Prompt generation tool | [**Open AgentCraft**](https://isangtao.github.io/WebPi/Tools/AgentCraft%20%28Gemini3.8Flash%29.html) |
 | **ePub2Mobi Converter** | Stand-alone eBook conversion utility | [**Convert eBooks**](https://isangtao.github.io/WebPi/Tools/epub2mobi.html) |
 | **Voice** | Local voice chat (for Chrome browser) | [**Voice1B**](https://drive.google.com/file/d/19LYJoyEw3OoOMgxTrRgUrkW26n7ke8S6/view?usp=sharing) |
+
+---
+
+### LocalVault and Voice Setup (assuming Mac or Linux):
+* Grant executable permission: chmod +x LocalVault4B.exe
+* Run the file: ./LocalVault4B.exe
+* Open your browser and navigate to: http://localhost:1234
 
 ---
 
