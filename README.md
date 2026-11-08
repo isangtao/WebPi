@@ -38,14 +38,14 @@ Features and limitations:
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.5GB)**](https://drive.google.com/file/d/1hML2O_5UQGFtCNzL3yU9smbdEkYQJf7q/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/11nltVW42_Yd9hJY6s7IZzVNLH_PgzGI6/view?usp=sharing) |
+| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.5GB)**](https://drive.google.com/file/d/1hML2O_5UQGFtCNzL3yU9smbdEkYQJf7q/view?usp=sharing) or [**9B (6.7GB) w/ Voice**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
 
 ### LocalVault Setup (steps for Mac or Linux):
 * In terminal, grant executable permission: chmod +x LocalVault4B.exe
 * Run the file: ./LocalVault4B.exe
 * Open your browser and navigate to: http://localhost:1234.
 
-For Windows, launch the executable from the command line: LocalVault4B.exe
+For Windows, launch the executable from the command line: LocalVault4B.exe then navigate to http://localhost:1234.
 
 ---
 
