@@ -45,7 +45,7 @@ Features and limitations:
 * Run the file: ./LocalVault4B.exe
 * Open your browser and navigate to: http://localhost:1234.
 
-For Windows, launch the executable from the command line: LocalVault4B.exe then navigate to http://localhost:1234.
+For Windows, launch the executable from the command line then navigate to http://localhost:1234.
 
 ---
 
