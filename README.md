@@ -38,7 +38,7 @@ Features and limitations:
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.5GB)**](https://drive.google.com/file/d/1hML2O_5UQGFtCNzL3yU9smbdEkYQJf7q/view?usp=sharing) or [**9B (6.7GB) w/ Voice**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
+| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1lX3dORros62Rnw9bMkrvms9Gi7glKrFF/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
 
 ### LocalVault Setup (steps for Mac or Linux):
 * In terminal, grant executable permission: chmod +x LocalVault4B.exe
