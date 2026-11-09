@@ -45,8 +45,8 @@ Features and limitations:
 * Voice requires Chrome (or Edge) browser for TTS support.  
 
 ### LocalVault Setup:
-* For Windows, launch the executable from the command line then navigate to http://localhost:1234.  
-* For Linux and Mac, open terminal and enter the following commands then open your browser and navigate to: http://localhost:1234.
+* For Windows, launch the executable from the command line, then navigate to http://localhost:1234 in Chrome.  
+* For Linux and Mac, open terminal and enter the following commands, then navigate to: http://localhost:1234 in Chrome.
 ``` sh
 chmod +x LocalVault4B.exe
 ./LocalVault4B.exe
