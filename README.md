@@ -2,7 +2,7 @@
 
 ![WebPi Screenshot](https://isangtao.github.io/WebPi/Images/WebPi.png)
 
-**Autonomous coding agent running sandboxed in the browser. Only a local AI server is needed.**
+**Autonomous coding agent running sandboxed in the browser.**
 
 [![Live Demo](https://img.shields.io/badge/Launch-WebPi%20App-0078D4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://isangtao.github.io/WebPi/WebPi.html)
 [![Documentation](https://img.shields.io/badge/Docs-WebPi%20Docs-2ea44f?style=for-the-badge&logo=read-the-docs&logoColor=white)](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html)
