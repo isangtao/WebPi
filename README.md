@@ -40,12 +40,14 @@ Features and limitations:
 | **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
 | **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1lX3dORros62Rnw9bMkrvms9Gi7glKrFF/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
 
+For Windows, launch the executable from the command line then navigate to http://localhost:1234.  
+LocalVault4B requires 6GB of Nvidia VRAM and LocalVault9B requires 12GB of VRAM. RTX series GPUs are recommended.  
+Voice requires Chrome (or Edge) browser for TTS support.  
+
 ### LocalVault Setup (steps for Mac or Linux):
 * In terminal, grant executable permission: chmod +x LocalVault4B.exe
 * Run the file: ./LocalVault4B.exe
 * Open your browser and navigate to: http://localhost:1234.
-
-For Windows, launch the executable from the command line then navigate to http://localhost:1234.
 
 ---
 
