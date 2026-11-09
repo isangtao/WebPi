@@ -41,7 +41,7 @@ Features and limitations:
 | **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1yj4Xowgtej9Y0qTxFj5wiZjrNnFlJo6c/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
 
 ### LocalVault Requirements:
-* LocalVault4B requires 6GB of VRAM and LocalVault9B requires 12GB of VRAM. RTX series GPUs are recommended.  
+* LocalVault4B requires 6GB of VRAM and LocalVault9B requires 8-12GB of VRAM. RTX series GPUs are recommended.  
 * Voice requires Chrome (or Edge) browser for TTS support.  
 
 ### LocalVault Setup:
