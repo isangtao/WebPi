@@ -30,8 +30,8 @@ Limitations:
    * WebPi can only access the in-browser virtual file system
    * Text files must be manually copied and pasted to "import" them
    * **The only exceptions are**
-      * Saving sessions and session files. Restoring sessions.
-      * links to external resources e.g. public-domain photos, external libraries, APIs, etc.**
+      * Restoring sessions and saving sessions & session files. This is initiated by the user.
+      * HTML links to external resources e.g. public-domain photos, external libraries, APIs, etc.
 * Webpi tool functionality can only be extended by modifying the html code directly.
 
 **With an air-gapped, local AI server, WebPi delivers a sovereign agentic framework, ensuring complete privacy, cloud independence, unlimited usage, and total ownership.**
