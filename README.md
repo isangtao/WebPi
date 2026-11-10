@@ -45,7 +45,7 @@ Features & Limitations:
 
 ### LocalVault Requirements:
 * LocalVault4B requires 6GB of VRAM and LocalVault9B requires 8-12GB of VRAM. RTX series GPUs are recommended.  
-* Voice requires Chrome (or Edge) browser for TTS support.  
+* Voice requires a microphone and Chrome (or Edge) for TTS support.  
 
 ### LocalVault Setup:
 * For Windows, launch the executable from the command line, then open http://localhost:1234 in Chrome.  
