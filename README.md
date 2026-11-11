@@ -58,7 +58,7 @@ chmod +x LocalVault4B.exe
 
 ### LocalVault Testing
 * Click the WebPi Link, complete the prompt, then press send. With an RTX GPU, you should reach ~50+ tokens per second.
-* Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Speak with them normally. Ask about the company and their areas of specialization.
+* Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
   
 ---
 
