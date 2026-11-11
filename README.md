@@ -50,10 +50,12 @@ Features & Limitations:
 ### LocalVault Setup:
 * For Windows, launch the executable from the command line, then open http://localhost:1234 in Chrome.  
 * For Linux and Mac, open terminal and enter the following commands, then open http://localhost:1234 in Chrome.
+
 ``` sh
 chmod +x LocalVault4B.exe
 ./LocalVault4B.exe
 ```
+
 * Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Speak with them normally. Ask about the company and their areas of specialization.
   
 ---
