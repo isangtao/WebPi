@@ -41,11 +41,11 @@ Features & Limitations:
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1yj4Xowgtej9Y0qTxFj5wiZjrNnFlJo6c/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1y9iokuhR9tF_yxjWG55WzXwz1EpaKurR/view?usp=sharing) |
+| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1SDujBj3U3Qtt0AIaYTS9mrBPTlCU_y7U/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1C0SNAPNIzm4FhNL2xJiJ5Eea0LhEaEaQ/view?usp=sharing) |
 
 ### LocalVault Requirements:
 * LocalVault4B requires 6GB of VRAM and LocalVault9B requires 8-12GB of VRAM. RTX series GPUs are recommended.  
-* Voice requires a microphone and Chrome (or Edge) for TTS support.  
+* Staff requires a microphone and Chrome (or Edge) for TTS support.  
 
 ### LocalVault Setup:
 * For Windows, launch the executable from the command line, then open http://localhost:1234 in Chrome.  
@@ -54,7 +54,8 @@ Features & Limitations:
 chmod +x LocalVault4B.exe
 ./LocalVault4B.exe
 ```
-
+* Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Speak with them normally. Ask about the company and their areas of specialization.
+  
 ---
 
 ## 📄 License
