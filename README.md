@@ -41,7 +41,7 @@ Features & Limitations:
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1SDujBj3U3Qtt0AIaYTS9mrBPTlCU_y7U/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1C0SNAPNIzm4FhNL2xJiJ5Eea0LhEaEaQ/view?usp=sharing) |
+| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1ZZVmt7J5hzEvbJTa551VQ5_L2TG_6W0C/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/16W9nkwkQ_gBk1qSpwrc_7SphGvRgysdY/view?usp=sharing) |
 
 ### LocalVault Requirements:
 * LocalVault4B requires 6GB of VRAM and LocalVault9B requires 8-12GB of VRAM. RTX series GPUs are recommended.  
