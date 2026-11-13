@@ -59,7 +59,7 @@ chmod +x LocalVault4B.exe
 ### LocalVault Testing
 * Click the WebPi Link, complete the prompt, then press send. 
 * Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
-* 4B Tokens/Second: Mac ~30+, RTX GPU ~50+
+* LocalVault4B Tokens/Second: Mac ~30+, RTX GPU ~50+
   
 ---
 
