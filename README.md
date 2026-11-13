@@ -57,7 +57,7 @@ chmod +x LocalVault4B.exe
 ```
 
 ### LocalVault Testing
-* Click the WebPi Link, complete the prompt, then press send. On a modern Mac, you should be able to reach ~30+ tokens per second. With an RTX GPU, you should reach ~50+ tokens per second.
+* Click the WebPi Link, complete the prompt, then press send. Tokens/Second: Mac ~30+, RTX GPU, ~50+
 * Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
   
 ---
