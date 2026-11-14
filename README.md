@@ -57,7 +57,7 @@ chmod +x LocalVault4B.exe
 ```
 
 ### LocalVault Testing
-* Click the WebPi Link, complete the prompt, then press send. You can also import any text file and enter any prompt to e.g. analyze the contents. WebPi is a general purpose agent and is not restricted to making webpages.
+* Click the WebPi Link, complete the prompt, then press send. You can also save any text file in the virtual file system and enter any prompt to e.g. analyze the contents. WebPi is a general purpose agent and is not restricted to making webpages.
 * Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
 * LocalVault4B Tokens/Second: Mac ~30+, RTX GPU ~50+
   
