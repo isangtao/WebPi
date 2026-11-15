@@ -59,7 +59,7 @@ chmod +x LocalVault4B.exe
 ### Included Apps & Testing
 * **WebPi:** General-purpose agent—save any text file to the VFS and prompt it to analyze or edit contents, not just build webpages.
 * **Staff (`Staff.html`):** Chat with three AGI Labs researchers—**Sharon**, **Becky**, and **Conrad**. Address any of them by name to switch personas.
-* **ResumeCrafter & Voice (`ResumeCrafter.html` / `Voice.html`):** Paste your resume and a job description to tailor resumes. For verbal interview practice, copy the generated interview prompt into the system field on the hidden `Voice.html` page and click **Start Voice Chat**.
+* **ResumeCrafter & Voice (`ResumeCrafter.html` / `Voice.html`):** Paste your resume and a job description to tailor resumes. For verbal interview practice, copy the generated interview prompt into the system field on the `Voice.html` page and click **Start Voice Chat**.
 
 ---
 
