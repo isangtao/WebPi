@@ -36,7 +36,7 @@ Inspired by Mario Zechner's Pi Coding Agent and built by Gemini3.8Flash, **WebPi
 | :--- | :--- | :--- |
 | **WebPi Interface** | Core web application | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
 | **WebPi Architecture** | System overview & UML docs | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi + Qwen3.5 bundle (Win/Mac/Linux) | [**4B (3.4GB)**](https://drive.google.com/file/d/18StHFAwAfR34Sz-I1GKA9fqzXA69SftV/view?usp=sharing) \| [**9B (6.7GB)**](https://drive.google.com/file/d/1KgLe6PF5qrm4tb-EnWGL7oG4GeJkpo6r/view?usp=sharing) |
+| **LocalVault** | WebPi + Qwen3.5 bundle (Win/Mac/Linux) | [**4B (3.4GB)**](https://drive.google.com/file/d/11kfq-OfSDT58frAapskeOOzE_6Zt47jA/view?usp=sharing) \| [**9B (6.7GB)**](https://drive.google.com/file/d/1mVvWr0X8fl655IfF3qPAem02LORzTDeH/view?usp=sharing) |
 
 ---
 
