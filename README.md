@@ -45,7 +45,7 @@ Inspired by Mario Zechner's Pi Coding Agent and built by Gemini3.8Flash, **WebPi
 ### Requirements & Performance
 * **VRAM:** 6GB for LocalVault4B; 8–12GB for LocalVault9B (RTX GPUs recommended).
 * **Audio (`Voice.html & Staff.html`):** Requires a microphone and Chrome or Edge for TTS.
-* **Speed:** 4B runs at ~30+ tok/s (Mac) and ~50+ tok/s (RTX). 9B can run faster with MTP enabled.
+* **Speed:** 4B runs at ~30+ tok/s (Mac) and ~50+ tok/s (RTX). 9B has MTP enabled, so potentially faster.
 
 ### Setup
 Run the executable from your terminal/command prompt, then open `http://localhost:1234` in Chrome:
