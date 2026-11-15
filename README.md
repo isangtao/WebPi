@@ -60,7 +60,7 @@ chmod +x LocalVault4B.exe
 * Click the WebPi Link, complete the prompt, then press send. You can also save any text file in the virtual file system and enter any prompt to e.g. analyze or modify the contents. WebPi is a general purpose agent and is not restricted to making webpages.
 * Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
 * Replace the default resume in ResumeCrafter.html and add a Job Description to create your own custom resumes. There is a hidden page named Voice.html where you can practice your verbal interviews. Simply copy and paste the interview prompt, from ResumeCrafter into the system field in Voice and click "Start Voice Chat"
-* LocalVault4B Tokens/Second: Mac ~30+, RTX GPU ~50+
+* LocalVault4B Tokens/Second: Mac ~30+, RTX GPU ~50+. LocalVault9B can reach faster speeds because it is MTP enabled.
   
 ---
 
