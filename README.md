@@ -12,26 +12,21 @@
 
 </div>
 
+
 ## 📌 Overview
 
-Based on the Pi Coding Agent concept by Mario Zechner and written by Gemini3.8Flash, **WebPi** is a single-file, self-contained, minimal, autonomous coding agent running sandboxed in the browser on an air-gapped PC. No installation is required. Just point it to any AI server (local Qwen3.8-27B recommended). 
+Inspired by Mario Zechner's Pi Coding Agent and built by Gemini3.8Flash, **WebPi** is a single-file, zero-install autonomous coding agent that runs sandboxed in your browser—even on air-gapped PCs. Point it to any AI server (local **Qwen3.8-27B** recommended) for a completely private, cloud-independent, sovereign agentic workflow.
 
-Features & Limitations:
+### Features
+* **Workspace:** Chat, File, Text Editor, and HTML Preview panes.
+* **Session Control:** Save/restore full sessions (samples in `Sessions/`) and roll back to any conversation point.
+* **Agent Tools:** Read, write, edit, move, delete, and list files; create/remove folders.
+* **Transparency:** All API and tool calls log directly to the browser console.
 
-* Save and restore complete sessions (see samples in the Sessions directory of this repo)
-* Chat pane, File pane, Text editor pane, and Preview pane (for html files)
-* Roll-back and restore changes to any point in the conversation
-* Tools: read file, write to file, edit file, move file, delete file, list files, and create/remove folder
-* All API and tool calls are printed to console for inspection
-* WebPi has no direct access outside of its sandbox
-   * WebPi can only access the in-browser virtual file system
-   * Text files must be manually copied and pasted to "import" them
-   * **The only exceptions are**
-      * Restoring sessions and saving sessions & session files. These actions are executed by the user.
-      * HTML links to external resources e.g. public-domain photos, external libraries, APIs, etc.
-* Webpi tool functionality can only be extended by modifying the html code directly.
-
-**With an air-gapped, local AI server, WebPi delivers a sovereign agentic framework, ensuring complete privacy, cloud independence, unlimited usage, and total ownership.**
+### Sandbox & Limitations
+* **Isolated Virtual File System (VFS):** No direct access to your host machine; text files are imported via copy-paste.
+* **Only External Touchpoints:** User-triggered session save/restore and external HTML links (libraries, APIs, public-domain assets).
+* **Extensibility:** Modify the single HTML file directly to add or change tools.
 
 ---
 
@@ -39,29 +34,33 @@ Features & Limitations:
 
 | Component | Description | Direct Access |
 | :--- | :--- | :--- |
-| **WebPi Interface** | Core web application portal | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
-| **WebPi Architecture** | System overview & technical documentation | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
-| **LocalVault** | WebPi powered by Qwen3.5 (Linux/Mac/Win) | [**4B (3.4GB)**](https://drive.google.com/file/d/1mf95NdT70dkG-2ULiXkpf_cPuMTji58e/view?usp=sharing) or [**9B (6.7GB)**](https://drive.google.com/file/d/1O16ZHT_v0HeMSK_txFyRCIM-m5EBpy1W/view?usp=sharing) |
+| **WebPi Interface** | Core web application | [**Launch WebPi**](https://isangtao.github.io/WebPi/WebPi.html) |
+| **WebPi Architecture** | System overview & UML docs | [**Read UML Docs**](https://isangtao.github.io/WebPi/Architecture/WebPiDoc%20%28Gemini3.8Flash%29.html) |
+| **LocalVault** | WebPi + Qwen3.5 bundle (Win/Mac/Linux) | [**4B (3.4GB)**](https://drive.google.com/file/d/1mf95NdT70dkG-2ULiXkpf_cPuMTji58e/view?usp=sharing) \| [**9B (6.7GB)**](https://drive.google.com/file/d/1O16ZHT_v0HeMSK_txFyRCIM-m5EBpy1W/view?usp=sharing) |
 
-### LocalVault Requirements:
-* LocalVault4B requires 6GB of VRAM and LocalVault9B requires 8-12GB of VRAM. RTX series GPUs are recommended.  
-* Staff requires a microphone and Chrome (or Edge) for TTS support.  
+---
 
-### LocalVault Setup:
-* For Windows, launch the executable from the command line, then open http://localhost:1234 in Chrome.  
-* For Linux and Mac, open terminal and enter the following commands, then open http://localhost:1234 in Chrome.
+## 🖥️ LocalVault
 
-``` sh
+### Requirements & Performance
+* **VRAM:** 6GB for LocalVault4B; 8–12GB for LocalVault9B (RTX GPUs recommended).
+* **Audio (`Staff.html`):** Requires a microphone and Chrome or Edge for TTS.
+* **Speed:** 4B runs at ~30+ tok/s (Mac) and ~50+ tok/s (RTX). 9B can run faster with MTP enabled.
+
+### Setup
+Run the executable from your terminal/command prompt, then open `http://localhost:1234` in Chrome:
+
+```sh
+# Linux / Mac (skip chmod on Windows)
 chmod +x LocalVault4B.exe
 ./LocalVault4B.exe
 ```
 
-### LocalVault Testing
-* Click the WebPi Link, complete the prompt, then press send. You can also save any text file in the virtual file system and enter any prompt to e.g. analyze or modify the contents. WebPi is a general purpose agent and is not restricted to making webpages.
-* Staff.html has three researchers who work for a company called AGI Labs: Sharon, Becky and Conrad. Address them by name to switch personas and speak with them normally. Ask about e.g. the company and their areas of specialization.
-* Replace the default resume in ResumeCrafter.html and add a Job Description to create your own custom resumes. There is a hidden page named Voice.html where you can practice your verbal interviews. Simply copy and paste the interview prompt, from ResumeCrafter into the system field in Voice and click "Start Voice Chat"
-* LocalVault4B Tokens/Second: Mac ~30+, RTX GPU ~50+. LocalVault9B can reach faster speeds because it is MTP enabled.
-  
+### Included Apps & Testing
+* **WebPi:** General-purpose agent—save any text file to the VFS and prompt it to analyze or edit contents, not just build webpages.
+* **Staff (`Staff.html`):** Chat with three AGI Labs researchers—**Sharon**, **Becky**, and **Conrad**. Address any of them by name to switch personas.
+* **ResumeCrafter & Voice (`ResumeCrafter.html` / `Voice.html`):** Paste your resume and a job description to tailor resumes. For verbal interview practice, copy the generated interview prompt into the system field on the hidden `Voice.html` page and click **Start Voice Chat**.
+
 ---
 
 ## 📄 License
